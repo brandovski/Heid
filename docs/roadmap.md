@@ -12,7 +12,7 @@
 - [x] Configurar Tailwind CSS
 - [x] Instalar e configurar Tremor
 - [x] Criar projeto no Supabase
-- [x] Escrever e aplicar migrations iniciais (todas as tabelas)
+- [x] Escrever e aplicar migrations iniciais (001–012)
 - [x] Configurar RLS em todas as tabelas
 - [x] Rodar seed com categorias padrão
 - [x] Cadastrar os dois usuários manualmente no Supabase Auth
@@ -23,6 +23,22 @@
 - [x] Deploy inicial na Vercel (apenas para validar pipeline)
 
 **Critério de conclusão:** login funciona, sessão é mantida, rotas protegidas redirecionam corretamente. ✅ **Concluído em 2026-02-25**
+
+---
+
+## Fase 1.5 — Modelo de Escopo (pré-Fase 2)
+
+**Objetivo:** preparar o banco para suportar visão pessoal/familiar antes de construir CRUDs.
+
+- [x] Definir modelo `scope` (`personal` | `family`) + `user_id` + `is_shared`
+- [x] Migration 013: adicionar colunas de escopo a todas as entidades financeiras
+- [x] Migration 014: criar `family_contributions` para o Caixa Familiar
+- [x] Migration 015: criar `projects`, `project_groups`, `project_items`
+- [x] Migration 016: substituir políticas `family_access` por `scoped_select`/`scoped_modify`
+- [ ] Rodar migrations 013, 014, 016 no Supabase (migration 015 aguarda Fase 9)
+- [ ] Atualizar `src/types/database.ts` com novos campos e interfaces
+
+**Critério de conclusão:** banco suporta dados pessoais e familiares com RLS correto.
 
 ---
 
@@ -37,24 +53,24 @@
 - [ ] Arquivar categoria (soft delete — não permitir exclusão com vínculos)
 
 ### Cartões de Crédito
-- [ ] Listagem de cartões
-- [ ] Criar cartão (nome, bandeira, closing_day, due_day, limite, últimos 4 dígitos, cor)
+- [ ] Listagem de cartões (pessoais e da família)
+- [ ] Criar cartão com seleção de escopo e opção de compartilhamento
 - [ ] Editar cartão
 - [ ] Desativar cartão (is_active = false)
 
 ### Receitas Fixas
-- [ ] Listagem de receitas fixas
-- [ ] Criar receita fixa
+- [ ] Listagem de receitas fixas (pessoais e da família)
+- [ ] Criar receita fixa com escopo e opção de compartilhamento
 - [ ] Editar receita fixa
 - [ ] Ativar / desativar receita fixa
 
 ### Despesas Fixas
-- [ ] Listagem de despesas fixas
-- [ ] Criar despesa fixa (com vínculo opcional a cartão)
+- [ ] Listagem de despesas fixas (pessoais e da família)
+- [ ] Criar despesa fixa com escopo, compartilhamento e vínculo opcional a cartão
 - [ ] Editar despesa fixa
 - [ ] Ativar / desativar despesa fixa
 
-**Critério de conclusão:** todas as entidades base podem ser criadas, editadas e desativadas sem erros.
+**Critério de conclusão:** todas as entidades base podem ser criadas com escopo correto, editadas e desativadas sem erros.
 
 ---
 
@@ -62,16 +78,17 @@
 
 **Objetivo:** usuário consegue lançar, visualizar e gerenciar transações avulsas.
 
-- [ ] Listagem de transações com filtros (mês, tipo, status, categoria)
-- [ ] Criar transação de receita avulsa (`income`)
-- [ ] Criar transação de despesa avulsa (`expense`)
+- [ ] Listagem de transações com filtros (mês, tipo, status, categoria, escopo)
+- [ ] Criar transação de receita avulsa (`income`) com seleção de escopo
+- [ ] Criar transação de despesa avulsa (`expense`) com seleção de escopo
 - [ ] Marcar transação como `paid` (com data de pagamento opcional)
 - [ ] Marcar transação como `cancelled`
 - [ ] Editar transação lançada manualmente
 - [ ] Excluir transação (somente manuais; automáticas apenas cancelam)
 - [ ] Distinção visual de status (`pending` / `paid` / `cancelled`) com badges
+- [ ] Toggle de visão: Pessoal | Familiar
 
-**Critério de conclusão:** fluxo completo de lançamento e gestão de status funciona para transações manuais.
+**Critério de conclusão:** fluxo completo de lançamento e gestão de status funciona para transações manuais com escopo.
 
 ---
 
@@ -80,14 +97,14 @@
 **Objetivo:** usuário consegue cadastrar compras parceladas e assinaturas recorrentes.
 
 ### Parcelamentos
-- [ ] Cadastrar compra parcelada (total, nº parcelas, data da primeira parcela, cartão, categoria)
+- [ ] Cadastrar compra parcelada (total, nº parcelas, data da primeira parcela, cartão, categoria, escopo)
 - [ ] Geração automática das N transações do tipo `installment` ao cadastrar
 - [ ] Listagem de grupos de parcelamento com status das parcelas
 - [ ] Cancelar parcelas restantes de um grupo
 
 ### Assinaturas
 - [ ] Listagem de assinaturas ativas
-- [ ] Cadastrar assinatura (nome, moeda, valor, dia de cobrança, cartão, categoria)
+- [ ] Cadastrar assinatura (nome, moeda, valor, dia de cobrança, cartão, categoria, escopo)
 - [ ] Editar assinatura
 - [ ] Cancelar assinatura (`cancelled_at = now()`, `is_active = false`)
 - [ ] Integração com AwesomeAPI para cotação USD→BRL
@@ -101,13 +118,12 @@
 
 **Objetivo:** automações mensais funcionam de forma confiável e idempotente.
 
-- [ ] Implementar cron `fetch-exchange-rate` (dia 1, 05:30) — busca e armazena cotação do dia
-- [ ] Implementar cron `generate-monthly` (dia 1, 06:00) — gera transações de fixas e assinaturas
-- [ ] Garantir idempotência em ambos os jobs (verificar existência antes de inserir)
+- [ ] Implementar cron `fetch-exchange-rate` (dia 1, 05:30)
+- [ ] Implementar cron `generate-monthly` (dia 1, 06:00) — respeita `scope` e `user_id`
+- [ ] Garantir idempotência (verificar existência antes de inserir)
 - [ ] Implementar cron `supabase-keepalive` (a cada 3 dias)
 - [ ] Configurar `vercel.json` com os schedules dos crons
 - [ ] Testar geração manual via chamada direta ao endpoint
-- [ ] Validar tratamento de erros e log de execução
 
 **Critério de conclusão:** ao acionar manualmente o cron, transações do mês são geradas corretamente e sem duplicatas.
 
@@ -117,31 +133,45 @@
 
 **Objetivo:** usuário consegue definir e acompanhar o orçamento por categoria.
 
-- [ ] Listagem do orçamento do mês corrente com barra de progresso (Tremor `<ProgressBar />`)
+- [ ] Listagem do orçamento do mês com barra de progresso (`<ProgressBar />`)
+- [ ] Orçamento pessoal e familiar separados (toggle)
 - [ ] Detectar ausência de orçamento no mês e exibir modal de criação
-- [ ] Implementar opção "Clonar do mês anterior"
-- [ ] Implementar opção "Criar do zero"
-- [ ] Adicionar categoria ao orçamento do mês
-- [ ] Editar valor planejado de uma categoria
-- [ ] Remover categoria do orçamento do mês
-- [ ] Cálculo correto de gasto realizado vs. comprometido vs. planejado
-- [ ] Destaque visual para categorias acima do limite (cor vermelha)
+- [ ] Opção "Clonar do mês anterior"
+- [ ] Adicionar / editar / remover categoria do orçamento
+- [ ] Cálculo: gasto realizado vs. comprometido vs. planejado
+- [ ] Destaque visual para categorias acima do limite
 - [ ] Navegação entre meses
 
-**Critério de conclusão:** orçamento do mês é criado, clonado e acompanhado com barras de progresso corretas.
+**Critério de conclusão:** orçamento pessoal e familiar criados e acompanhados com barras de progresso corretas.
 
 ---
 
-## Fase 7 — Dashboard
+## Fase 7 — Visão Familiar / Caixa Familiar
+
+**Objetivo:** tela dedicada à gestão financeira conjunta do casal.
+
+- [ ] Tela `/family` com toggle Pessoal | Familiar na navegação principal
+- [ ] Configuração de contribuição mensal (cada usuário define o seu valor no Caixa Familiar)
+- [ ] Exibição do Caixa Familiar: contribuição de cada um + total disponível + saldo livre
+- [ ] Visão de despesas familiares do mês (scope = 'family')
+- [ ] Visualização de itens pessoais compartilhados pelo parceiro (is_shared = true, somente leitura)
+- [ ] Indicação clara de quem é dono de cada item pessoal compartilhado
+
+**Critério de conclusão:** cada usuário vê sua visão pessoal e a visão familiar, com o Caixa Familiar calculado corretamente.
+
+---
+
+## Fase 8 — Dashboard
 
 **Objetivo:** tela principal consolidada com visão financeira completa do mês.
 
 - [ ] Cards de resumo: Receitas, Despesas, Saldo realizado, A receber, A pagar
+- [ ] Toggle Pessoal | Familiar nos cards de resumo
 - [ ] Gráfico de evolução dos últimos 6 meses (`<AreaChart />`)
 - [ ] Gráfico de distribuição por categoria (`<DonutChart />`)
 - [ ] Seção de orçamento por categoria com `<ProgressBar />`
 - [ ] Cards de faturas por cartão com status e botão de pagamento
-- [ ] Modal de registro de pagamento de fatura (total ou parcial)
+- [ ] Modal de registro de pagamento de fatura
 - [ ] Tabela de próximos lançamentos (próximos 7–10 `pending`)
 - [ ] Navegação entre meses no dashboard
 - [ ] Loading states e tratamento de erros em todos os componentes
@@ -150,9 +180,30 @@
 
 ---
 
-## Backlog (pós v1.0)
+## Fase 9 — Projetos
 
-Funcionalidades consideradas mas fora do escopo inicial:
+**Objetivo:** módulo de planejamento de compras/projetos com orçamento e rastreamento de pagamentos.
+
+- [ ] Listar projetos (pessoais e familiares) com status e progresso de orçamento
+- [ ] Criar projeto (nome, descrição, budget total, data alvo, escopo)
+- [ ] Editar projeto / marcar como concluído ou cancelado
+- [ ] Criar grupos dentro de um projeto
+- [ ] Criar itens dentro de um grupo com tipo de pagamento:
+  - `cash`: origem (Parceiro 1 / Parceiro 2 / Caixa Familiar) + método (débito/pix/dinheiro/transferência)
+  - `card_installment`: cartão + nº de parcelas
+  - `deposit_remainder`: valor do sinal + data do restante
+- [ ] Confirmar item (status → `confirmed`) com definição do valor real
+- [ ] Gerar transação(ões) ao confirmar pagamento (status → `paid`)
+- [ ] Painel de resumo do projeto:
+  - Total orçado vs. total real
+  - Quanto foi pago vs. pendente
+  - Estimativa de sobra/estouro do budget
+
+**Critério de conclusão:** projeto completo funciona do planejamento ao pagamento, com transações geradas corretamente.
+
+---
+
+## Backlog (pós v1.0)
 
 - Relatórios e exportação (PDF / CSV)
 - Filtros avançados na listagem de transações

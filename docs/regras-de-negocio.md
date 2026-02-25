@@ -314,8 +314,8 @@ Lista dos próximos 7 a 10 lançamentos com `status = pending`, ordenados por `d
 | Tabela | Descrição |
 |---|---|
 | `profiles` | Extensão do `auth.users` do Supabase com `family_id` para vincular o casal |
-| `categories` | Categorias de receitas e despesas |
-| `credit_cards` | Cartões de crédito cadastrados |
+| `categories` | Categorias globais compartilhadas entre os dois usuários |
+| `credit_cards` | Cartões de crédito (pessoais ou compartilhados) |
 | `fixed_incomes` | Receitas fixas recorrentes |
 | `fixed_expenses` | Despesas fixas recorrentes |
 | `subscriptions` | Assinaturas recorrentes no cartão |
@@ -323,19 +323,32 @@ Lista dos próximos 7 a 10 lançamentos com `status = pending`, ordenados por `d
 | `transactions` | Todas as movimentações financeiras |
 | `budgets` | Orçamento mensal por categoria |
 | `invoice_payments` | Registros de pagamento de faturas de cartão |
+| `family_contributions` | Contribuições mensais de cada usuário ao caixa familiar |
+| `projects` | Projetos do casal (viagem, casamento, compras maiores etc.) |
+| `project_groups` | Grupos/categorias de gastos dentro de um projeto |
+| `project_items` | Itens a considerar dentro de cada grupo do projeto |
 
 ### 6.2 Políticas de RLS
 
-Todas as tabelas possuem RLS habilitado. A política padrão permite acesso somente a registros cujo `family_id` corresponde ao `family_id` do usuário autenticado via `auth.uid()`. Isso permite que ambos os membros do casal vejam e editem os mesmos dados, enquanto bloqueia qualquer acesso externo.
+Com a introdução do escopo (ver Módulo 10), as políticas RLS passam a considerar duas dimensões:
+
+- **Dados de família** (`scope = 'family'`): acessíveis por ambos os membros via `family_id`
+- **Dados pessoais** (`scope = 'personal'`): acessíveis apenas pelo dono via `user_id = auth.uid()`
+- **Dados pessoais compartilhados** (`scope = 'personal'` + `is_shared = true`): SELECT permitido ao parceiro da mesma família; INSERT/UPDATE/DELETE apenas pelo dono
 
 ```sql
--- Exemplo de política RLS padrão
-CREATE POLICY "family_access" ON transactions
-  FOR ALL USING (
-    family_id = (
-      SELECT family_id FROM profiles WHERE id = auth.uid()
-    )
-  );
+-- Exemplo: política de leitura com escopo
+CREATE POLICY "scoped_select" ON credit_cards FOR SELECT USING (
+  (scope = 'family'   AND family_id = auth_family_id()) OR
+  (scope = 'personal' AND user_id   = auth.uid())       OR
+  (scope = 'personal' AND is_shared = true AND family_id = auth_family_id())
+);
+
+-- Exemplo: política de escrita (apenas dono ou família)
+CREATE POLICY "scoped_modify" ON credit_cards FOR ALL USING (
+  (scope = 'family'   AND family_id = auth_family_id()) OR
+  (scope = 'personal' AND user_id   = auth.uid())
+);
 ```
 
 ---
@@ -359,23 +372,29 @@ couple/
 ├── app/
 │   ├── (auth)/
 │   │   └── login/
-│   ├── dashboard/
-│   ├── transactions/
-│   ├── cards/
-│   │   └── [id]/           # Detalhe da fatura de um cartão
-│   ├── budget/
-│   ├── fixed/
-│   │   ├── incomes/
-│   │   └── expenses/
-│   ├── subscriptions/
-│   ├── settings/
-│   │   └── categories/
+│   ├── (app)/
+│   │   ├── dashboard/
+│   │   ├── transactions/
+│   │   ├── cards/
+│   │   │   └── [id]/           # Detalhe da fatura de um cartão
+│   │   ├── budget/
+│   │   ├── fixed/
+│   │   │   ├── incomes/
+│   │   │   └── expenses/
+│   │   ├── subscriptions/
+│   │   ├── family/             # Visão e orçamento familiar
+│   │   ├── projects/           # Lista de projetos
+│   │   │   └── [id]/           # Detalhe de um projeto
+│   │   └── settings/
+│   │       └── categories/
 │   └── api/
 │       ├── transactions/
 │       ├── cards/
 │       ├── budget/
 │       ├── fixed/
 │       ├── subscriptions/
+│       ├── family/
+│       ├── projects/
 │       └── cron/
 │           ├── generate-monthly/
 │           ├── fetch-exchange-rate/
@@ -385,7 +404,9 @@ couple/
 │   ├── dashboard/
 │   ├── transactions/
 │   ├── cards/
-│   └── budget/
+│   ├── budget/
+│   ├── family/
+│   └── projects/
 ├── lib/
 │   ├── supabase/            # Client + server client
 │   ├── utils/
@@ -409,13 +430,196 @@ couple/
 | Fase | Entregável | Detalhes |
 |---|---|---|
 | 1 | Setup inicial | Supabase + migrations + RLS + Next.js + autenticação |
-| 2 | CRUD base | Categorias, cartões, receitas fixas, despesas fixas |
-| 3 | Transações manuais | Lançamento, listagem com filtros, mudança de status |
+| 2 | CRUD base + Escopo | Categorias, cartões, receitas fixas, despesas fixas — já com suporte a escopo pessoal/família |
+| 3 | Transações manuais | Lançamento, listagem com filtros, mudança de status, seleção de escopo |
 | 4 | Parcelamentos e assinaturas | Geração de parcelas, cadastro de assinaturas + integração câmbio |
 | 5 | Cron jobs | Geração automática mensal de transações |
 | 6 | Orçamento mensal | CRUD, clonagem do mês anterior, acompanhamento com Tremor |
-| 7 | Dashboard | Cards de resumo, AreaChart, DonutChart, faturas, próximos lançamentos |
+| 7 | Visão Familiar + Caixa Familiar | Toggle Pessoal/Família, tela de contribuições, dashboard familiar |
+| 8 | Dashboard | Cards de resumo, AreaChart, DonutChart, faturas, próximos lançamentos |
+| 9 | Projetos | CRUD de projetos, grupos, itens, tipos de pagamento, integração com transações |
 
 ---
 
-*Couple — Documento de Regras de Negócio v1.0 — Confidencial, uso interno do casal*
+## 10. Escopo e Visibilidade
+
+### 10.1 Conceito de Escopo
+
+Cada entidade financeira pertence a um de dois escopos:
+
+| Escopo | Significado | Quem acessa |
+|---|---|---|
+| `personal` | Dado pessoal de um usuário | Apenas o dono (+ parceiro se `is_shared = true`) |
+| `family` | Dado compartilhado do casal | Ambos os usuários |
+
+**Campos adicionados às tabelas com escopo:**
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `scope` | `TEXT DEFAULT 'personal'` | `'personal'` ou `'family'` |
+| `user_id` | `UUID` | Dono do registro (NULL se família) |
+| `is_shared` | `BOOLEAN DEFAULT false` | Parceiro pode visualizar (somente leitura) |
+
+**Tabelas com escopo:** `credit_cards`, `fixed_incomes`, `fixed_expenses`, `subscriptions`, `installment_groups`, `transactions`, `budgets`.
+
+**Tabela sem escopo:** `categories` — globais, compartilhadas sempre entre os dois usuários.
+
+### 10.2 Compartilhamento Voluntário
+
+Um usuário pode marcar qualquer entidade pessoal como `is_shared = true`. O efeito:
+- O parceiro **visualiza** o item e suas transações vinculadas
+- O parceiro **não pode editar ou excluir** (somente o dono)
+- Caso prático: "quero que meu parceiro veja as parcelas do meu cartão pessoal"
+
+### 10.3 Interface — Toggle Pessoal / Família
+
+A interface oferece um toggle global no topo da aplicação:
+
+- **Pessoal:** exibe dados do usuário autenticado + itens compartilhados com ele pelo parceiro
+- **Família:** exibe apenas dados com `scope = 'family'`
+
+O contexto do toggle é mantido durante a navegação e resolvido no servidor via cookie de sessão.
+
+### 10.4 Caixa Familiar
+
+O caixa familiar é o "fundo conjunto" do casal. Cada usuário configura uma contribuição mensal.
+
+**Tabela `family_contributions`:**
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `user_id` | UUID | Quem está contribuindo |
+| `amount` | NUMERIC(12,2) | Valor da contribuição mensal |
+| `effective_from` | DATE | A partir de quando essa contribuição vale |
+| `notes` | TEXT | Observações opcionais |
+
+**Cálculo do caixa:**
+- Saldo disponível = soma das contribuições dos dois usuários no mês − despesas com `scope = 'family'` no mês
+
+**Tela Familiar exibe:**
+- Contribuição de cada parceiro no mês
+- Total disponível no caixa
+- Total gasto do caixa
+- Saldo restante
+
+### 10.5 Origem do Pagamento
+
+Ao registrar qualquer pagamento (transação manual ou item de projeto), o usuário informa a origem — de onde o dinheiro está saindo:
+
+| Origem | Escopo gerado na transação |
+|---|---|
+| Parceiro 1 (nome real) | `scope = 'personal'`, `user_id = id do parceiro 1` |
+| Parceiro 2 (nome real) | `scope = 'personal'`, `user_id = id do parceiro 2` |
+| Caixa Familiar | `scope = 'family'` |
+
+Para pagamentos via cartão de crédito, a origem é inferida pelo cartão selecionado.
+
+---
+
+## 11. Projetos
+
+### 11.1 Visão Geral
+
+Projetos são objetivos financeiros maiores com orçamento próprio e prazo definido. Exemplos: casamento, viagem, reforma, compra de móveis. Cada projeto tem vida própria — começa, evolui e termina — e seu orçamento é **independente** do orçamento mensal do sistema.
+
+Projetos podem ter escopo `personal` (meu projeto) ou `family` (projeto do casal).
+
+### 11.2 Dados do Projeto
+
+**Tabela `projects`:**
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `name` | TEXT | Nome do projeto |
+| `description` | TEXT | Descrição livre |
+| `total_budget` | NUMERIC(12,2) | Orçamento total definido |
+| `target_date` | DATE (nullable) | Data alvo (ex: data do casamento) |
+| `status` | TEXT | `active` / `completed` / `cancelled` |
+| `scope` | TEXT | `personal` ou `family` |
+| `user_id` | UUID | Criador (dono) |
+| `family_id` | UUID | Vínculo com a família |
+
+### 11.3 Grupos do Projeto
+
+Grupos são categorias de gasto específicas do projeto — independentes das categorias globais do sistema.
+
+**Tabela `project_groups`:**
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `project_id` | UUID (FK) | Projeto ao qual pertence |
+| `name` | TEXT | Nome do grupo (ex: Decoração, Buffet) |
+| `description` | TEXT | Observações do grupo |
+| `order` | SMALLINT | Ordem de exibição |
+
+### 11.4 Itens do Projeto
+
+Itens são os gastos individuais dentro de cada grupo. Cada item passa por um ciclo: considerando → confirmado → pago.
+
+**Tabela `project_items`:**
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `project_group_id` | UUID (FK) | Grupo ao qual pertence |
+| `project_id` | UUID (FK) | Projeto (denormalizado para queries) |
+| `name` | TEXT | Nome do item (ex: "Buffet — Empresa X") |
+| `description` | TEXT | Descrição adicional |
+| `budget_amount` | NUMERIC(12,2) | Valor orçado / estimado |
+| `actual_amount` | NUMERIC(12,2) | Valor real fechado |
+| `payment_type` | TEXT | `cash` / `card_installment` / `deposit_remainder` |
+| `payment_origin` | TEXT | `personal` / `family` |
+| `payment_user_id` | UUID (nullable) | Quem paga (se `payment_origin = personal`) |
+| `payment_method` | TEXT (nullable) | `debit` / `pix` / `cash` / `transfer` (somente `payment_type = cash`) |
+| `credit_card_id` | UUID (nullable) | Cartão (se `card_installment`) |
+| `installments_count` | SMALLINT (nullable) | Nº de parcelas (se `card_installment`) |
+| `deposit_amount` | NUMERIC(12,2) (nullable) | Valor do sinal (se `deposit_remainder`) |
+| `remainder_date` | DATE (nullable) | Data do pagamento restante (se `deposit_remainder`) |
+| `category_id` | UUID (FK, nullable) | Categoria global para a transação gerada |
+| `notes` | TEXT | Observações livres |
+| `status` | TEXT | `considering` / `confirmed` / `paid` / `cancelled` |
+| `transaction_id` | UUID (FK, nullable) | Transação gerada (pagamento único ou à vista) |
+| `deposit_transaction_id` | UUID (FK, nullable) | Transação do sinal |
+| `remainder_transaction_id` | UUID (FK, nullable) | Transação do restante |
+
+**Regra:** `remainder_amount` é sempre calculado: `actual_amount − deposit_amount`. Não é armazenado.
+
+### 11.5 Tipos de Pagamento
+
+**À vista (`cash`)**
+Campos exibidos: origem do pagamento (Parceiro 1 / Parceiro 2 / Caixa Familiar) + método (débito, pix, dinheiro, transferência).
+
+**Parcelado no cartão (`card_installment`)**
+Campos exibidos: cartão (selecionado do cadastro) + número de parcelas. A origem é inferida pelo cartão.
+
+**Sinal + Restante (`deposit_remainder`)**
+Campos exibidos: valor do sinal + data do pagamento restante + origem. O valor do restante é exibido automaticamente (`actual_amount − deposit_amount`).
+
+### 11.6 Painel de Resumo do Projeto
+
+Exibido no topo da tela do projeto:
+
+| Métrica | Cálculo |
+|---|---|
+| Budget total | `projects.total_budget` |
+| Previsto para gastar | Soma de `budget_amount` de todos os itens ativos |
+| Saldo estimado | `total_budget − previsto para gastar` |
+| Já gasto (real) | Soma de `actual_amount` dos itens com `status = paid` |
+| Saldo real | `total_budget − já gasto` |
+
+### 11.7 Integração com Transações
+
+Quando um item é marcado como `confirmed` ou `paid` com valor real informado, o sistema **gera transações reais** na tabela `transactions`:
+
+- `cash`: 1 transação com a origem e método informados
+- `card_installment`: N transações do tipo `installment` vinculadas ao cartão
+- `deposit_remainder`: 2 transações — uma do sinal (imediata) e uma do restante (na `remainder_date`)
+
+Todas as transações geradas recebem a `category_id` escolhida pelo usuário e uma referência ao `project_item_id` para rastreabilidade.
+
+### 11.8 Status do Projeto
+
+Quando todos os itens de um projeto estão com `status = paid` ou `cancelled`, o sistema exibe uma sugestão para marcar o projeto como `completed`.
+
+---
+
+*Couple — Documento de Regras de Negócio v1.1 — Confidencial, uso interno do casal*

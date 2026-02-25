@@ -188,10 +188,67 @@ Vercel Cron → GET /api/cron/generate-monthly
 ## 6. Segurança
 
 - Cadastro público desabilitado no Supabase Auth
-- RLS em todas as tabelas com política de `family_id`
+- RLS em todas as tabelas — políticas de escopo em entidades financeiras; `family_id` nas demais
 - Cron endpoints protegidos por `CRON_SECRET` no header `Authorization`
 - `SUPABASE_SERVICE_ROLE_KEY` restrita ao servidor
 - Validação de input nas API Routes antes de qualquer operação no banco
+
+---
+
+## 7. Modelo de Escopo e Visibilidade
+
+### 7.1 Conceito
+
+Cada entidade financeira (cartão, receita fixa, despesa fixa, assinatura, parcelamento, transação, orçamento) possui três campos adicionais:
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `scope` | `'personal' \| 'family'` | A quem o item pertence |
+| `user_id` | `UUID \| null` | Dono (obrigatório quando scope='personal') |
+| `is_shared` | `boolean` | Parceiro pode visualizar (somente leitura) |
+
+Categorias e `invoice_payments` são sempre **familiares** — sem escopo pessoal.
+
+### 7.2 Regras de visibilidade
+
+| Situação | Quem vê |
+|---|---|
+| `scope='family'` | Ambos os usuários da família |
+| `scope='personal'` | Apenas o dono (`user_id = auth.uid()`) |
+| `scope='personal'` + `is_shared=true` | Dono + parceiro (leitura) |
+
+**Escrita:** sempre restrita ao dono ou à família, nunca ao parceiro via `is_shared`.
+
+### 7.3 Visibilidade de transações
+
+Transações não têm `is_shared` próprio. A visibilidade de transações pessoais pelo parceiro é **herdada da entidade-pai** (cartão, receita fixa, etc.):
+
+```sql
+-- Parceiro vê transação pessoal SE a entidade-pai está compartilhada
+scope = 'personal' AND family_id = auth_family_id() AND (
+  credit_card_id IN (SELECT id FROM credit_cards WHERE is_shared = true AND user_id != auth.uid())
+  -- ... mesma lógica para fixed_incomes, fixed_expenses, subscriptions, installment_groups
+)
+```
+
+### 7.4 Caixa Familiar (`family_contributions`)
+
+- Cada usuário define um valor de contribuição mensal (`effective_from` como data de vigência)
+- Saldo do Caixa Familiar: `SUM(contribuições do mês) - SUM(transactions.amount WHERE scope='family')`
+- Calculado dinamicamente — não armazenado
+
+### 7.5 Toggle de visão na UI
+
+A UI apresenta um toggle **Pessoal | Familiar** nas telas principais.
+
+- **Pessoal:** exibe apenas itens do usuário autenticado (scope='personal' AND user_id = uid) + itens familiares relevantes
+- **Familiar:** exibe itens com scope='family' + itens pessoais do parceiro que têm is_shared=true (somente leitura)
+
+### 7.6 Origem do pagamento em Projetos
+
+Itens de projeto têm `payment_origin`:
+- `'personal'` + `payment_user_id` → transação com `scope='personal'`, `user_id=payment_user_id`
+- `'family'` → transação com `scope='family'`
 
 ---
 

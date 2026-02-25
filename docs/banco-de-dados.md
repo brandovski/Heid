@@ -9,21 +9,25 @@
 ## Diagrama ER (simplificado)
 
 ```
-profiles ──────────────────────────────────────────────────────┐
-   │ family_id                                                  │
-   │                                                            │
-categories ◄──────────────────────────────────────────────┐    │
-   │                                                       │    │
-   ├◄── fixed_incomes                                      │    │
-   ├◄── fixed_expenses ──────────► credit_cards ◄──────────┼────┤
-   ├◄── subscriptions  ──────────►      │                  │    │
-   ├◄── budgets                         │                  │    │
-   └◄── transactions ◄──────────────────┘                  │    │
-            │                                              │    │
-            ├── installment_groups ◄────────── credit_cards│    │
-            └── invoice_payments ◄──────────── credit_cards│    │
-                                                           │    │
-   (todas as tabelas têm family_id referenciando profiles) ┘    │
+profiles ──────────────────────────────────────────────────────────┐
+   │ family_id                                                      │
+   │                                                                │
+categories ◄──────────────────────────────────────────────────┐    │
+   │                                                           │    │
+   ├◄── fixed_incomes (scope, user_id, is_shared)             │    │
+   ├◄── fixed_expenses (scope, user_id, is_shared) ──────────►│    │
+   ├◄── subscriptions  (scope, user_id, is_shared)            │    │
+   ├◄── budgets (scope, user_id)                              │    │
+   └◄── transactions (scope, user_id) ◄─────────────────────────┐  │
+            │                                                 │  │  │
+            ├── installment_groups (scope, user_id, is_shared)│  │  │
+            └── invoice_payments                              │  │  │
+                                                             │  │  │
+   credit_cards (scope, user_id, is_shared) ─────────────────┘  │  │
+   family_contributions ─────────────────────────────────────────┘  │
+   projects (scope, user_id) ─────────────────────────────────────┘
+     └── project_groups
+           └── project_items ──────────► transactions
 ```
 
 ---
@@ -49,6 +53,8 @@ CREATE TABLE profiles (
 
 ### `categories`
 
+Categorias são **globais da família** — sem escopo pessoal, sempre compartilhadas.
+
 ```sql
 CREATE TABLE categories (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -64,7 +70,6 @@ CREATE TABLE categories (
 **Seed de categorias padrão:**
 
 ```sql
--- Executado via supabase/seed.sql após configurar o family_id
 INSERT INTO categories (family_id, name, icon, color) VALUES
   ('<family_id>', 'Alimentação',  '🍔', '#F97316'),
   ('<family_id>', 'Transporte',   '🚗', '#3B82F6'),
@@ -80,6 +85,8 @@ INSERT INTO categories (family_id, name, icon, color) VALUES
 
 ### `credit_cards`
 
+Adicionados em `013`: `scope`, `user_id`, `is_shared`.
+
 ```sql
 CREATE TABLE credit_cards (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -92,7 +99,12 @@ CREATE TABLE credit_cards (
   last_four_digits CHAR(4),
   color            TEXT,                 -- hex para identificação visual
   is_active        BOOLEAN DEFAULT true,
-  created_at       TIMESTAMPTZ DEFAULT now()
+  -- Escopo (migration 013)
+  scope            TEXT NOT NULL DEFAULT 'family',  -- 'personal' | 'family'
+  user_id          UUID REFERENCES auth.users(id),  -- dono (se personal)
+  is_shared        BOOLEAN NOT NULL DEFAULT false,  -- parceiro pode ver
+  created_at       TIMESTAMPTZ DEFAULT now(),
+  CONSTRAINT chk_credit_cards_scope CHECK (scope IN ('personal', 'family'))
 );
 ```
 
@@ -100,25 +112,34 @@ CREATE TABLE credit_cards (
 
 ### `fixed_incomes`
 
+Adicionados em `013`: `scope`, `user_id`, `is_shared`.
+
 ```sql
 CREATE TABLE fixed_incomes (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   family_id    UUID NOT NULL,
   description  TEXT NOT NULL,
   amount       NUMERIC(12,2) NOT NULL,
-  day_of_month SMALLINT NOT NULL,        -- 1–31
+  day_of_month SMALLINT NOT NULL,
   category_id  UUID REFERENCES categories(id),
   is_active    BOOLEAN DEFAULT true,
   start_date   DATE NOT NULL,
-  end_date     DATE,                     -- nullable: sem data de término
+  end_date     DATE,
   notes        TEXT,
-  created_at   TIMESTAMPTZ DEFAULT now()
+  -- Escopo (migration 013)
+  scope        TEXT NOT NULL DEFAULT 'family',
+  user_id      UUID REFERENCES auth.users(id),
+  is_shared    BOOLEAN NOT NULL DEFAULT false,
+  created_at   TIMESTAMPTZ DEFAULT now(),
+  CONSTRAINT chk_fixed_incomes_scope CHECK (scope IN ('personal', 'family'))
 );
 ```
 
 ---
 
 ### `fixed_expenses`
+
+Adicionados em `013`: `scope`, `user_id`, `is_shared`.
 
 ```sql
 CREATE TABLE fixed_expenses (
@@ -134,8 +155,13 @@ CREATE TABLE fixed_expenses (
   notes          TEXT,
   payment_method TEXT NOT NULL DEFAULT 'account',  -- 'account' | 'credit_card'
   credit_card_id UUID REFERENCES credit_cards(id),
+  -- Escopo (migration 013)
+  scope          TEXT NOT NULL DEFAULT 'family',
+  user_id        UUID REFERENCES auth.users(id),
+  is_shared      BOOLEAN NOT NULL DEFAULT false,
   created_at     TIMESTAMPTZ DEFAULT now(),
-  CONSTRAINT chk_payment_method CHECK (payment_method IN ('account', 'credit_card'))
+  CONSTRAINT chk_payment_method CHECK (payment_method IN ('account', 'credit_card')),
+  CONSTRAINT chk_fixed_expenses_scope CHECK (scope IN ('personal', 'family'))
 );
 ```
 
@@ -143,29 +169,38 @@ CREATE TABLE fixed_expenses (
 
 ### `subscriptions`
 
+Adicionados em `013`: `scope`, `user_id`, `is_shared`.
+
 ```sql
 CREATE TABLE subscriptions (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   family_id         UUID NOT NULL,
   name              TEXT NOT NULL,
-  original_currency TEXT NOT NULL DEFAULT 'BRL',  -- 'BRL' | 'USD'
-  amount_original   NUMERIC(12,2) NOT NULL,        -- valor na moeda original
-  amount_brl        NUMERIC(12,2) NOT NULL,         -- último valor convertido em BRL
-  billing_day       SMALLINT NOT NULL,              -- 1–28
+  original_currency TEXT NOT NULL DEFAULT 'BRL',
+  amount_original   NUMERIC(12,2) NOT NULL,
+  amount_brl        NUMERIC(12,2) NOT NULL,
+  billing_day       SMALLINT NOT NULL,
   credit_card_id    UUID NOT NULL REFERENCES credit_cards(id),
   category_id       UUID REFERENCES categories(id),
   start_date        DATE NOT NULL,
   cancelled_at      TIMESTAMPTZ,
   notes             TEXT,
   is_active         BOOLEAN DEFAULT true,
+  -- Escopo (migration 013)
+  scope             TEXT NOT NULL DEFAULT 'family',
+  user_id           UUID REFERENCES auth.users(id),
+  is_shared         BOOLEAN NOT NULL DEFAULT false,
   created_at        TIMESTAMPTZ DEFAULT now(),
-  CONSTRAINT chk_currency CHECK (original_currency IN ('BRL', 'USD'))
+  CONSTRAINT chk_currency CHECK (original_currency IN ('BRL', 'USD')),
+  CONSTRAINT chk_subscriptions_scope CHECK (scope IN ('personal', 'family'))
 );
 ```
 
 ---
 
 ### `installment_groups`
+
+Adicionados em `013`: `scope`, `user_id`, `is_shared`.
 
 ```sql
 CREATE TABLE installment_groups (
@@ -178,7 +213,12 @@ CREATE TABLE installment_groups (
   credit_card_id         UUID NOT NULL REFERENCES credit_cards(id),
   category_id            UUID REFERENCES categories(id),
   notes                  TEXT,
-  created_at             TIMESTAMPTZ DEFAULT now()
+  -- Escopo (migration 013)
+  scope                  TEXT NOT NULL DEFAULT 'family',
+  user_id                UUID REFERENCES auth.users(id),
+  is_shared              BOOLEAN NOT NULL DEFAULT false,
+  created_at             TIMESTAMPTZ DEFAULT now(),
+  CONSTRAINT chk_installment_groups_scope CHECK (scope IN ('personal', 'family'))
 );
 ```
 
@@ -186,7 +226,7 @@ CREATE TABLE installment_groups (
 
 ### `transactions`
 
-Tabela central do sistema. Contém todas as movimentações financeiras.
+Tabela central do sistema. Adicionados em `013`: `scope`, `user_id`.
 
 ```sql
 CREATE TYPE transaction_type AS ENUM (
@@ -200,7 +240,7 @@ CREATE TABLE transactions (
   family_id            UUID NOT NULL,
   description          TEXT NOT NULL,
   amount               NUMERIC(12,2) NOT NULL,
-  date                 DATE NOT NULL,               -- data de competência
+  date                 DATE NOT NULL,
   type                 transaction_type NOT NULL,
   status               transaction_status NOT NULL DEFAULT 'pending',
   category_id          UUID REFERENCES categories(id),
@@ -209,38 +249,47 @@ CREATE TABLE transactions (
   subscription_id      UUID REFERENCES subscriptions(id),
   fixed_income_id      UUID REFERENCES fixed_incomes(id),
   fixed_expense_id     UUID REFERENCES fixed_expenses(id),
-  exchange_rate        NUMERIC(10,4),               -- cotação usada (se conversão)
-  original_amount      NUMERIC(12,2),               -- valor antes da conversão
-  original_currency    TEXT,                        -- 'USD', etc.
-  exchange_estimated   BOOLEAN DEFAULT false,        -- true se cotação foi fallback
-  auto_generated       BOOLEAN DEFAULT false,        -- true se criada pelo cron
-  paid_at              TIMESTAMPTZ,                  -- data real de pagamento
+  exchange_rate        NUMERIC(10,4),
+  original_amount      NUMERIC(12,2),
+  original_currency    TEXT,
+  exchange_estimated   BOOLEAN DEFAULT false,
+  auto_generated       BOOLEAN DEFAULT false,
+  paid_at              TIMESTAMPTZ,
   notes                TEXT,
+  -- Escopo (migration 013)
+  scope                TEXT NOT NULL DEFAULT 'family',  -- 'personal' | 'family'
+  user_id              UUID REFERENCES auth.users(id),
   created_at           TIMESTAMPTZ DEFAULT now(),
-  updated_at           TIMESTAMPTZ DEFAULT now()
+  updated_at           TIMESTAMPTZ DEFAULT now(),
+  CONSTRAINT chk_transactions_scope CHECK (scope IN ('personal', 'family'))
 );
 
--- Índices para performance nas queries mais frequentes
-CREATE INDEX idx_transactions_family_date ON transactions(family_id, date);
+CREATE INDEX idx_transactions_family_date   ON transactions(family_id, date);
 CREATE INDEX idx_transactions_family_status ON transactions(family_id, status);
-CREATE INDEX idx_transactions_credit_card ON transactions(credit_card_id, date);
-CREATE INDEX idx_transactions_category ON transactions(category_id, date);
+CREATE INDEX idx_transactions_credit_card   ON transactions(credit_card_id, date);
+CREATE INDEX idx_transactions_category      ON transactions(category_id, date);
+CREATE INDEX idx_transactions_scope         ON transactions(family_id, scope, user_id);
 ```
 
-**Índice de idempotência para cron jobs:**
+**Índices de idempotência para cron jobs (função IMMUTABLE):**
 
 ```sql
--- Garante que o cron não gere duplicatas para fixed_income no mesmo mês
+-- Função auxiliar IMMUTABLE para usar em expressões de índice
+CREATE OR REPLACE FUNCTION year_month_key(d DATE)
+RETURNS TEXT LANGUAGE sql IMMUTABLE STRICT AS $$
+  SELECT TO_CHAR(d, 'YYYY-MM')
+$$;
+
 CREATE UNIQUE INDEX idx_transactions_fixed_income_month
-  ON transactions(fixed_income_id, date_trunc('month', date))
+  ON transactions(fixed_income_id, year_month_key(date))
   WHERE fixed_income_id IS NOT NULL;
 
 CREATE UNIQUE INDEX idx_transactions_fixed_expense_month
-  ON transactions(fixed_expense_id, date_trunc('month', date))
+  ON transactions(fixed_expense_id, year_month_key(date))
   WHERE fixed_expense_id IS NOT NULL;
 
 CREATE UNIQUE INDEX idx_transactions_subscription_month
-  ON transactions(subscription_id, date_trunc('month', date))
+  ON transactions(subscription_id, year_month_key(date))
   WHERE subscription_id IS NOT NULL;
 ```
 
@@ -248,16 +297,22 @@ CREATE UNIQUE INDEX idx_transactions_subscription_month
 
 ### `budgets`
 
+Adicionados em `013`: `scope`, `user_id`.
+
 ```sql
 CREATE TABLE budgets (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   family_id       UUID NOT NULL,
-  reference_month TEXT NOT NULL,    -- formato: 'YYYY-MM'
+  reference_month TEXT NOT NULL,    -- 'YYYY-MM'
   category_id     UUID NOT NULL REFERENCES categories(id),
   planned_amount  NUMERIC(12,2) NOT NULL,
   notes           TEXT,
+  -- Escopo (migration 013)
+  scope           TEXT NOT NULL DEFAULT 'family',
+  user_id         UUID REFERENCES auth.users(id),
   created_at      TIMESTAMPTZ DEFAULT now(),
-  UNIQUE (family_id, reference_month, category_id)
+  UNIQUE (family_id, reference_month, category_id),
+  CONSTRAINT chk_budgets_scope CHECK (scope IN ('personal', 'family'))
 );
 ```
 
@@ -270,57 +325,193 @@ CREATE TABLE invoice_payments (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   family_id       UUID NOT NULL,
   credit_card_id  UUID NOT NULL REFERENCES credit_cards(id),
-  reference_month TEXT NOT NULL,    -- formato: 'YYYY-MM'
+  reference_month TEXT NOT NULL,    -- 'YYYY-MM'
   amount_paid     NUMERIC(12,2) NOT NULL,
   paid_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
   notes           TEXT,
   created_at      TIMESTAMPTZ DEFAULT now(),
-  UNIQUE (credit_card_id, reference_month)   -- um pagamento por fatura
+  UNIQUE (credit_card_id, reference_month)
 );
 ```
 
 ---
 
-## Políticas RLS
+### `family_contributions` *(migration 014)*
 
-### Política padrão (aplicada a todas as tabelas)
+Cada usuário configura o valor que contribui mensalmente para o Caixa Familiar.
 
 ```sql
--- Habilitar RLS
-ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE credit_cards ENABLE ROW LEVEL SECURITY;
-ALTER TABLE fixed_incomes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE fixed_expenses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE installment_groups ENABLE ROW LEVEL SECURITY;
-ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE budgets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE invoice_payments ENABLE ROW LEVEL SECURITY;
-
--- Política: acesso apenas ao family_id do usuário autenticado
--- (replicar para cada tabela substituindo o nome)
-
-CREATE POLICY "family_access" ON categories
-  FOR ALL USING (
-    family_id = (SELECT family_id FROM profiles WHERE id = auth.uid())
-  );
-
--- Repetir o padrão acima para: credit_cards, fixed_incomes, fixed_expenses,
--- subscriptions, installment_groups, transactions, budgets, invoice_payments
+CREATE TABLE family_contributions (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  family_id      UUID NOT NULL,
+  user_id        UUID NOT NULL REFERENCES auth.users(id),
+  amount         NUMERIC(12,2) NOT NULL CHECK (amount > 0),
+  effective_from DATE NOT NULL,
+  notes          TEXT,
+  created_at     TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (family_id, user_id, effective_from)
+);
 ```
 
-### Política de profiles
+> O saldo do Caixa Familiar é calculado dinamicamente: `SUM(contribuições do mês) - SUM(transações com scope='family' no mês)`.
+
+---
+
+### `projects` *(migration 015)*
 
 ```sql
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE TABLE projects (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  family_id    UUID NOT NULL,
+  user_id      UUID NOT NULL REFERENCES auth.users(id),
+  scope        TEXT NOT NULL DEFAULT 'family',     -- 'personal' | 'family'
+  name         TEXT NOT NULL,
+  description  TEXT,
+  total_budget NUMERIC(12,2) NOT NULL CHECK (total_budget >= 0),
+  target_date  DATE,
+  status       TEXT NOT NULL DEFAULT 'active',     -- 'active' | 'completed' | 'cancelled'
+  created_at   TIMESTAMPTZ DEFAULT now(),
+  updated_at   TIMESTAMPTZ DEFAULT now(),
+  CONSTRAINT chk_projects_scope  CHECK (scope  IN ('personal', 'family')),
+  CONSTRAINT chk_projects_status CHECK (status IN ('active', 'completed', 'cancelled'))
+);
+```
 
--- Usuário lê apenas o próprio perfil
-CREATE POLICY "own_profile" ON profiles
-  FOR SELECT USING (id = auth.uid());
+---
 
--- Usuário atualiza apenas o próprio perfil
-CREATE POLICY "update_own_profile" ON profiles
-  FOR UPDATE USING (id = auth.uid());
+### `project_groups` *(migration 015)*
+
+```sql
+CREATE TABLE project_groups (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id  UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  name        TEXT NOT NULL,
+  description TEXT,
+  "order"     SMALLINT NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+```
+
+---
+
+### `project_items` *(migration 015)*
+
+```sql
+CREATE TABLE project_items (
+  id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_group_id         UUID NOT NULL REFERENCES project_groups(id) ON DELETE CASCADE,
+  project_id               UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  name                     TEXT NOT NULL,
+  description              TEXT,
+  budget_amount            NUMERIC(12,2),   -- valor estimado
+  actual_amount            NUMERIC(12,2),   -- valor real fechado
+
+  -- Tipo de pagamento
+  payment_type             TEXT,            -- 'cash' | 'card_installment' | 'deposit_remainder'
+  payment_origin           TEXT,            -- 'personal' | 'family'
+  payment_user_id          UUID REFERENCES auth.users(id),  -- quem paga (se personal)
+
+  -- Para payment_type = 'cash'
+  payment_method           TEXT,            -- 'debit' | 'pix' | 'cash' | 'transfer'
+
+  -- Para payment_type = 'card_installment'
+  credit_card_id           UUID REFERENCES credit_cards(id),
+  installments_count       SMALLINT,
+
+  -- Para payment_type = 'deposit_remainder' (Sinal + Restante)
+  deposit_amount           NUMERIC(12,2),   -- valor do sinal
+  -- remainder = actual_amount - deposit_amount (calculado, não armazenado)
+  remainder_date           DATE,            -- data do pagamento restante
+
+  category_id              UUID REFERENCES categories(id) ON DELETE SET NULL,
+  notes                    TEXT,
+  status                   TEXT NOT NULL DEFAULT 'considering',
+
+  -- Links para transações geradas
+  transaction_id           UUID REFERENCES transactions(id) ON DELETE SET NULL,
+  deposit_transaction_id   UUID REFERENCES transactions(id) ON DELETE SET NULL,
+  remainder_transaction_id UUID REFERENCES transactions(id) ON DELETE SET NULL,
+
+  created_at               TIMESTAMPTZ DEFAULT now(),
+  updated_at               TIMESTAMPTZ DEFAULT now(),
+
+  CONSTRAINT chk_item_payment_type   CHECK (payment_type   IN ('cash', 'card_installment', 'deposit_remainder') OR payment_type IS NULL),
+  CONSTRAINT chk_item_payment_origin CHECK (payment_origin IN ('personal', 'family') OR payment_origin IS NULL),
+  CONSTRAINT chk_item_payment_method CHECK (payment_method IN ('debit', 'pix', 'cash', 'transfer') OR payment_method IS NULL),
+  CONSTRAINT chk_item_status         CHECK (status IN ('considering', 'confirmed', 'paid', 'cancelled'))
+);
+```
+
+**Status do item:**
+- `considering` — avaliando, ainda sem valor real fechado
+- `confirmed` — decidido, valor real definido, aguardando pagamento
+- `paid` — transação(ões) gerada(s)
+- `cancelled` — descartado
+
+---
+
+## Políticas RLS
+
+### Função auxiliar
+
+```sql
+-- Retorna o family_id do usuário autenticado
+CREATE OR REPLACE FUNCTION auth_family_id()
+RETURNS UUID LANGUAGE sql STABLE AS $$
+  SELECT family_id FROM profiles WHERE id = auth.uid()
+$$;
+```
+
+### Política original (tabelas sem escopo)
+
+```sql
+-- profiles: lê e edita apenas o próprio
+CREATE POLICY "own_profile"       ON profiles FOR SELECT USING (id = auth.uid());
+CREATE POLICY "update_own_profile" ON profiles FOR UPDATE USING (id = auth.uid());
+
+-- categories, invoice_payments: acesso por family_id
+CREATE POLICY "family_access" ON categories
+  FOR ALL USING (family_id = auth_family_id());
+
+CREATE POLICY "family_access" ON family_contributions
+  FOR ALL USING (family_id = auth_family_id());
+```
+
+### Políticas de escopo (migration 016)
+
+Aplicadas a: `credit_cards`, `fixed_incomes`, `fixed_expenses`, `subscriptions`,
+`installment_groups`, `transactions`, `budgets`.
+
+```sql
+-- Leitura: vê o próprio (personal), o da família (family),
+-- ou o pessoal do parceiro se is_shared = true
+CREATE POLICY "scoped_select" ON credit_cards FOR SELECT USING (
+  (scope = 'family'   AND family_id = auth_family_id())                          OR
+  (scope = 'personal' AND user_id   = auth.uid())                                OR
+  (scope = 'personal' AND is_shared = true AND family_id = auth_family_id())
+);
+
+-- Escrita: família ou dono
+CREATE POLICY "scoped_modify" ON credit_cards FOR ALL USING (
+  (scope = 'family'   AND family_id = auth_family_id()) OR
+  (scope = 'personal' AND user_id   = auth.uid())
+);
+```
+
+**Transações** têm visibilidade herdada de entidades compartilhadas:
+
+```sql
+CREATE POLICY "scoped_select" ON transactions FOR SELECT USING (
+  (scope = 'family'   AND family_id = auth_family_id()) OR
+  (scope = 'personal' AND user_id   = auth.uid())       OR
+  (scope = 'personal' AND family_id = auth_family_id() AND (
+    credit_card_id       IN (SELECT id FROM credit_cards   WHERE is_shared = true AND user_id != auth.uid()) OR
+    fixed_income_id      IN (SELECT id FROM fixed_incomes  WHERE is_shared = true AND user_id != auth.uid()) OR
+    fixed_expense_id     IN (SELECT id FROM fixed_expenses WHERE is_shared = true AND user_id != auth.uid()) OR
+    subscription_id      IN (SELECT id FROM subscriptions  WHERE is_shared = true AND user_id != auth.uid()) OR
+    installment_group_id IN (SELECT id FROM installment_groups WHERE is_shared = true AND user_id != auth.uid())
+  ))
+);
 ```
 
 ---
@@ -336,9 +527,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER set_updated_at
-  BEFORE UPDATE ON transactions
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+-- Aplicado em: transactions, projects, project_items
 ```
 
 ---
@@ -360,8 +549,6 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 ```
 
-> Após criar os dois usuários, atualizar manualmente o `family_id` em ambos os perfis para o mesmo UUID.
-
 ---
 
 ## Ordem de execução das migrations
@@ -379,6 +566,10 @@ CREATE TRIGGER on_auth_user_created
 010_create_invoice_payments.sql
 011_rls_policies.sql
 012_triggers.sql
+013_add_scope_to_entities.sql       ← scope + user_id + is_shared em entidades financeiras
+014_create_family_contributions.sql  ← Caixa Familiar
+015_create_projects.sql              ← Módulo de projetos
+016_update_rls_for_scope.sql         ← Substitui family_access por scoped_select/scoped_modify
 ```
 
 ---

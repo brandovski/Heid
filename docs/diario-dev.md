@@ -7,23 +7,22 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 2 — CRUD Base
+**Fase:** Fase 1.5 — Modelo de Escopo (finalização)
 **Última sessão:** 2026-02-25
-**Próxima ação:** Implementar CRUD de categorias, cartões, receitas fixas e despesas fixas
+**Próxima ação:** Rodar migrations 013/014/016 no Supabase; atualizar `src/types/database.ts`; commit e push; iniciar Fase 2
 
 ### O que está feito
-- [x] Regras de negócio documentadas (`docs/regras-de-negocio.md`)
-- [x] Roadmap criado com 7 fases e checklist rastreável (`docs/roadmap.md`)
-- [x] Arquitetura e decisões técnicas documentadas (`docs/arquitetura.md`)
-- [x] Schema completo do banco de dados com DDL e políticas RLS (`docs/banco-de-dados.md`)
+- [x] Regras de negócio documentadas com seções de Escopo e Projetos (`docs/regras-de-negocio.md`)
+- [x] Roadmap atualizado para 9 fases + Fase 1.5 (`docs/roadmap.md`)
+- [x] Arquitetura atualizada com Seção 7 (Escopo e Visibilidade) (`docs/arquitetura.md`)
+- [x] Schema completo atualizado com todas as novas tabelas e colunas (`docs/banco-de-dados.md`)
 - [x] Guia de setup do ambiente de desenvolvimento (`docs/setup.md`)
 - [x] Projeto Next.js 14.2.35 criado e buildando sem erros
 - [x] Dependências instaladas: @supabase/ssr, @supabase/supabase-js, @tremor/react, clsx, tailwind-merge
 - [x] Tailwind CSS configurado (com path do Tremor no content)
-- [x] 12 migrations SQL criadas (`supabase/migrations/001-012`)
+- [x] 16 migrations SQL criadas (`supabase/migrations/001-016`)
 - [x] Seed de categorias padrão (`supabase/seed.sql`)
 - [x] Clientes Supabase: browser, server e service role
-- [x] Tipos TypeScript do schema completo (`src/types/database.ts`)
 - [x] Middleware de proteção de rotas com `getUser()` (seguro)
 - [x] Página de login com formulário funcional
 - [x] Layout protegido `(app)` com verificação server-side
@@ -31,10 +30,16 @@
 - [x] `vercel.json` com 3 cron schedules configurados
 - [x] `.env.local` configurado com chaves do Supabase
 - [x] Repositório GitHub criado: `gabrielbrandao-atus/couple`
-- [x] Push inicial para o GitHub
+- [x] Migrations 001–012 aplicadas no Supabase
 
 ### O que está pendente
-- Todos os itens da Fase 2 em diante (ver roadmap)
+- [x] Rodar migration 013 no Supabase (adiciona scope/user_id/is_shared às entidades)
+- [x] Rodar migration 014 no Supabase (cria family_contributions)
+- [x] Rodar migration 016 no Supabase (substitui RLS policies por scoped_*)
+- [ ] Migration 015 (projects) — aguardar Fase 9
+- [x] Atualizar `src/types/database.ts` com novos campos e interfaces
+- [ ] Commit e push de todas as alterações desta sessão
+- [ ] Iniciar Fase 2: CRUD base
 
 ### Referências do ambiente
 - **Supabase project ref:** `djteloswmyjsqeplzkxy`
@@ -57,6 +62,38 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 003 — 2026-02-25
+
+**Objetivo:** Design e documentação do modelo de Escopo Pessoal/Familiar e do Módulo de Projetos antes de iniciar a Fase 2
+
+**O que foi feito:**
+- Analisado o modelo atual (tudo compartilhado via `family_id`) e identificada a necessidade de suporte a dados pessoais
+- Projetado modelo `scope` + `user_id` + `is_shared` para entidades financeiras
+- Definido conceito de Caixa Familiar com contribuições mensais configuráveis por usuário
+- Projetado Módulo de Projetos com grupos, itens e três tipos de pagamento (cash, card_installment, deposit_remainder)
+- Definido conceito de `payment_origin` (Parceiro 1 / Parceiro 2 / Caixa Familiar) que determina o `scope` da transação gerada
+- Criadas migrations 013, 014, 015, 016
+- Atualizada documentação completa: regras-de-negocio.md, banco-de-dados.md, roadmap.md, arquitetura.md, diario-dev.md
+- Atualizado `src/types/database.ts` com novos campos e interfaces
+
+**Decisões tomadas:**
+- Categorias permanecem globais da família (sem escopo pessoal)
+- Visibilidade de transações pessoais é herdada da entidade-pai (não armazenada na transação)
+- Saldo do Caixa Familiar é calculado dinamicamente, não armazenado
+- O `remainder` do item (Sinal + Restante) é calculado: `actual_amount - deposit_amount`; não armazenado
+- Migration 015 (projetos) será executada apenas na Fase 9
+- Roadmap reestruturado de 7 para 9 fases + Fase 1.5
+
+**Problemas encontrados:**
+- Nenhum problema técnico nesta sessão (sessão de planejamento e documentação)
+
+**Próxima sessão:**
+- Rodar migrations 013/014/016 no Supabase via Management API
+- Commit e push de todas as alterações
+- Iniciar Fase 2: CRUD base (categorias, cartões, receitas e despesas fixas com suporte a escopo)
 
 ---
 
