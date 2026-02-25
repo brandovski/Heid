@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/fetch-exchange-rate",
+      "schedule": "30 5 1 * *"
+    },
+    {
+      "path": "/api/cron/generate-monthly",
+      "schedule": "0 6 1 * *"
+    },
+    {
+      "path": "/api/cron/supabase-keepalive",
+      "schedule": "0 9 */3 * *"
+    }
+  ]
+}
