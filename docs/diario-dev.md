@@ -7,20 +7,20 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 1.5 — Modelo de Escopo (finalização)
+**Fase:** Fase 1.5 — Modelo de Escopo (finalização) + Módulo de Investimentos (schema)
 **Última sessão:** 2026-02-25
-**Próxima ação:** Rodar migrations 013/014/016 no Supabase; atualizar `src/types/database.ts`; commit e push; iniciar Fase 2
+**Próxima ação:** Rodar migration 017 Parte 1 (ENUM isolado) → Partes 2–5 (tabelas) no Supabase; após Fase 9, rodar migration 018; commit e push; iniciar Fase 2
 
 ### O que está feito
-- [x] Regras de negócio documentadas com seções de Escopo e Projetos (`docs/regras-de-negocio.md`)
-- [x] Roadmap atualizado para 9 fases + Fase 1.5 (`docs/roadmap.md`)
+- [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
+- [x] Roadmap atualizado para 11 fases + Fase 1.5 (`docs/roadmap.md`)
 - [x] Arquitetura atualizada com Seção 7 (Escopo e Visibilidade) (`docs/arquitetura.md`)
 - [x] Schema completo atualizado com todas as novas tabelas e colunas (`docs/banco-de-dados.md`)
 - [x] Guia de setup do ambiente de desenvolvimento (`docs/setup.md`)
 - [x] Projeto Next.js 14.2.35 criado e buildando sem erros
 - [x] Dependências instaladas: @supabase/ssr, @supabase/supabase-js, @tremor/react, clsx, tailwind-merge
 - [x] Tailwind CSS configurado (com path do Tremor no content)
-- [x] 16 migrations SQL criadas (`supabase/migrations/001-016`)
+- [x] 18 migrations SQL criadas (`supabase/migrations/001-018`)
 - [x] Seed de categorias padrão (`supabase/seed.sql`)
 - [x] Clientes Supabase: browser, server e service role
 - [x] Middleware de proteção de rotas com `getUser()` (seguro)
@@ -31,13 +31,17 @@
 - [x] `.env.local` configurado com chaves do Supabase
 - [x] Repositório GitHub criado: `gabrielbrandao-atus/couple`
 - [x] Migrations 001–012 aplicadas no Supabase
+- [x] `src/types/database.ts` atualizado com tipos de investimento e campos de migration 017
 
 ### O que está pendente
-- [x] Rodar migration 013 no Supabase (adiciona scope/user_id/is_shared às entidades)
-- [x] Rodar migration 014 no Supabase (cria family_contributions)
-- [x] Rodar migration 016 no Supabase (substitui RLS policies por scoped_*)
+- [x] Rodar migration 013 no Supabase (aplicada em sessão anterior)
+- [x] Rodar migration 014 no Supabase (aplicada em sessão anterior)
+- [x] Rodar migration 016 no Supabase (aplicada em sessão anterior)
 - [ ] Migration 015 (projects) — aguardar Fase 9
-- [x] Atualizar `src/types/database.ts` com novos campos e interfaces
+- [x] Rodar migration 017 Parte 1 (ENUM: investment_deposit + investment_withdrawal) no Supabase
+- [x] Rodar migration 017 Partes 2–4 (investments, investment_transactions, investment_snapshots) no Supabase
+- [ ] Rodar migration 017 Parte 5 (ALTER TABLE project_items) — diferida para após migration 015 (Fase 9)
+- [ ] Migration 018 (investment_id em transactions) — diferida para início da Fase 10
 - [ ] Commit e push de todas as alterações desta sessão
 - [ ] Iniciar Fase 2: CRUD base
 
@@ -62,6 +66,51 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 004 — 2026-02-25
+
+**Objetivo:** Design e implementação do schema do Módulo de Investimentos (migrations 017 + 018)
+
+**O que foi feito:**
+- Criada migration `017_create_investments.sql` com 5 partes:
+  - Parte 1: extensão do ENUM `transaction_type` com `investment_deposit` e `investment_withdrawal` (deve ser executada isolada no Supabase)
+  - Parte 2: tabela `investments` com scope, user_id NOT NULL, 10 tipos, aporte mensal, elegibilidade para projetos, RLS scoped_select/scoped_modify
+  - Parte 3: tabela `investment_transactions` (aportes/resgates) com índice único de idempotência para cron
+  - Parte 4: tabela `investment_snapshots` (saldo de mercado, append-only, sem updated_at)
+  - Parte 5: colunas `investment_id` e `expected_payment_date` em `project_items`; constraint `payment_origin` expandida para incluir `'investment'`; constraint `chk_item_investment_required` adicionada
+- Criada migration `018_add_investment_to_transactions.sql` (diferida para Fase 10):
+  - Adiciona `investment_id` em `transactions`
+  - Atualiza `scoped_select` de `transactions` para incluir visibilidade de investimentos elegíveis do parceiro
+- Atualizado `src/types/database.ts`:
+  - `TransactionType`: adicionados `investment_deposit` e `investment_withdrawal`
+  - `PaymentOrigin`: adicionado `'investment'`
+  - `Transaction`: adicionado `investment_id: string | null`
+  - `ProjectItem`: adicionados `investment_id` e `expected_payment_date`
+  - Novos tipos: `InvestmentType`, `InvestmentTransactionType`
+  - Novas interfaces: `Investment`, `InvestmentTransaction`, `InvestmentSnapshot`
+- Atualizada documentação:
+  - `docs/regras-de-negocio.md`: Seção 12 completa (10 subseções)
+  - `docs/banco-de-dados.md`: DDL das 3 novas tabelas + project_items atualizado + transactions atualizado + migrations 017/018 na ordem de execução
+  - `docs/roadmap.md`: Fase 10 (Investimentos) e Fase 11 (Fluxo Futuro) adicionadas
+
+**Decisões tomadas:**
+- `user_id NOT NULL` em `investments` — desvio intencional do padrão de outras entidades; necessário pois o user_id define o dono do aporte automático gerado pelo cron
+- Migration 018 diferida para Fase 10: migration 017 já está completa e segura para rodar isoladamente
+- Idempotência de aportes automáticos via `UNIQUE INDEX` em `(investment_id, date_trunc('month', date)) WHERE auto_generated = true` — não usa a função `year_month_key` (já usada em transactions) pois `date_trunc` é nativamente IMMUTABLE no PostgreSQL para timezone fixo
+- `investment_snapshots` sem `updated_at` — cada snapshot é imutável por design
+- RLS de `investment_transactions` e `investment_snapshots` herda visibilidade do investimento pai via subquery (mesmo padrão de project_groups/project_items)
+
+**Problemas encontrados:**
+- `date_trunc('month', date)` não é IMMUTABLE no PostgreSQL — índice rejeitado. Corrigido para `year_month_key(date)` (função IMMUTABLE já existente no projeto). Migration 017 Parte 3 corrigida no arquivo.
+- Migration 017 Parte 5 (ALTER TABLE project_items) não pôde ser executada pois migration 015 ainda não foi aplicada — diferida para Fase 9.
+
+**Próxima sessão:**
+- Rodar migration 017 no Supabase (Parte 1 isolada, depois Partes 2–5)
+- Rodar migrations 013, 014, 016 no Supabase
+- Commit e push de todas as alterações
+- Iniciar Fase 2: CRUD base
 
 ---
 

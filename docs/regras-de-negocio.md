@@ -622,4 +622,99 @@ Quando todos os itens de um projeto estão com `status = paid` ou `cancelled`, o
 
 ---
 
-*Couple — Documento de Regras de Negócio v1.1 — Confidencial, uso interno do casal*
+## 12. Investimentos
+
+### 12.1 Visão Geral
+
+O módulo de Investimentos permite ao casal registrar, acompanhar e projetar o crescimento de investimentos financeiros. Cada investimento pertence a um usuário (pessoal) ou à família, e pode ser marcado como elegível para pagamento de itens de projeto.
+
+### 12.2 Tipos de Investimento
+
+| Tipo | Descrição |
+|---|---|
+| `cofrinho` | Cofrinho digital (ex.: Nubank) |
+| `cdb` | CDB de renda fixa |
+| `lci_lca` | LCI / LCA |
+| `tesouro_direto` | Tesouro Direto |
+| `renda_variavel` | Ações e ETFs |
+| `fii` | Fundos de Investimento Imobiliário |
+| `fundo` | Fundo de investimento |
+| `previdencia` | Previdência privada |
+| `cripto` | Criptoativos |
+| `outro` | Outros |
+
+### 12.3 Dados do Investimento
+
+- **Escopo** (`scope`): `personal` (padrão) ou `family`
+- **Dono** (`user_id`): NOT NULL — obrigatório; define o responsável pelo aporte automático
+- **Meta** (`goal_amount`): valor alvo do investimento (opcional)
+- **Aporte mensal automático** (`monthly_contribution_amount` + `monthly_contribution_day`): se configurados, o cron gera um `investment_transaction` do tipo `deposit` todo mês
+- **Elegível para projetos** (`is_eligible_for_projects`): se `true`, o investimento aparece como opção de pagamento em itens de projeto para qualquer membro da família
+- **Ativo** (`is_active`): `false` arquiva o investimento sem perda de histórico
+
+### 12.4 Transações de Investimento (`investment_transactions`)
+
+Cada aporte ou resgate gera um registro em `investment_transactions`:
+
+| Campo | Descrição |
+|---|---|
+| `type` | `deposit` (aporte) ou `withdrawal` (resgate) |
+| `amount` | Valor positivo do aporte/resgate |
+| `date` | Data do aporte/resgate |
+| `transaction_id` | Referência opcional à transação financeira vinculada |
+| `auto_generated` | `true` se gerado pelo cron mensal |
+
+**Idempotência do cron:** o índice único `idx_inv_tx_auto_month` garante um único aporte automático por investimento por mês-calendário.
+
+### 12.5 Snapshots de Saldo (`investment_snapshots`)
+
+Para calcular rentabilidade, o usuário ou o cron registra o **saldo de mercado** atual do investimento. A tabela é **append-only** — cada atualização gera uma nova linha; nunca atualiza registros anteriores.
+
+- O snapshot mais recente é identificado pela maior `date`
+- Snapshots não precisam ser diários — o usuário os registra quando desejar
+
+### 12.6 Cálculos (não armazenados)
+
+| Métrica | Fórmula |
+|---|---|
+| Total aportado | `SUM(amount WHERE type='deposit') − SUM(amount WHERE type='withdrawal')` |
+| Rentabilidade R$ | `último snapshot.value − total aportado` |
+| Rentabilidade % | `(rentabilidade R$ / total aportado) × 100` |
+| Projeção conservadora | `saldo atual + (aporte_mensal × N meses) − SUM(project_items.actual_amount WHERE investment_id=X AND status='confirmed')` |
+| Projeção com retorno | Itera mês a mês aplicando o % do último retorno mensal conhecido |
+
+### 12.7 Integração com Projetos
+
+Quando `is_eligible_for_projects = true`, o investimento aparece como opção de `payment_origin = 'investment'` no cadastro de itens de projeto. Nesse caso:
+
+- `project_items.investment_id` deve ser preenchido (constraint `chk_item_investment_required`)
+- `expected_payment_date` indica quando o valor será sacado do investimento
+- O item continua gerando uma transação financeira normalmente ao ser pago
+
+### 12.8 Visibilidade (RLS)
+
+- Investimentos pessoais (`scope = 'personal'`) são visíveis apenas pelo dono
+- Investimentos familiares (`scope = 'family'`) são visíveis por ambos
+- Investimentos pessoais com `is_eligible_for_projects = true` são visíveis pelo parceiro **apenas para seleção em projetos** — os detalhes financeiros não são expostos
+
+### 12.9 Automação (Cron)
+
+O cron mensal `generate-monthly` (Fase 5) será estendido para:
+
+1. Localizar todos os investimentos ativos com `monthly_contribution_amount NOT NULL`
+2. Para cada investimento, verificar se já existe um `investment_transaction` com `auto_generated = true` no mês corrente (idempotência via índice único)
+3. Se não existe, inserir um novo `investment_transaction` do tipo `deposit`
+4. Inserir também a `transaction` financeira correspondente do tipo `investment_deposit` vinculada ao `user_id` do investimento
+
+### 12.10 Tipos de Transação Financeira
+
+Os novos valores do enum `transaction_type` são:
+
+| Valor | Descrição |
+|---|---|
+| `investment_deposit` | Aporte em investimento (saída financeira) |
+| `investment_withdrawal` | Resgate de investimento (entrada financeira) |
+
+---
+
+*Couple — Documento de Regras de Negócio v1.2 — Confidencial, uso interno do casal*

@@ -203,6 +203,61 @@
 
 ---
 
+## Fase 10 — Investimentos
+
+**Objetivo:** usuário consegue criar, acompanhar e projetar investimentos, com integração ao módulo de projetos.
+
+### Schema (migrations)
+- [x] Migration 017: tabelas `investments`, `investment_transactions`, `investment_snapshots`; alterações em `project_items` (migration 017 — criada em 2026-02-25)
+- [ ] Migration 018: adicionar `investment_id` em `transactions`; atualizar `scoped_select` (diferida — rodar no início desta fase)
+
+### CRUD de Investimentos
+- [ ] Listar investimentos (pessoais e familiares) com saldo atual e rentabilidade
+- [ ] Criar investimento (tipo, escopo, meta, aporte mensal, elegibilidade para projetos)
+- [ ] Editar investimento
+- [ ] Arquivar investimento (`is_active = false`)
+
+### Aportes e Resgates
+- [ ] Registrar aporte manual (`investment_transaction` tipo `deposit`)
+- [ ] Registrar resgate manual (`investment_transaction` tipo `withdrawal`)
+- [ ] Visualizar histórico de aportes/resgates com totais
+
+### Snapshots de Saldo
+- [ ] Registrar saldo de mercado atual (cria novo snapshot)
+- [ ] Exibir histórico de snapshots com gráfico de evolução
+
+### Cálculos e Projeções
+- [ ] Exibir: total aportado, rentabilidade R$, rentabilidade %
+- [ ] Projeção conservadora (sem retorno)
+- [ ] Projeção com retorno (baseada no último retorno mensal)
+
+### Integração com Projetos
+- [ ] Exibir investimentos elegíveis como opção de pagamento em itens de projeto
+- [ ] Exibir total comprometido com projetos confirmados na tela do investimento
+
+### Automação (extensão do cron `generate-monthly`)
+- [ ] Gerar aporte automático mensal para investimentos com `monthly_contribution_amount`
+- [ ] Garantir idempotência via índice único `idx_inv_tx_auto_month`
+
+**Critério de conclusão:** usuário consegue acompanhar todos os investimentos com saldo atualizado, projeção de crescimento e integração com projetos.
+
+---
+
+## Fase 11 — Fluxo Futuro / Calendário Financeiro
+
+**Objetivo:** visualização temporal de todos os compromissos financeiros futuros — transações, aportes, vencimentos de projetos.
+
+- [ ] Tela de calendário / linha do tempo mensal
+- [ ] Exibir lançamentos pendentes (`status = pending`) ordenados por data
+- [ ] Exibir aportes mensais de investimentos previstos
+- [ ] Exibir `expected_payment_date` de itens de projeto confirmados
+- [ ] Indicação visual de saldo projetado dia a dia
+- [ ] Filtro por escopo (Pessoal / Familiar / Tudo)
+
+**Critério de conclusão:** usuário consegue ver todos os compromissos financeiros do mês em uma única tela com saldo projetado.
+
+---
+
 ## Backlog (pós v1.0)
 
 - Relatórios e exportação (PDF / CSV)

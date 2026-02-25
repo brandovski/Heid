@@ -226,11 +226,12 @@ CREATE TABLE installment_groups (
 
 ### `transactions`
 
-Tabela central do sistema. Adicionados em `013`: `scope`, `user_id`.
+Tabela central do sistema. Adicionados em `013`: `scope`, `user_id`. Adicionado em `018`: `investment_id`.
 
 ```sql
 CREATE TYPE transaction_type AS ENUM (
-  'income', 'expense', 'installment', 'subscription', 'fixed_income', 'fixed_expense'
+  'income', 'expense', 'installment', 'subscription', 'fixed_income', 'fixed_expense',
+  'investment_deposit', 'investment_withdrawal'  -- migration 017 (Parte 1)
 );
 
 CREATE TYPE transaction_status AS ENUM ('pending', 'paid', 'cancelled');
@@ -259,6 +260,8 @@ CREATE TABLE transactions (
   -- Escopo (migration 013)
   scope                TEXT NOT NULL DEFAULT 'family',  -- 'personal' | 'family'
   user_id              UUID REFERENCES auth.users(id),
+  -- Investimento vinculado (migration 018 — diferida para Fase 10)
+  investment_id        UUID REFERENCES investments(id) ON DELETE SET NULL,
   created_at           TIMESTAMPTZ DEFAULT now(),
   updated_at           TIMESTAMPTZ DEFAULT now(),
   CONSTRAINT chk_transactions_scope CHECK (scope IN ('personal', 'family'))
@@ -394,7 +397,7 @@ CREATE TABLE project_groups (
 
 ---
 
-### `project_items` *(migration 015)*
+### `project_items` *(migrations 015 + 017)*
 
 ```sql
 CREATE TABLE project_items (
@@ -408,7 +411,7 @@ CREATE TABLE project_items (
 
   -- Tipo de pagamento
   payment_type             TEXT,            -- 'cash' | 'card_installment' | 'deposit_remainder'
-  payment_origin           TEXT,            -- 'personal' | 'family'
+  payment_origin           TEXT,            -- 'personal' | 'family' | 'investment'
   payment_user_id          UUID REFERENCES auth.users(id),  -- quem paga (se personal)
 
   -- Para payment_type = 'cash'
@@ -427,6 +430,10 @@ CREATE TABLE project_items (
   notes                    TEXT,
   status                   TEXT NOT NULL DEFAULT 'considering',
 
+  -- Investimento como origem de pagamento (migration 017)
+  investment_id            UUID REFERENCES investments(id) ON DELETE SET NULL,
+  expected_payment_date    DATE,            -- data prevista de saque do investimento
+
   -- Links para transações geradas
   transaction_id           UUID REFERENCES transactions(id) ON DELETE SET NULL,
   deposit_transaction_id   UUID REFERENCES transactions(id) ON DELETE SET NULL,
@@ -435,10 +442,12 @@ CREATE TABLE project_items (
   created_at               TIMESTAMPTZ DEFAULT now(),
   updated_at               TIMESTAMPTZ DEFAULT now(),
 
-  CONSTRAINT chk_item_payment_type   CHECK (payment_type   IN ('cash', 'card_installment', 'deposit_remainder') OR payment_type IS NULL),
-  CONSTRAINT chk_item_payment_origin CHECK (payment_origin IN ('personal', 'family') OR payment_origin IS NULL),
-  CONSTRAINT chk_item_payment_method CHECK (payment_method IN ('debit', 'pix', 'cash', 'transfer') OR payment_method IS NULL),
-  CONSTRAINT chk_item_status         CHECK (status IN ('considering', 'confirmed', 'paid', 'cancelled'))
+  CONSTRAINT chk_item_payment_type       CHECK (payment_type   IN ('cash', 'card_installment', 'deposit_remainder') OR payment_type IS NULL),
+  CONSTRAINT chk_item_payment_origin     CHECK (payment_origin IN ('personal', 'family', 'investment') OR payment_origin IS NULL),
+  CONSTRAINT chk_item_payment_method     CHECK (payment_method IN ('debit', 'pix', 'cash', 'transfer') OR payment_method IS NULL),
+  CONSTRAINT chk_item_status             CHECK (status IN ('considering', 'confirmed', 'paid', 'cancelled')),
+  -- investment_id obrigatório quando payment_origin = 'investment'
+  CONSTRAINT chk_item_investment_required CHECK (payment_origin IS DISTINCT FROM 'investment' OR investment_id IS NOT NULL)
 );
 ```
 
@@ -551,6 +560,104 @@ CREATE TRIGGER on_auth_user_created
 
 ---
 
+### `investments` *(migration 017)*
+
+```sql
+CREATE TABLE investments (
+  id                          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  family_id                   UUID        NOT NULL,
+  -- NOT NULL intencional: user_id serve como dono dos aportes automáticos no cron
+  user_id                     UUID        NOT NULL REFERENCES auth.users(id),
+  scope                       TEXT        NOT NULL DEFAULT 'personal',
+  name                        TEXT        NOT NULL,
+  description                 TEXT,
+  type                        TEXT        NOT NULL,
+  goal_amount                 NUMERIC(12,2),
+  monthly_contribution_amount NUMERIC(12,2),
+  monthly_contribution_day    SMALLINT    CHECK (monthly_contribution_day BETWEEN 1 AND 28),
+  is_eligible_for_projects    BOOLEAN     NOT NULL DEFAULT false,
+  is_active                   BOOLEAN     NOT NULL DEFAULT true,
+  created_at                  TIMESTAMPTZ DEFAULT now(),
+  updated_at                  TIMESTAMPTZ DEFAULT now(),
+
+  CONSTRAINT chk_investments_scope CHECK (scope IN ('personal', 'family')),
+  CONSTRAINT chk_investments_type  CHECK (type  IN (
+    'cofrinho', 'cdb', 'lci_lca', 'tesouro_direto', 'renda_variavel',
+    'fii', 'fundo', 'previdencia', 'cripto', 'outro'
+  )),
+  CONSTRAINT chk_investments_contribution CHECK (
+    (monthly_contribution_amount IS NULL AND monthly_contribution_day IS NULL) OR
+    (monthly_contribution_amount IS NOT NULL AND monthly_contribution_day IS NOT NULL)
+  )
+);
+
+CREATE INDEX idx_investments_family   ON investments(family_id, is_active);
+CREATE INDEX idx_investments_scope    ON investments(family_id, scope, user_id);
+CREATE INDEX idx_investments_eligible ON investments(family_id)
+  WHERE is_eligible_for_projects = true;
+```
+
+**RLS:** `scoped_select` — família, pessoal próprio, ou pessoal elegível para projetos (da mesma família). `scoped_modify` — família ou dono.
+
+---
+
+### `investment_transactions` *(migration 017)*
+
+```sql
+CREATE TABLE investment_transactions (
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  investment_id  UUID        NOT NULL REFERENCES investments(id) ON DELETE CASCADE,
+  family_id      UUID        NOT NULL,
+  type           TEXT        NOT NULL,   -- 'deposit' | 'withdrawal'
+  amount         NUMERIC(12,2) NOT NULL  CHECK (amount > 0),
+  date           DATE        NOT NULL,
+  notes          TEXT,
+  transaction_id UUID        REFERENCES transactions(id) ON DELETE SET NULL,
+  auto_generated BOOLEAN     NOT NULL DEFAULT false,
+  created_at     TIMESTAMPTZ DEFAULT now(),
+
+  CONSTRAINT chk_inv_tx_type CHECK (type IN ('deposit', 'withdrawal'))
+);
+
+CREATE INDEX idx_inv_tx_investment ON investment_transactions(investment_id, date);
+CREATE INDEX idx_inv_tx_family     ON investment_transactions(family_id, date);
+
+-- Idempotência do cron: um único aporte automático por investimento por mês
+-- Usa year_month_key (IMMUTABLE) — mesma função usada em transactions
+CREATE UNIQUE INDEX idx_inv_tx_auto_month
+  ON investment_transactions(investment_id, year_month_key(date))
+  WHERE auto_generated = true;
+```
+
+**RLS:** `family_access` — herda visibilidade do investimento pai via subquery.
+
+---
+
+### `investment_snapshots` *(migration 017)*
+
+Tabela **append-only** — cada atualização de saldo de mercado gera uma nova linha.
+
+```sql
+CREATE TABLE investment_snapshots (
+  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  investment_id UUID        NOT NULL REFERENCES investments(id) ON DELETE CASCADE,
+  family_id     UUID        NOT NULL,
+  value         NUMERIC(12,2) NOT NULL CHECK (value >= 0),
+  date          DATE        NOT NULL,
+  notes         TEXT,
+  created_at    TIMESTAMPTZ DEFAULT now()
+  -- Sem updated_at: append-only
+);
+
+-- Índice DESC para buscar snapshot mais recente eficientemente
+CREATE INDEX idx_inv_snapshots_recent ON investment_snapshots(investment_id, date DESC);
+CREATE INDEX idx_inv_snapshots_family ON investment_snapshots(family_id, date DESC);
+```
+
+**RLS:** `family_access` — herda visibilidade do investimento pai via subquery.
+
+---
+
 ## Ordem de execução das migrations
 
 ```
@@ -566,10 +673,12 @@ CREATE TRIGGER on_auth_user_created
 010_create_invoice_payments.sql
 011_rls_policies.sql
 012_triggers.sql
-013_add_scope_to_entities.sql       ← scope + user_id + is_shared em entidades financeiras
-014_create_family_contributions.sql  ← Caixa Familiar
-015_create_projects.sql              ← Módulo de projetos
-016_update_rls_for_scope.sql         ← Substitui family_access por scoped_select/scoped_modify
+013_add_scope_to_entities.sql         ← scope + user_id + is_shared em entidades financeiras
+014_create_family_contributions.sql   ← Caixa Familiar
+015_create_projects.sql               ← Módulo de projetos
+016_update_rls_for_scope.sql          ← Substitui family_access por scoped_select/scoped_modify
+017_create_investments.sql            ← Módulo de Investimentos (PARTE 1 isolada: ENUM; PARTES 2–5: tabelas)
+018_add_investment_to_transactions.sql ← Vincula transactions a investments (diferida — Fase 10)
 ```
 
 ---

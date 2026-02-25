@@ -4,7 +4,9 @@ export type TransactionType =
   | "installment"
   | "subscription"
   | "fixed_income"
-  | "fixed_expense";
+  | "fixed_expense"
+  | "investment_deposit"
+  | "investment_withdrawal";
 
 export type TransactionStatus = "pending" | "paid" | "cancelled";
 
@@ -145,6 +147,8 @@ export interface Transaction {
   // Escopo (migration 013)
   scope: Scope;
   user_id: string | null;
+  // Investimento vinculado (migration 018 — diferida para Fase 10)
+  investment_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -193,7 +197,7 @@ export type ProjectItemStatus = "considering" | "confirmed" | "paid" | "cancelle
 
 export type PaymentType = "cash" | "card_installment" | "deposit_remainder";
 
-export type PaymentOrigin = "personal" | "family";
+export type PaymentOrigin = "personal" | "family" | "investment";
 
 export type CashPaymentMethod = "debit" | "pix" | "cash" | "transfer";
 
@@ -244,10 +248,70 @@ export interface ProjectItem {
   category_id: string | null;
   notes: string | null;
   status: ProjectItemStatus;
+  // Investimento vinculado (migration 017)
+  investment_id: string | null;
+  expected_payment_date: string | null;  // DATE
   // Links para transações geradas
   transaction_id: string | null;
   deposit_transaction_id: string | null;
   remainder_transaction_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// --- Migration 017: Investimentos ---
+
+export type InvestmentType =
+  | "cofrinho"
+  | "cdb"
+  | "lci_lca"
+  | "tesouro_direto"
+  | "renda_variavel"
+  | "fii"
+  | "fundo"
+  | "previdencia"
+  | "cripto"
+  | "outro";
+
+export type InvestmentTransactionType = "deposit" | "withdrawal";
+
+export interface Investment {
+  id: string;
+  family_id: string;
+  user_id: string;  // NOT NULL — dono do investimento e dos aportes automáticos
+  scope: Scope;
+  name: string;
+  description: string | null;
+  type: InvestmentType;
+  goal_amount: number | null;
+  monthly_contribution_amount: number | null;
+  monthly_contribution_day: number | null;  // 1–28
+  is_eligible_for_projects: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InvestmentTransaction {
+  id: string;
+  investment_id: string;
+  family_id: string;
+  type: InvestmentTransactionType;
+  amount: number;
+  date: string;  // DATE
+  notes: string | null;
+  transaction_id: string | null;  // transação financeira vinculada
+  auto_generated: boolean;
+  created_at: string;
+}
+
+export interface InvestmentSnapshot {
+  id: string;
+  investment_id: string;
+  family_id: string;
+  value: number;
+  date: string;  // DATE
+  notes: string | null;
+  created_at: string;
+  // Sem updated_at: tabela append-only
 }
