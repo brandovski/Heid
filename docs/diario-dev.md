@@ -11,7 +11,7 @@
 
 **Fase:** Fase 2 — CRUD Base
 **Última sessão:** 2026-02-25
-**Próxima ação:** Iniciar Fase 2 — CRUD de categorias, cartões de crédito, receitas fixas e despesas fixas (com suporte a scope)
+**Próxima ação:** Fase 2 concluída — iniciar Fase 3 (Transações Manuais)
 
 ### O que está feito
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
@@ -44,8 +44,9 @@
 - [x] Rodar migration 017 Partes 2–4 (investments, investment_transactions, investment_snapshots) no Supabase
 - [ ] Rodar migration 017 Parte 5 (ALTER TABLE project_items) — diferida para após migration 015 (Fase 9)
 - [ ] Migration 018 (investment_id em transactions) — diferida para início da Fase 10
-- [ ] Commit e push de todas as alterações desta sessão
-- [ ] Iniciar Fase 2: CRUD base
+- [x] Commit e push de todas as alterações desta sessão
+- [x] Fase 2 — CRUD base concluída
+- [ ] Iniciar Fase 3: Transações Manuais
 
 ### Referências do ambiente
 - **Supabase project ref:** `djteloswmyjsqeplzkxy`
@@ -68,6 +69,42 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 005 — 2026-02-25
+
+**Objetivo:** Implementar Fase 2 — CRUD Base (categorias, cartões, receitas e despesas fixas)
+
+**O que foi feito:**
+- Instalada dependência `lucide-react` para ícones
+- Criada Navbar com ícones (Dashboard, Categorias, Cartões, Fixas, Sair)
+- Atualizado layout `(app)` para incluir a Navbar
+- Criados componentes compartilhados: `Modal.tsx` e `ScopeSelector.tsx`
+- CRUD completo de **Categorias**: listagem, criar, editar, arquivar (soft delete)
+  - Seletor de cor com 12 presets, campo de emoji para ícone
+- CRUD completo de **Cartões de Crédito**: listagem (grid), criar, editar, desativar
+  - Seletor de bandeira, dias de fechamento/vencimento, limite opcional, 4 últimos dígitos, cor, scope
+- CRUD de **Receitas e Despesas Fixas** em única página `/fixas` com abas (tabs)
+  - Receitas: descrição, valor, dia do mês, categoria, data de início, notas, scope
+  - Despesas: mesmos campos + forma de pagamento (conta ou cartão de crédito)
+- 8 API Routes implementadas (POST e PATCH com [id] para cada entidade)
+  - `family_id` e `user_id` extraídos da sessão autenticada — nunca vêm do formulário
+  - RLS do Supabase aplicado automaticamente via anon key + session
+- Build passando sem erros de TypeScript
+- Commit e push para GitHub
+
+**Decisões tomadas:**
+- Categorias sem scope (globais da família), conforme decidido na Fase 1.5
+- Page component (Server) busca dados; List component (Client) gerencia estado de modal
+- Mutações via API Routes (não Server Actions), conforme padrão da arquitetura
+- `router.refresh()` após cada mutação para re-fetch server-side sem reload de página
+
+**Problemas encontrados:**
+- Nenhum. Build passou limpo na primeira tentativa.
+
+**Próxima sessão:**
+- Iniciar Fase 3: Transações Manuais
 
 ---
 
