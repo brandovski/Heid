@@ -40,15 +40,27 @@ CREATE INDEX idx_transactions_family_status ON transactions(family_id, status);
 CREATE INDEX idx_transactions_credit_card   ON transactions(credit_card_id, date);
 CREATE INDEX idx_transactions_category      ON transactions(category_id, date);
 
+-- Função IMMUTABLE helper para os índices de idempotência.
+-- date_trunc() e expressões com date::text são STABLE no Postgres,
+-- então não podem ser usados diretamente em índices.
+-- Declarar a função como IMMUTABLE é o padrão recomendado para
+-- extrações de datas sem fuso horário (DATE é timezone-free).
+CREATE OR REPLACE FUNCTION year_month_key(d DATE)
+RETURNS TEXT
+LANGUAGE sql IMMUTABLE STRICT
+AS $$
+  SELECT TO_CHAR(d, 'YYYY-MM')
+$$;
+
 -- Índices de idempotência: evitam duplicatas nos cron jobs
 CREATE UNIQUE INDEX idx_transactions_fixed_income_month
-  ON transactions(fixed_income_id, date_trunc('month', date))
+  ON transactions(fixed_income_id, year_month_key(date))
   WHERE fixed_income_id IS NOT NULL;
 
 CREATE UNIQUE INDEX idx_transactions_fixed_expense_month
-  ON transactions(fixed_expense_id, date_trunc('month', date))
+  ON transactions(fixed_expense_id, year_month_key(date))
   WHERE fixed_expense_id IS NOT NULL;
 
 CREATE UNIQUE INDEX idx_transactions_subscription_month
-  ON transactions(subscription_id, date_trunc('month', date))
+  ON transactions(subscription_id, year_month_key(date))
   WHERE subscription_id IS NOT NULL;
