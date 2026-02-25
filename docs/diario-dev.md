@@ -2,6 +2,8 @@
 
 > Este documento é o registro vivo do projeto. Atualizado ao fim de cada sessão.
 > Serve como ponto de partida para retomar o contexto sem depender da memória da sessão anterior.
+>
+> Antes de criar ou alterar migrations, consultar também: `docs/padroes.md`
 
 ---
 
