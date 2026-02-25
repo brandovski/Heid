@@ -7,9 +7,9 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 1 — Setup Inicial (em andamento)
+**Fase:** Fase 2 — CRUD Base
 **Última sessão:** 2026-02-25
-**Próxima ação:** Gestor executar migrations no Supabase + criar usuários + configurar family_id + deploy na Vercel
+**Próxima ação:** Implementar CRUD de categorias, cartões, receitas fixas e despesas fixas
 
 ### O que está feito
 - [x] Regras de negócio documentadas (`docs/regras-de-negocio.md`)
@@ -34,10 +34,7 @@
 - [x] Push inicial para o GitHub
 
 ### O que está pendente
-- [ ] Gestor: desabilitar "Enable Sign Ups" no Supabase Auth
-- [ ] Gestor: conectar repositório `couple` na Vercel
-- [ ] Gestor: adicionar variáveis de ambiente na Vercel e fazer deploy
-- [ ] Testar login localmente (`npm run dev`)
+- Todos os itens da Fase 2 em diante (ver roadmap)
 
 ### Referências do ambiente
 - **Supabase project ref:** `djteloswmyjsqeplzkxy`
@@ -90,8 +87,6 @@
 - Tipos do `setAll()` no `@supabase/ssr` precisavam de tipagem explícita com `strict: true`
 
 **Próxima sessão:**
-- Confirmar que gestor executou migrations e configurou usuários
-- Testar login localmente e fazer deploy na Vercel
 - Iniciar Fase 2: CRUD base (categorias, cartões, receitas e despesas fixas)
 
 ---

@@ -8,21 +8,21 @@
 
 **Objetivo:** projeto rodando localmente com banco configurado e autenticação funcionando.
 
-- [ ] Criar projeto Next.js 14+ com TypeScript e App Router
-- [ ] Configurar Tailwind CSS
-- [ ] Instalar e configurar Tremor
-- [ ] Criar projeto no Supabase
-- [ ] Escrever e aplicar migrations iniciais (todas as tabelas)
-- [ ] Configurar RLS em todas as tabelas
-- [ ] Rodar seed com categorias padrão
-- [ ] Cadastrar os dois usuários manualmente no Supabase Auth
-- [ ] Desabilitar cadastro público no Supabase Auth
-- [ ] Implementar página de login com Supabase Auth
-- [ ] Implementar middleware de proteção de rotas (redirect para login)
-- [ ] Configurar variáveis de ambiente (`.env.local`)
-- [ ] Deploy inicial na Vercel (apenas para validar pipeline)
+- [x] Criar projeto Next.js 14+ com TypeScript e App Router
+- [x] Configurar Tailwind CSS
+- [x] Instalar e configurar Tremor
+- [x] Criar projeto no Supabase
+- [x] Escrever e aplicar migrations iniciais (todas as tabelas)
+- [x] Configurar RLS em todas as tabelas
+- [x] Rodar seed com categorias padrão
+- [x] Cadastrar os dois usuários manualmente no Supabase Auth
+- [x] Desabilitar cadastro público no Supabase Auth
+- [x] Implementar página de login com Supabase Auth
+- [x] Implementar middleware de proteção de rotas (redirect para login)
+- [x] Configurar variáveis de ambiente (`.env.local`)
+- [x] Deploy inicial na Vercel (apenas para validar pipeline)
 
-**Critério de conclusão:** login funciona, sessão é mantida, rotas protegidas redirecionam corretamente.
+**Critério de conclusão:** login funciona, sessão é mantida, rotas protegidas redirecionam corretamente. ✅ **Concluído em 2026-02-25**
 
 ---
 
