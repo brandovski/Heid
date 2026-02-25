@@ -9,9 +9,9 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 1.5 — Modelo de Escopo (finalização) + Módulo de Investimentos (schema)
+**Fase:** Fase 2 — CRUD Base
 **Última sessão:** 2026-02-25
-**Próxima ação:** Rodar migration 017 Parte 1 (ENUM isolado) → Partes 2–5 (tabelas) no Supabase; após Fase 9, rodar migration 018; commit e push; iniciar Fase 2
+**Próxima ação:** Iniciar Fase 2 — CRUD de categorias, cartões de crédito, receitas fixas e despesas fixas (com suporte a scope)
 
 ### O que está feito
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
