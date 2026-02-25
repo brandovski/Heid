@@ -33,14 +33,17 @@
 - [x] Repositório GitHub criado: `gabrielbrandao-atus/couple`
 - [x] Push inicial para o GitHub
 
-### O que está pendente (ações do gestor)
-1. Acessar o Supabase SQL Editor e executar as migrations em ordem (001 → 012)
-2. Em Authentication > Users, criar os dois usuários manualmente
-3. Em Authentication > Configuration, desabilitar "Enable Sign Ups"
-4. Executar o SQL de configuração do `family_id` (ver `docs/setup.md`)
-5. Executar o `supabase/seed.sql` com o `family_id` real
-6. Conectar o repositório `couple` na Vercel
-7. Adicionar as variáveis de ambiente na Vercel e fazer deploy
+### O que está pendente
+- [ ] Gestor: desabilitar "Enable Sign Ups" no Supabase Auth
+- [ ] Gestor: conectar repositório `couple` na Vercel
+- [ ] Gestor: adicionar variáveis de ambiente na Vercel e fazer deploy
+- [ ] Testar login localmente (`npm run dev`)
+
+### Referências do ambiente
+- **Supabase project ref:** `djteloswmyjsqeplzkxy`
+- **family_id:** `cbe6f412-d190-49de-a062-10cc17b9b77d`
+- **User 1:** `f860afbb-a0eb-4683-b82a-022a9fbe2e51`
+- **User 2:** `6665da54-7400-4fb0-94dd-1cbd1c4d182d`
 
 ### Bloqueios / Decisões pendentes
 - 4 vulnerabilidades de segurança no Next.js 14 (DoS via Image Optimizer e RSC). Fix requer upgrade para Next.js 16 (breaking change). Risco baixo para app privado — avaliar upgrade em sessão futura.

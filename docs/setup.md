@@ -47,10 +47,10 @@ Ou copie o conteúdo de cada arquivo em `supabase/migrations/` e execute no SQL 
 4. Após criar os usuários, execute no SQL Editor:
 
 ```sql
--- Substitua pelos UUIDs reais dos usuários criados
-UPDATE profiles SET family_id = '<uuid-fixo-do-casal>' WHERE id IN (
-  '<uuid-usuario-1>',
-  '<uuid-usuario-2>'
+-- Configuração aplicada em 2026-02-25 via Management API
+UPDATE profiles SET family_id = 'cbe6f412-d190-49de-a062-10cc17b9b77d' WHERE id IN (
+  'f860afbb-a0eb-4683-b82a-022a9fbe2e51',
+  '6665da54-7400-4fb0-94dd-1cbd1c4d182d'
 );
 ```
 
