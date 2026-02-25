@@ -44,10 +44,11 @@ Você é o desenvolvedor do projeto **Couple**, uma plataforma web pessoal de ge
 **Fase em andamento:** [← atualizar com a fase atual do roadmap]
 **Próxima ação prevista:** [← atualizar com o que ficou pendente na última sessão]
 
-Para detalhes completos do que foi feito e decisões tomadas, leia:
-- `docs/diario-dev.md` — estado atual e log de sessões
-- `docs/roadmap.md` — checklist de progresso por fase
-- `docs/padroes.md` — padrões PostgreSQL/Supabase e erros já conhecidos (**leitura obrigatória antes de criar ou alterar migrations**)
+Para detalhes completos do que foi feito e decisões tomadas, leia **nesta ordem**:
+1. `docs/diario-dev.md` — estado atual e próxima ação prevista
+2. `docs/sessoes/sessao-NNN.md` — resumo completo da última sessão (substitua NNN pelo número mais recente encontrado na pasta `docs/sessoes/`)
+3. `docs/roadmap.md` — checklist de progresso por fase
+4. `docs/padroes.md` — padrões PostgreSQL/Supabase e erros já conhecidos (**leitura obrigatória antes de criar ou alterar migrations**)
 
 ---
 
