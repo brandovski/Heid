@@ -47,6 +47,7 @@ Você é o desenvolvedor do projeto **Couple**, uma plataforma web pessoal de ge
 Para detalhes completos do que foi feito e decisões tomadas, leia:
 - `docs/diario-dev.md` — estado atual e log de sessões
 - `docs/roadmap.md` — checklist de progresso por fase
+- `docs/padroes.md` — padrões PostgreSQL/Supabase e erros já conhecidos (**leitura obrigatória antes de criar ou alterar migrations**)
 
 ---
 
@@ -58,7 +59,8 @@ Para detalhes completos do que foi feito e decisões tomadas, leia:
 - API Routes para escrita e cron jobs
 - Nunca deletar registros fisicamente — usar `is_active = false` ou `cancelled_at`
 - Todas as datas em UTC no banco; exibição em `America/Sao_Paulo` no frontend
-- Mudanças no banco via Supabase Management API (token disponível no .env.local como `SUPABASE_SERVICE_ROLE_KEY`; para Management API usar o token de acesso pessoal salvo no contexto)
+- Mudanças no banco via Supabase Management API (token de acesso pessoal salvo na memória global do Claude)
+- **Antes de qualquer migration:** ler `docs/padroes.md` — contém armadilhas PostgreSQL conhecidas (IMMUTABLE em índices, ENUM fora de transação, etc.) e registro de erros anteriores
 
 ---
 
