@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { DayPicker } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
@@ -38,31 +39,66 @@ export default function DatePicker({
   className = "",
 }: DatePickerProps) {
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties>({});
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  const updatePosition = useCallback(() => {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const popoverHeight = 320; // estimativa
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const top =
+      spaceBelow >= popoverHeight
+        ? rect.bottom + window.scrollY + 4
+        : rect.top + window.scrollY - popoverHeight - 4;
+
+    setPopoverStyle({
+      position: "absolute",
+      top,
+      left: rect.left + window.scrollX,
+      width: Math.max(rect.width, 280),
+      zIndex: 9999,
+    });
+  }, []);
 
   useEffect(() => {
+    if (!open) return;
+    updatePosition();
+
     function handleOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const target = e.target as Node;
+      if (
+        triggerRef.current?.contains(target) ||
+        popoverRef.current?.contains(target)
+      )
+        return;
+      setOpen(false);
     }
     function handleEscape(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
     }
+    function handleScroll() {
+      updatePosition();
+    }
+
     document.addEventListener("mousedown", handleOutside);
     document.addEventListener("keydown", handleEscape);
+    window.addEventListener("scroll", handleScroll, true);
     return () => {
       document.removeEventListener("mousedown", handleOutside);
       document.removeEventListener("keydown", handleEscape);
+      window.removeEventListener("scroll", handleScroll, true);
     };
-  }, []);
+  }, [open, updatePosition]);
 
   const selected = parseDate(value);
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
       {/* Trigger */}
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`w-full flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm text-left transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -75,52 +111,60 @@ export default function DatePicker({
         <span className="flex-1">{value ? formatDisplay(value) : placeholder}</span>
       </button>
 
-      {/* Popover */}
-      {open && (
-        <div className="absolute z-50 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg p-3">
-          <DayPicker
-            mode="single"
-            selected={selected}
-            onSelect={(date) => {
-              if (date) {
-                onChange(formatDate(date));
-                setOpen(false);
-              }
-            }}
-            locale={ptBR}
-            weekStartsOn={0}
-            showOutsideDays
-            classNames={{
-              months: "flex flex-col",
-              month: "space-y-3",
-              caption: "flex items-center justify-between px-1",
-              caption_label: "text-sm font-semibold text-gray-900 capitalize",
-              nav: "flex items-center gap-1",
-              nav_button:
-                "p-1 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors",
-              nav_button_previous: "",
-              nav_button_next: "",
-              table: "w-full border-collapse",
-              head_row: "flex",
-              head_cell:
-                "w-9 text-center text-xs font-medium text-gray-400 pb-1",
-              row: "flex mt-1",
-              cell: "w-9 text-center p-0",
-              day: "w-9 h-9 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none",
-              day_selected:
-                "bg-blue-600 text-white hover:bg-blue-700 font-medium",
-              day_today: "font-bold text-blue-600",
-              day_outside: "text-gray-300",
-              day_disabled: "text-gray-200 cursor-not-allowed",
-              day_hidden: "invisible",
-            }}
-            components={{
-              IconLeft: () => <ChevronLeft size={16} />,
-              IconRight: () => <ChevronRight size={16} />,
-            }}
-          />
-        </div>
-      )}
+      {/* Popover via Portal — escapa de qualquer overflow */}
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            ref={popoverRef}
+            style={popoverStyle}
+            className="bg-white border border-gray-200 rounded-xl shadow-xl p-3"
+          >
+            <DayPicker
+              mode="single"
+              selected={selected}
+              onSelect={(date) => {
+                if (date) {
+                  onChange(formatDate(date));
+                  setOpen(false);
+                }
+              }}
+              locale={ptBR}
+              weekStartsOn={0}
+              showOutsideDays
+              classNames={{
+                months: "flex flex-col",
+                month: "space-y-3",
+                caption: "flex items-center justify-between px-1",
+                caption_label:
+                  "text-sm font-semibold text-gray-900 capitalize",
+                nav: "flex items-center gap-1",
+                nav_button:
+                  "p-1 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors",
+                nav_button_previous: "",
+                nav_button_next: "",
+                table: "w-full border-collapse",
+                head_row: "flex",
+                head_cell:
+                  "w-9 text-center text-xs font-medium text-gray-400 pb-1",
+                row: "flex mt-1",
+                cell: "w-9 text-center p-0",
+                day: "w-9 h-9 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none",
+                day_selected:
+                  "bg-blue-600 text-white hover:bg-blue-700 font-medium",
+                day_today: "font-bold text-blue-600",
+                day_outside: "text-gray-300",
+                day_disabled: "text-gray-200 cursor-not-allowed",
+                day_hidden: "invisible",
+              }}
+              components={{
+                IconLeft: () => <ChevronLeft size={16} />,
+                IconRight: () => <ChevronRight size={16} />,
+              }}
+            />
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
