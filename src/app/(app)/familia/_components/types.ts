@@ -1,5 +1,3 @@
-export type ViewType = "familiar" | "pessoal";
-
 export interface FamilyMember {
   id: string;
   full_name: string | null;
@@ -26,42 +24,6 @@ export interface FamilyTransaction {
     icon: string | null;
     color: string | null;
   } | null;
-}
-
-export interface SharedFixedIncome {
-  id: string;
-  description: string;
-  amount: number;
-  day_of_month: number;
-  user_id: string;
-  category: { name: string; icon: string | null } | null;
-}
-
-export interface SharedFixedExpense {
-  id: string;
-  description: string;
-  amount: number;
-  day_of_month: number;
-  user_id: string;
-  category: { name: string; icon: string | null } | null;
-}
-
-export interface SharedSubscription {
-  id: string;
-  name: string;
-  amount_brl: number;
-  original_currency: "BRL" | "USD";
-  amount_original: number;
-  billing_day: number;
-  user_id: string;
-  category: { name: string; icon: string | null } | null;
-}
-
-export interface SharedCreditCard {
-  id: string;
-  name: string;
-  brand: string;
-  user_id: string;
 }
 
 const EXPENSE_TYPES = new Set([
