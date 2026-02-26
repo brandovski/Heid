@@ -32,6 +32,7 @@ interface Props {
   currentMonth: string;
   escopo: EscopoType;
   userName: string;
+  partnerName: string;
   transactions: TransactionRow[];
   historicalTransactions: HistoricalTxRow[];
   budgets: BudgetRow[];
@@ -44,6 +45,7 @@ export default function DashboardView({
   currentMonth,
   escopo,
   userName,
+  partnerName,
   transactions,
   historicalTransactions,
   budgets,
@@ -67,11 +69,11 @@ export default function DashboardView({
 
   // ── Navegação ─────────────────────────────────────────────────────────────────
   function navigate(delta: number) {
-    router.push(`/dashboard?mes=${shiftMonth(currentMonth, delta)}&escopo=${escopo}`);
+    router.push(`/dashboard?mes=${shiftMonth(currentMonth, delta)}&escopo=${escopo === "parceiro" ? "parceiro" : "personal"}`);
   }
 
   function toggleEscopo() {
-    const next: EscopoType = escopo === "family" ? "personal" : "family";
+    const next: EscopoType = escopo === "personal" ? "parceiro" : "personal";
     router.push(`/dashboard?mes=${currentMonth}&escopo=${next}`);
   }
 
@@ -102,16 +104,6 @@ export default function DashboardView({
         {/* Toggle escopo */}
         <div className="flex rounded-lg border border-gray-200 bg-white p-0.5 text-sm shrink-0">
           <button
-            onClick={() => escopo !== "family" && toggleEscopo()}
-            className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
-              escopo === "family"
-                ? "bg-blue-600 text-white"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Familiar
-          </button>
-          <button
             onClick={() => escopo !== "personal" && toggleEscopo()}
             className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
               escopo === "personal"
@@ -119,7 +111,17 @@ export default function DashboardView({
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            Pessoal
+            {userName}
+          </button>
+          <button
+            onClick={() => escopo !== "parceiro" && toggleEscopo()}
+            className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+              escopo === "parceiro"
+                ? "bg-blue-600 text-white"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {partnerName}
           </button>
         </div>
       </div>
@@ -194,7 +196,7 @@ export default function DashboardView({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-gray-700">Orçamento</h2>
           <Link
-            href={`/orcamento?mes=${currentMonth}&escopo=${escopo}`}
+            href={`/orcamento?mes=${currentMonth}`}
             className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
           >
             Ver tudo <ExternalLink size={12} />
@@ -206,7 +208,7 @@ export default function DashboardView({
               Nenhum orçamento configurado para este mês
             </p>
             <Link
-              href={`/orcamento?mes=${currentMonth}&escopo=${escopo}`}
+              href={`/orcamento?mes=${currentMonth}`}
               className="text-sm font-medium text-blue-600 hover:text-blue-700"
             >
               Configurar orçamento →
@@ -242,7 +244,7 @@ export default function DashboardView({
               <p className="text-xs text-gray-400 text-center pt-1">
                 +{budgetsWithStats.length - 5} categorias —{" "}
                 <Link
-                  href={`/orcamento?mes=${currentMonth}&escopo=${escopo}`}
+                  href={`/orcamento?mes=${currentMonth}`}
                   className="text-blue-600 hover:text-blue-700"
                 >
                   ver tudo
@@ -313,7 +315,7 @@ export default function DashboardView({
             Próximos lançamentos
           </h2>
           <Link
-            href={`/transacoes?mes=${currentMonth}&escopo=${escopo}`}
+            href={`/transacoes?mes=${currentMonth}`}
             className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
           >
             Ver tudo <ExternalLink size={12} />

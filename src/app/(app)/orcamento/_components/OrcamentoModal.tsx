@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/ui/Modal";
-import { BudgetEntry, BudgetWithStats, EscopoType } from "./types";
+import { BudgetEntry, BudgetWithStats } from "./types";
 
 interface Category {
   id: string;
@@ -17,7 +17,6 @@ interface Props {
   onClose: () => void;
   editing: BudgetWithStats | null;
   referenceMonth: string;
-  escopo: EscopoType;
   categories: Category[];
   budgetedCategoryIds: Set<string>;
 }
@@ -27,7 +26,6 @@ export default function OrcamentoModal({
   onClose,
   editing,
   referenceMonth,
-  escopo,
   categories,
   budgetedCategoryIds,
 }: Props) {
@@ -84,7 +82,7 @@ export default function OrcamentoModal({
             category_id: categoryId,
             planned_amount: parseFloat(plannedAmount),
             notes: notes || null,
-            scope: escopo,
+            scope: "personal",
           }),
         });
         if (!res.ok) {

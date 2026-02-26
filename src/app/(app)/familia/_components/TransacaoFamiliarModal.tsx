@@ -3,20 +3,33 @@
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import DatePicker from "@/components/ui/DatePicker";
-import type { Category, CreditCard } from "@/types/database";
-import type { TransactionWithRelations } from "./types";
+import type { FamilyTransaction } from "./types";
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string | null;
+  color: string | null;
+}
+
+interface CreditCard {
+  id: string;
+  name: string;
+  brand: string | null;
+  color: string | null;
+}
 
 interface Props {
-  transacao: TransactionWithRelations | null;
-  categorias: Pick<Category, "id" | "name" | "icon">[];
-  cartoes: Pick<CreditCard, "id" | "name" | "brand">[];
+  transacao: FamilyTransaction | null;
+  categorias: Category[];
+  cartoes: CreditCard[];
   onClose: () => void;
   onSaved: () => void;
 }
 
 type PaymentMode = "avista" | "parcelado";
 
-export default function TransacaoModal({
+export default function TransacaoFamiliarModal({
   transacao,
   categorias,
   cartoes,
@@ -28,7 +41,7 @@ export default function TransacaoModal({
 
   const [type, setType] = useState<"income" | "expense">(
     transacao
-      ? ["income", "fixed_income", "investment_withdrawal"].includes(transacao.type)
+      ? ["income", "fixed_income"].includes(transacao.type)
         ? "income"
         : "expense"
       : "expense"
@@ -43,7 +56,7 @@ export default function TransacaoModal({
   const [creditCardId, setCreditCardId] = useState(
     transacao?.credit_card_id ?? ""
   );
-  const [notes, setNotes] = useState(transacao?.notes ?? "");
+  const [notes, setNotes] = useState("");
 
   // Parcelamento — apenas despesa + cartão + nova transação
   const [paymentMode, setPaymentMode] = useState<PaymentMode>("avista");
@@ -80,7 +93,7 @@ export default function TransacaoModal({
 
     try {
       if (!isEditing && showParcelamento && paymentMode === "parcelado") {
-        // Criar parcelamento
+        // Criar parcelamento familiar
         const res = await fetch("/api/parcelamentos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -92,43 +105,56 @@ export default function TransacaoModal({
             credit_card_id: creditCardId,
             category_id: categoryId || null,
             notes: notes || null,
-            scope: "personal",
+            scope: "family",
           }),
         });
         if (!res.ok) {
           const { error: msg } = await res.json();
           throw new Error(msg ?? "Erro ao criar parcelamento");
         }
-      } else {
-        // Criar / editar transação avulsa
-        const url = isEditing ? `/api/transacoes/${transacao.id}` : "/api/transacoes";
-        const method = isEditing ? "PATCH" : "POST";
-
-        const payload: Record<string, unknown> = {
-          description: description.trim(),
-          amount: parseFloat(amount),
-          date,
-          category_id: categoryId || null,
-          credit_card_id:
-            type === "expense" && paymentMethod === "credit_card"
-              ? creditCardId
-              : null,
-          notes: notes || null,
-          scope: "personal",
-        };
-
-        if (!isEditing) {
-          payload.type = type;
-        }
-
-        const res = await fetch(url, {
-          method,
+      } else if (isEditing) {
+        // Editar transação existente
+        const res = await fetch(`/api/transacoes/${transacao.id}`, {
+          method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            description: description.trim(),
+            amount: parseFloat(amount),
+            date,
+            category_id: categoryId || null,
+            credit_card_id:
+              type === "expense" && paymentMethod === "credit_card"
+                ? creditCardId
+                : null,
+            notes: notes || null,
+          }),
         });
         if (!res.ok) {
           const { error: msg } = await res.json();
           throw new Error(msg ?? "Erro ao salvar");
+        }
+      } else {
+        // Criar nova transação familiar
+        const res = await fetch("/api/transacoes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            description: description.trim(),
+            amount: parseFloat(amount),
+            date,
+            type,
+            category_id: categoryId || null,
+            credit_card_id:
+              type === "expense" && paymentMethod === "credit_card"
+                ? creditCardId
+                : null,
+            notes: notes || null,
+            scope: "family",
+          }),
+        });
+        if (!res.ok) {
+          const { error: msg } = await res.json();
+          throw new Error(msg ?? "Erro ao criar");
         }
       }
 
@@ -143,10 +169,10 @@ export default function TransacaoModal({
   const title = isEditing
     ? "Editar Transação"
     : type === "income"
-    ? "Nova Receita"
-    : "Nova Despesa";
+    ? "Nova Receita Familiar"
+    : "Nova Despesa Familiar";
 
-  const formId = "transacao-form";
+  const formId = "transacao-familiar-form";
 
   return (
     <Modal
@@ -226,7 +252,7 @@ export default function TransacaoModal({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={
-              type === "income" ? "Ex: Freelance, Venda..." : "Ex: Mercado, Farmácia..."
+              type === "income" ? "Ex: Venda, Aluguel..." : "Ex: Supermercado, Conta..."
             }
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />

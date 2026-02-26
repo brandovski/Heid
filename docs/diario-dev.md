@@ -9,7 +9,7 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 9 — Projetos
+**Fase:** Reestruturação de Escopo Pessoal/Familiar (pré-Fase 9)
 **Última sessão:** 2026-02-26
 **Próxima ação:** Iniciar Fase 9 — Projetos (requer rodar migration 015 antes)
 
@@ -80,6 +80,58 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 013 — 2026-02-26
+
+**Objetivo:** Reestruturação de Escopo Pessoal/Familiar — separação clara entre /transacoes (pessoal), /familia (familiar) e /orcamento (sempre pessoal)
+
+**O que foi feito:**
+
+*Banco (via Management API):*
+- `UPDATE profiles SET full_name = 'Gabriel'` e `SET full_name = 'Heide'`
+- `ALTER TABLE profiles ADD COLUMN IF NOT EXISTS share_with_partner BOOLEAN NOT NULL DEFAULT false`
+- `Transaction.is_shared` adicionado ao tipo em `src/types/database.ts`
+
+*D — /orcamento (mais simples):*
+- `page.tsx` — removido `escopo` de `searchParams`; sempre usa `scope='personal'` e `user_id` do usuário logado
+- `OrcamentoList.tsx` — removido toggle Familiar/Pessoal; título "Orçamento Pessoal"; navegação sem `escopo` na URL
+- `OrcamentoModal.tsx` — removido prop `escopo`; `scope: 'personal'` hardcoded
+
+*C — /dashboard:*
+- `types.ts` — `EscopoType` agora é `"personal" | "parceiro"` (antes `"family"`)
+- `page.tsx` — busca `partnerName` dos profiles; default escopo = `"personal"`; query `"parceiro"` busca `.eq('is_shared', true).neq('user_id', user.id)`; orçamento sempre pessoal do usuário logado; links `/orcamento` sem param `escopo`
+- `DashboardView.tsx` — toggle renomeado para nome do usuário / nome do parceiro (nomes reais); prop `partnerName` adicionada
+
+*B — /transacoes:*
+- `page.tsx` — adiciona `.eq('scope', 'personal')` na query; busca `partnerName` e `share_with_partner` dos profiles
+- `TransacaoList.tsx` — remove aba "Tudo" e "Familiar"; adiciona tabs "Meu" e `partnerName`; toggle "Compartilhar com [Parceiro]" (PATCH `/api/profile/sharing`); grupos de fatura só na aba pessoal
+- `TransacaoCard.tsx` — `onEdit` e `onPagar` tornados opcionais (exibição read-only na aba do parceiro)
+- `TransacaoModal.tsx` — removido `ScopeSelector`; `scope: 'personal'` hardcoded; **parcelamento adicionado**: toggle À vista/Parcelado quando despesa + cartão; se parcelado → POST `/api/parcelamentos`
+- `api/transacoes/route.ts` — lê `share_with_partner` do perfil e define `is_shared` automaticamente; `user_id` sempre preenchido para scope personal
+- `api/profile/sharing/route.ts` ← **novo** — PATCH `share_with_partner` no perfil do usuário
+
+*A — /familia:*
+- `page.tsx` — adiciona queries de `categories` e `credit_cards` ao `Promise.all`; passa `categorias` e `cartoes` para `FamiliaView`
+- `types.ts` — `FamilyTransaction` expandida com `auto_generated`, `category_id`, `credit_card_id`
+- `FamiliaView.tsx` — botão "Nova Transação"; ações por card (editar/pagar/cancelar/excluir); modal de pagar inline (`PagarFamiliaModal`); render `TransacaoFamiliarModal`
+- `TransacaoFamiliarModal.tsx` ← **novo** — modal completo: tipo Despesa/Receita, campos padrão, forma de pagamento, cartão, parcelamento (mesmo padrão do TransacaoModal), scope hardcoded `'family'`
+
+**Decisões tomadas:**
+- `is_shared` para transações pessoais é definido automaticamente no servidor com base em `profile.share_with_partner` (não enviado pelo cliente)
+- Dashboard "Parceiro" filtra `is_shared = true AND user_id != meu_id` (transações pessoais compartilhadas do parceiro)
+- Toggle de compartilhamento é persistente (salvo no banco), não por transação
+- Transações de fatura de cartão exibidas apenas na aba "Meu" (são sempre do usuário logado)
+- `PagarFamiliaModal` embutido no `FamiliaView` (não em arquivo separado) por ser simples e evitar arquivos extras
+- EscopoType do dashboard mudou de `"family"` para `"parceiro"` — `searchParams.escopo` atualizado correspondentemente
+
+**Problemas encontrados:**
+- `Transaction` em `database.ts` não tinha `is_shared` → adicionado o campo ao interface
+- Build passando sem erros após correção
+
+**Próxima sessão:**
+- Iniciar Fase 9: Projetos (rodar migration 015 no Supabase antes de iniciar)
 
 ---
 

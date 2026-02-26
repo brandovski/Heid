@@ -52,16 +52,26 @@ export default async function DashboardPage({
   const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
   const mes = searchParams.mes ?? currentMonth;
   const escopo: EscopoType =
-    searchParams.escopo === "personal" ? "personal" : "family";
+    searchParams.escopo === "parceiro" ? "parceiro" : "personal";
 
   const [y, m] = mes.split("-").map(Number);
   const firstDay = `${mes}-01`;
   const lastDay = `${mes}-${String(new Date(y, m, 0).getDate()).padStart(2, "0")}`;
   const sixMonthsStart = `${shiftMonth(mes, -5)}-01`;
 
+  // Buscar nome do parceiro
+  const { data: partnerProfile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("family_id", profile.family_id)
+    .neq("id", user.id)
+    .single();
+
+  const partnerName = partnerProfile?.full_name ?? "Parceiro";
+
   // ── Queries ───────────────────────────────────────────────────────────────────
 
-  // Transações do mês (todas as colunas: resumo + gráfico de categorias + faturas)
+  // Transações do mês
   let txCurrentQ = supabase
     .from("transactions")
     .select(
@@ -75,10 +85,14 @@ export default async function DashboardPage({
   if (escopo === "personal") {
     txCurrentQ = txCurrentQ.eq("scope", "personal").eq("user_id", user.id);
   } else {
-    txCurrentQ = txCurrentQ.eq("scope", "family");
+    // parceiro: transações pessoais compartilhadas do parceiro
+    txCurrentQ = txCurrentQ
+      .eq("scope", "personal")
+      .eq("is_shared", true)
+      .neq("user_id", user.id);
   }
 
-  // Transações dos últimos 6 meses (leve: só para o gráfico de evolução)
+  // Transações dos últimos 6 meses (para gráfico de evolução)
   let txHistoricalQ = supabase
     .from("transactions")
     .select("amount, date, type, status")
@@ -90,23 +104,23 @@ export default async function DashboardPage({
   if (escopo === "personal") {
     txHistoricalQ = txHistoricalQ.eq("scope", "personal").eq("user_id", user.id);
   } else {
-    txHistoricalQ = txHistoricalQ.eq("scope", "family");
+    txHistoricalQ = txHistoricalQ
+      .eq("scope", "personal")
+      .eq("is_shared", true)
+      .neq("user_id", user.id);
   }
 
-  // Orçamentos do mês
-  let budgetsQ = supabase
+  // Orçamentos do mês (sempre pessoal do usuário logado)
+  const budgetsQ = supabase
     .from("budgets")
     .select("id, category_id, planned_amount, category:categories(name, icon, color)")
     .eq("family_id", profile.family_id)
     .eq("reference_month", mes)
-    .eq("scope", escopo)
+    .eq("scope", "personal")
+    .eq("user_id", user.id)
     .order("created_at");
 
-  if (escopo === "personal") {
-    budgetsQ = budgetsQ.eq("user_id", user.id);
-  }
-
-  // Próximos lançamentos pendentes (a partir de hoje, scoped)
+  // Próximos lançamentos pendentes
   let upcomingQ = supabase
     .from("transactions")
     .select("id, description, amount, date, type, category:categories(name, icon, color)")
@@ -119,7 +133,10 @@ export default async function DashboardPage({
   if (escopo === "personal") {
     upcomingQ = upcomingQ.eq("scope", "personal").eq("user_id", user.id);
   } else {
-    upcomingQ = upcomingQ.eq("scope", "family");
+    upcomingQ = upcomingQ
+      .eq("scope", "personal")
+      .eq("is_shared", true)
+      .neq("user_id", user.id);
   }
 
   const [
@@ -152,6 +169,7 @@ export default async function DashboardPage({
       currentMonth={mes}
       escopo={escopo}
       userName={profile.full_name ?? user.email ?? ""}
+      partnerName={partnerName}
       transactions={(transactions as unknown as TransactionRow[]) ?? []}
       historicalTransactions={(historicalTransactions as HistoricalTxRow[]) ?? []}
       budgets={(budgets as unknown as BudgetRow[]) ?? []}

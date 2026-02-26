@@ -28,12 +28,32 @@ export default async function TransacoesPage({
 
   const { firstDay, lastDay } = getMonthRange(mes);
 
+  // Buscar profile do usuário (para family_id e share_with_partner)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("family_id, share_with_partner")
+    .eq("id", user.id)
+    .single();
+
+  // Buscar perfis da família para nome do parceiro
+  let partnerName = "Parceiro";
+  if (profile?.family_id) {
+    const { data: partnerProfile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("family_id", profile.family_id)
+      .neq("id", user.id)
+      .single();
+    partnerName = partnerProfile?.full_name ?? "Parceiro";
+  }
+
   const [transacoesRes, categoriasRes, cartoesRes, invoicePaymentsRes] = await Promise.all([
     supabase
       .from("transactions")
       .select(
         "*, category:categories(id, name, icon, color), credit_card:credit_cards(id, name, brand, color)"
       )
+      .eq("scope", "personal")
       .gte("date", firstDay)
       .lte("date", lastDay)
       .order("date", { ascending: false })
@@ -63,6 +83,8 @@ export default async function TransacoesPage({
         invoicePayments={(invoicePaymentsRes.data ?? []) as InvoicePaymentSimple[]}
         mes={mes}
         currentUserId={user.id}
+        partnerName={partnerName}
+        shareWithPartner={profile?.share_with_partner ?? false}
       />
     </div>
   );

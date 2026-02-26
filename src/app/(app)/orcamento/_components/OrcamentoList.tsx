@@ -9,7 +9,6 @@ import {
   BudgetEntry,
   BudgetWithStats,
   TransactionRow,
-  EscopoType,
   computeStats,
   formatCurrency,
   formatMonth,
@@ -28,7 +27,6 @@ interface Props {
   transactions: TransactionRow[];
   categories: Category[];
   currentMonth: string;
-  escopo: EscopoType;
   userId: string;
 }
 
@@ -37,7 +35,6 @@ export default function OrcamentoList({
   transactions,
   categories,
   currentMonth,
-  escopo,
   userId,
 }: Props) {
   const router = useRouter();
@@ -62,12 +59,7 @@ export default function OrcamentoList({
 
   function navigate(delta: number) {
     const newMonth = shiftMonth(currentMonth, delta);
-    router.push(`/orcamento?mes=${newMonth}&escopo=${escopo}`);
-  }
-
-  function toggleEscopo() {
-    const newEscopo: EscopoType = escopo === "family" ? "personal" : "family";
-    router.push(`/orcamento?mes=${currentMonth}&escopo=${newEscopo}`);
+    router.push(`/orcamento?mes=${newMonth}`);
   }
 
   function openCreate() {
@@ -87,7 +79,7 @@ export default function OrcamentoList({
       const res = await fetch("/api/orcamento/clonar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reference_month: currentMonth, scope: escopo }),
+        body: JSON.stringify({ reference_month: currentMonth, scope: "personal" }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao clonar");
@@ -105,31 +97,7 @@ export default function OrcamentoList({
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-bold text-gray-900">Orçamento</h1>
-
-        {/* Toggle escopo */}
-        <div className="flex rounded-lg border border-gray-200 bg-white p-0.5 text-sm">
-          <button
-            onClick={() => escopo !== "family" && toggleEscopo()}
-            className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
-              escopo === "family"
-                ? "bg-blue-600 text-white"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Familiar
-          </button>
-          <button
-            onClick={() => escopo !== "personal" && toggleEscopo()}
-            className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
-              escopo === "personal"
-                ? "bg-blue-600 text-white"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Pessoal
-          </button>
-        </div>
+        <h1 className="text-xl font-bold text-gray-900">Orçamento Pessoal</h1>
       </div>
 
       {/* Navegação de mês */}
@@ -235,7 +203,6 @@ export default function OrcamentoList({
         }}
         editing={editing}
         referenceMonth={currentMonth}
-        escopo={escopo}
         categories={categories}
         budgetedCategoryIds={budgetedCategoryIds}
       />

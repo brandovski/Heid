@@ -20,6 +20,9 @@ export interface FamilyTransaction {
   date: string;
   type: string;
   status: string;
+  auto_generated: boolean;
+  category_id: string | null;
+  credit_card_id: string | null;
   category: {
     name: string;
     icon: string | null;

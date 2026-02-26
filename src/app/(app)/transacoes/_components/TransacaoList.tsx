@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import type { Category, CreditCard, TransactionStatus } from "@/types/database";
 import type { TransactionWithRelations, FaturaGrupo, InvoicePaymentSimple } from "./types";
 import {
@@ -25,9 +25,11 @@ interface Props {
   invoicePayments: InvoicePaymentSimple[];
   mes: string;
   currentUserId: string;
+  partnerName: string;
+  shareWithPartner: boolean;
 }
 
-type ScopeFilter = "all" | "personal" | "family";
+type ScopeFilter = "personal" | "partner";
 type TypeFilter = "all" | "income" | "expense";
 
 export default function TransacaoList({
@@ -36,10 +38,13 @@ export default function TransacaoList({
   cartoes,
   invoicePayments,
   mes,
+  currentUserId,
+  partnerName,
+  shareWithPartner,
 }: Props) {
   const router = useRouter();
 
-  const [scopeFilter, setScopeFilter] = useState<ScopeFilter>("all");
+  const [scopeFilter, setScopeFilter] = useState<ScopeFilter>("personal");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [statusFilter, setStatusFilter] = useState<TransactionStatus | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -47,6 +52,9 @@ export default function TransacaoList({
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<TransactionWithRelations | null>(null);
   const [pagando, setPagando] = useState<TransactionWithRelations | null>(null);
+
+  const [sharingLoading, setSharingLoading] = useState(false);
+  const [isShared, setIsShared] = useState(shareWithPartner);
 
   function handleEdit(t: TransactionWithRelations) {
     setEditing(t);
@@ -68,8 +76,26 @@ export default function TransacaoList({
     router.refresh();
   }
 
-  // ── Grupos de fatura por cartão ──────────────────────────────────────────────
-  const cardTxs = transacoes.filter(
+  async function handleShareToggle() {
+    setSharingLoading(true);
+    try {
+      const newValue = !isShared;
+      const res = await fetch("/api/profile/sharing", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ share_with_partner: newValue }),
+      });
+      if (res.ok) {
+        setIsShared(newValue);
+      }
+    } finally {
+      setSharingLoading(false);
+    }
+  }
+
+  // ── Grupos de fatura por cartão (apenas transações pessoais do usuário logado) ──
+  const myTransactions = transacoes.filter((t) => t.user_id === currentUserId);
+  const cardTxs = myTransactions.filter(
     (t) => t.credit_card_id && t.status !== "cancelled"
   );
   const flatTxs = transacoes.filter((t) => !t.credit_card_id);
@@ -105,9 +131,14 @@ export default function TransacaoList({
 
   const faturaGrupos = [...grupoMap.values()].filter((g) => g.total > 0);
 
-  // ── Filtering (apenas transações fora de cartão) ──────────────────────────
-  const filtered = flatTxs.filter((t) => {
-    if (scopeFilter !== "all" && t.scope !== scopeFilter) return false;
+  // ── Filtering ──────────────────────────────────────────────────────────────
+  const scopedTxs = flatTxs.filter((t) => {
+    if (scopeFilter === "personal") return t.user_id === currentUserId;
+    // partner: transações compartilhadas do parceiro
+    return t.is_shared === true && t.user_id !== currentUserId;
+  });
+
+  const filtered = scopedTxs.filter((t) => {
     if (typeFilter === "income" && !isIncome(t.type)) return false;
     if (
       typeFilter === "expense" &&
@@ -148,6 +179,34 @@ export default function TransacaoList({
           <Plus size={16} />
           <span className="hidden sm:inline">Nova Transação</span>
           <span className="sm:hidden">Nova</span>
+        </button>
+      </div>
+
+      {/* Toggle compartilhamento */}
+      <div className="flex items-center gap-3 mb-5 p-3 bg-gray-50 rounded-xl border border-gray-100">
+        <Share2 size={15} className="text-gray-400 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-gray-700">
+            Compartilhar com {partnerName}
+          </p>
+          <p className="text-xs text-gray-400">
+            Novas transações serão visíveis para {partnerName}
+          </p>
+        </div>
+        <button
+          role="switch"
+          aria-checked={isShared}
+          onClick={handleShareToggle}
+          disabled={sharingLoading}
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 ${
+            isShared ? "bg-blue-600" : "bg-gray-200"
+          }`}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+              isShared ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
         </button>
       </div>
 
@@ -213,14 +272,13 @@ export default function TransacaoList({
 
       {/* Filtros */}
       <div className="space-y-3 mb-5">
-        {/* Escopo */}
+        {/* Tabs Pessoal / Parceiro */}
         <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-full sm:w-fit">
           {(
             [
-              { value: "all", label: "Tudo" },
-              { value: "personal", label: "Pessoal" },
-              { value: "family", label: "Familiar" },
-            ] as { value: ScopeFilter; label: string }[]
+              { value: "personal" as ScopeFilter, label: "Meu" },
+              { value: "partner" as ScopeFilter, label: partnerName },
+            ]
           ).map(({ value, label }) => (
             <button
               key={value}
@@ -302,8 +360,8 @@ export default function TransacaoList({
         </div>
       </div>
 
-      {/* ── Grupos de fatura (fixos no topo) ── */}
-      {faturaGrupos.length > 0 && (
+      {/* ── Grupos de fatura (fixos no topo — apenas quando visualizando transações pessoais) ── */}
+      {scopeFilter === "personal" && faturaGrupos.length > 0 && (
         <div className="space-y-2 mb-4">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wide px-0.5">
             Faturas de cartão
@@ -320,12 +378,17 @@ export default function TransacaoList({
       )}
 
       {/* ── Lista de transações ── */}
-      {filtered.length === 0 && faturaGrupos.length === 0 ? (
+      {filtered.length === 0 && (scopeFilter !== "personal" || faturaGrupos.length === 0) ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-sm">Nenhuma transação encontrada.</p>
-          {transacoes.length === 0 && (
+          {scopeFilter === "personal" && transacoes.length === 0 && (
             <p className="text-xs mt-1">
               Lance uma nova transação ou aguarde o cron do mês.
+            </p>
+          )}
+          {scopeFilter === "partner" && (
+            <p className="text-xs mt-1">
+              {partnerName} não tem transações compartilhadas neste mês.
             </p>
           )}
         </div>
@@ -335,8 +398,8 @@ export default function TransacaoList({
             <TransacaoCard
               key={t.id}
               transacao={t}
-              onEdit={handleEdit}
-              onPagar={handlePagar}
+              onEdit={scopeFilter === "personal" ? handleEdit : undefined}
+              onPagar={scopeFilter === "personal" ? handlePagar : undefined}
               onSaved={handleSaved}
             />
           ))}

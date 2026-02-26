@@ -1,4 +1,4 @@
-export type EscopoType = "personal" | "family";
+export type EscopoType = "personal" | "parceiro";
 
 export interface TransactionRow {
   id: string;

@@ -34,13 +34,14 @@ export default async function FamiliaPage({
     { data: profiles },
     { data: contributions },
     { data: familyTransactions },
+    { data: categories },
+    { data: creditCards },
   ] = await Promise.all([
     supabase
       .from("profiles")
       .select("id, full_name")
       .eq("family_id", profile.family_id),
 
-    // Aportes realizados no mês selecionado
     supabase
       .from("family_contributions")
       .select("id, user_id, amount, date, transaction_id, notes, created_at")
@@ -49,11 +50,10 @@ export default async function FamiliaPage({
       .lte("date", lastDay)
       .order("date", { ascending: false }),
 
-    // Transações familiares do mês (debita do caixa)
     supabase
       .from("transactions")
       .select(
-        "id, description, amount, date, type, status, category:categories(name, icon, color)"
+        "id, description, amount, date, type, status, auto_generated, category_id, credit_card_id, category:categories(name, icon, color)"
       )
       .eq("family_id", profile.family_id)
       .eq("scope", "family")
@@ -61,6 +61,20 @@ export default async function FamiliaPage({
       .gte("date", firstDay)
       .lte("date", lastDay)
       .order("date", { ascending: false }),
+
+    supabase
+      .from("categories")
+      .select("id, name, icon, color")
+      .eq("family_id", profile.family_id)
+      .eq("is_active", true)
+      .order("name"),
+
+    supabase
+      .from("credit_cards")
+      .select("id, name, brand, color")
+      .eq("family_id", profile.family_id)
+      .eq("is_active", true)
+      .order("name"),
   ]);
 
   return (
@@ -72,6 +86,8 @@ export default async function FamiliaPage({
       familyTransactions={
         (familyTransactions as unknown as FamilyTransaction[]) ?? []
       }
+      categorias={categories ?? []}
+      cartoes={creditCards ?? []}
     />
   );
 }
