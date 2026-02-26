@@ -2,8 +2,26 @@ import type { Transaction, Category, CreditCard } from "@/types/database";
 
 export type TransactionWithRelations = Transaction & {
   category: Pick<Category, "id" | "name" | "icon" | "color"> | null;
-  credit_card: Pick<CreditCard, "id" | "name" | "brand"> | null;
+  credit_card: Pick<CreditCard, "id" | "name" | "brand" | "color"> | null;
 };
+
+export interface InvoicePaymentSimple {
+  id: string;
+  credit_card_id: string;
+  amount_paid: number;
+  paid_at: string;
+}
+
+export interface FaturaGrupo {
+  cartaoId: string;
+  cartaoNome: string;
+  cartaoBrand: string;
+  cartaoColor: string | null;
+  transactions: TransactionWithRelations[];
+  total: number;
+  isPaid: boolean;
+  payment: InvoicePaymentSimple | null;
+}
 
 export const INCOME_TYPES = [
   "income",

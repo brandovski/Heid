@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
+import PagarFaturaModal from "@/components/ui/PagarFaturaModal";
 import { createClient } from "@/lib/supabase/client";
 import type { CreditCard } from "@/types/database";
 
@@ -69,10 +70,7 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
   const [transactions, setTransactions] = useState<TxRow[]>([]);
   const [payment, setPayment] = useState<PaymentRow | null>(null);
   const [loading, setLoading] = useState(false);
-  const [amountStr, setAmountStr] = useState("");
-  const [notes, setNotes] = useState("");
-  const [payLoading, setPayLoading] = useState(false);
-  const [payError, setPayError] = useState("");
+  const [showPayModal, setShowPayModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -101,8 +99,6 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
     const typedTxs = (txs as unknown as TxRow[]) ?? [];
     setTransactions(typedTxs);
     setPayment(pmt as PaymentRow | null);
-    const total = typedTxs.reduce((s, t) => s + t.amount, 0);
-    setAmountStr(total > 0 ? total.toFixed(2) : "");
     setLoading(false);
   }, [month, cartao.id]);
 
@@ -110,62 +106,32 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
     if (isOpen) fetchData();
   }, [isOpen, fetchData]);
 
-  async function handlePayment(e: React.FormEvent) {
-    e.preventDefault();
-    setPayLoading(true);
-    setPayError("");
-    try {
-      const res = await fetch("/api/faturas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          credit_card_id: cartao.id,
-          reference_month: month,
-          amount_paid: parseFloat(amountStr),
-          notes: notes.trim() || null,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erro ao registrar pagamento");
-      router.refresh();
-      setNotes("");
-      await fetchData();
-    } catch (err) {
-      setPayError(err instanceof Error ? err.message : "Erro ao registrar pagamento");
-    } finally {
-      setPayLoading(false);
-    }
-  }
-
   const total = transactions.reduce((s, t) => s + t.amount, 0);
   const isPaid = payment !== null;
 
   return (
+    <>
     <Modal
       title={`Fatura — ${cartao.name}`}
       onClose={onClose}
       footer={
-        <div className="flex items-center gap-3">
-          {payError && <p className="text-xs text-red-600 flex-1">{payError}</p>}
-          <div className="flex gap-2 ml-auto">
+        <div className="flex gap-2 justify-end">
+          {!isPaid && !loading && (
             <button
               type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 rounded-lg transition-colors"
+              onClick={() => setShowPayModal(true)}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
             >
-              Fechar
+              Pagar Fatura
             </button>
-            {!isPaid && !loading && (
-              <button
-                type="submit"
-                form="fatura-pag-form"
-                disabled={payLoading || !amountStr}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors"
-              >
-                {payLoading ? "Salvando..." : "Registrar Pagamento"}
-              </button>
-            )}
-          </div>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 rounded-lg transition-colors"
+          >
+            Fechar
+          </button>
         </div>
       }
     >
@@ -229,54 +195,38 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
           </div>
         )}
 
-        {/* ── Seção de pagamento ── */}
-        {!loading && (
+        {/* ── Status de pagamento ── */}
+        {!loading && isPaid && (
           <div className="border-t border-gray-100 pt-4">
-            {isPaid ? (
-              <div className="flex items-start gap-3 text-sm text-green-700 bg-green-50 rounded-xl px-4 py-3">
-                <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium">
-                    Fatura paga: {formatCurrency(payment!.amount_paid)}
-                  </p>
-                  <p className="text-xs text-green-600 mt-0.5">
-                    Em {formatDate(payment!.paid_at.split("T")[0])}
-                    {payment!.notes && ` · ${payment!.notes}`}
-                  </p>
-                </div>
+            <div className="flex items-start gap-3 text-sm text-green-700 bg-green-50 rounded-xl px-4 py-3">
+              <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium">
+                  Fatura paga: {formatCurrency(payment!.amount_paid)}
+                </p>
+                <p className="text-xs text-green-600 mt-0.5">
+                  Em {formatDate(payment!.paid_at.split("T")[0])}
+                  {payment!.notes && ` · ${payment!.notes}`}
+                </p>
               </div>
-            ) : (
-              <form id="fatura-pag-form" onSubmit={handlePayment} className="space-y-3">
-                <p className="text-sm font-semibold text-gray-700">Registrar pagamento</p>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Valor pago (R$)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={amountStr}
-                    onChange={(e) => setAmountStr(e.target.value)}
-                    required
-                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">
-                    Observações (opcional)
-                  </label>
-                  <input
-                    type="text"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Ex: débito automático"
-                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </form>
-            )}
+            </div>
           </div>
         )}
       </div>
     </Modal>
+
+    <PagarFaturaModal
+      isOpen={showPayModal}
+      onClose={() => setShowPayModal(false)}
+      onSaved={async () => {
+        router.refresh();
+        await fetchData();
+      }}
+      cartaoNome={cartao.name}
+      totalAmount={total}
+      creditCardId={cartao.id}
+      referenceMonth={month}
+    />
+    </>
   );
 }

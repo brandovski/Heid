@@ -162,6 +162,7 @@ Ao chegar na fase correspondente, lembrar de verificar dependências antes de ap
 | `ProgressBar` | `src/components/ui/ProgressBar.tsx` | Barras de progresso (orçamento, etc.) |
 | `DatePicker` | `src/components/ui/DatePicker.tsx` | Seleção de datas (popover desktop, bottom sheet mobile) |
 | `ScopeSelector` | `src/components/ui/ScopeSelector.tsx` | Toggle Familiar/Pessoal |
+| `PagarFaturaModal` | `src/components/ui/PagarFaturaModal.tsx` | Pagamento de fatura de cartão — UX total/parcial + DatePicker; usado por Dashboard, Cartões e Transações |
 
 ---
 

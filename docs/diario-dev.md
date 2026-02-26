@@ -11,10 +11,10 @@
 
 **Fase:** Fase 9 — Projetos
 **Última sessão:** 2026-02-26
-**Próxima ação:** Iniciar Fase 9 — Projetos
+**Próxima ação:** Iniciar Fase 9 — Projetos (requer rodar migration 015 antes)
 
 ### O que está feito
-- [x] Fase 8 — Dashboard completo (`/dashboard`, 6 queries, 4 componentes, `POST /api/faturas`)
+- [x] Fase 8 — Dashboard completo + melhorias pós-fase: redesign de CartaoCard, FaturaDetalheModal, PagarFaturaModal compartilhado, FaturaGrupoCard em /transacoes
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
 - [x] Roadmap atualizado para 11 fases + Fase 1.5 (`docs/roadmap.md`)
 - [x] Arquitetura atualizada com Seção 7 (Escopo e Visibilidade) (`docs/arquitetura.md`)
@@ -80,6 +80,46 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 012 — 2026-02-26
+
+**Objetivo:** Melhorias pós-Fase 8 — redesign de cartões, modal de fatura unificado e agrupamento de transações por cartão em /transacoes
+
+**O que foi feito:**
+
+*API Route (1 arquivo modificado):*
+- `POST /api/faturas` — agora aceita `paid_at` (data do pagamento; fallback = hoje); após inserir em `invoice_payments`, executa bulk-update `status = 'paid'` em todas as transactions do cartão no mês (`gte/lte date`, `neq status cancelled`)
+
+*Componente compartilhado (1 arquivo criado):*
+- `src/components/ui/PagarFaturaModal.tsx` — modal reutilizado por 3 telas (Dashboard, Cartões, Transações); UX: radio "Valor total" (read-only com o montante) vs "Valor parcial" (input numérico); DatePicker com padrão "hoje" e seleção livre; campo de observações opcional
+
+*Cartões (`/cartoes`):*
+- `CartaoCard.tsx` — redesenho completo: layout `aspect-[8/5]` estilo cartão de crédito real; cor de fundo dinâmica (`cartao.color`), gradiente overlay, chip EMV decorativo, número mascarado, nome do titular e datas de fechamento/vencimento; badge de scope/compartilhamento; botões "Ver Fatura" + editar + ativar/desativar abaixo do cartão
+- `FaturaDetalheModal.tsx` — formulário inline removido; botão "Pagar Fatura" abre `PagarFaturaModal`; status pago exibe banner verde com data e valor
+- `CartaoList.tsx` — gerencia estado `viewingFatura` e renderiza `FaturaDetalheModal`
+
+*Dashboard:*
+- `FaturaModal.tsx` — reescrito como wrapper fino de `PagarFaturaModal` (sem duplicação de lógica)
+
+*Transações (`/transacoes`):*
+- `page.tsx` — adicionado `invoice_payments` do mês e `credit_cards` com `color` ao `Promise.all`; nova prop `invoicePayments` passada para `TransacaoList`
+- `types.ts` — adicionados `InvoicePaymentSimple` e `FaturaGrupo`
+- `FaturaGrupoCard.tsx` (novo) — card expansível: dot colorido + nome do cartão + bandeira + total + badge Pendente/Pago + chevron; expandido: lista compacta de transações read-only; rodapé com contagem e botão "Pagar Fatura" (unpaid) ou banner verde com data/valor (paid); usa `PagarFaturaModal`
+- `TransacaoList.tsx` — separa transações com `credit_card_id` (→ grupos) das demais (→ lista flat); grupos renderizados fixos acima da lista flat com label "Faturas de cartão"; filtros aplicados apenas à lista flat; empty state cobre ausência de grupos e flat
+
+**Decisões tomadas:**
+- Transações de cartão removidas da lista flat — aparecem apenas dentro dos grupos (organização visual)
+- Totais (Receitas/Despesas/Saldo) calculados só sobre transações fora de cartão; grupos exibem seus próprios totais no topo
+- Pagamento de fatura via qualquer tela (Dashboard, Cartões, Transações) é consistente: o bulk-update da API garante que todas as telas refletem o status correto após `router.refresh()`
+- `PagarFaturaModal` é o único lugar de lógica de pagamento — evita triplicação de código
+
+**Problemas encontrados:**
+- `FaturaDetalheModal` retornava dois elementos JSX irmãos (Modal + PagarFaturaModal) sem wrapper — corrigido com Fragment `<>...</>`
+
+**Próxima sessão:**
+- Iniciar Fase 9: Projetos (rodar migration 015 no Supabase antes de iniciar)
 
 ---
 

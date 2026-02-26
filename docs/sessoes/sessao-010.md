@@ -7,40 +7,44 @@
 
 ## Objetivo
 
-Implementar a Fase 7 completa: tela `/familia` com toggle Familiar/Pessoal, Caixa Familiar com contribuições configuráveis por usuário, saldo livre e listagem de transações familiares; view Pessoal com itens compartilhados pelo parceiro (somente leitura).
+Implementar a Fase 7 completa: tela `/familia` com Caixa Familiar (aportes reais, saldo, transações familiares) e navegação por mês.
+
+> **Nota:** O objetivo inicial incluía toggle Familiar/Pessoal e view de itens compartilhados pelo parceiro. Após discussão, esses itens foram removidos — já são visíveis em `/fixas`, `/assinaturas` e `/cartoes`. A tela `/familia` ficou focada exclusivamente no Caixa Familiar.
 
 ---
 
 ## O que foi feito
 
-### Sem migration necessária
+### Migration 020
 
-`family_contributions` (migration 014) já estava aplicada no banco. Nenhuma alteração de schema necessária.
+`020_update_family_contributions.sql` — revisão do modelo de `family_contributions`:
+
+- Coluna `effective_from` renomeada para `date`
+- Adicionada coluna `transaction_id UUID REFERENCES transactions(id) ON DELETE SET NULL`
+- Removida a constraint `UNIQUE (family_id, user_id, effective_from)`
+- Adicionado índice `idx_family_contributions_family_date ON family_contributions(family_id, date)`
+
+**Motivação:** A tabela deixou de ser "configuração de valor mensal" e passou a ser "registro de aporte efetivo". Cada linha = um pagamento real.
 
 ### API Route
 
 | Rota | Método | Descrição |
 |---|---|---|
-| `/api/familia/contribuicao` | `POST` | Cria ou atualiza contribuição mensal do usuário |
+| `/api/familia/contribuicao` | `POST` | Registra um aporte: cria despesa pessoal + registra no caixa familiar |
 
-**Lógica da rota:**
-1. Valida `amount > 0` e `mes` no formato `YYYY-MM`
-2. `effective_from = primeiro dia do mês` (`YYYY-MM-01`)
-3. Verifica se existe registro para `(family_id, user_id, effective_from)` → **update** se sim, **insert** se não
-4. Padrão pré-filtro — consistente com `generate-monthly` e `orcamento/clonar`
+**Lógica da rota (2 passos com rollback manual):**
+1. Valida `amount > 0`
+2. Cria transação pessoal (`type='expense'`, `scope='personal'`, `status='paid'`, `description='Contribuição ao Caixa Familiar'`)
+3. Insere em `family_contributions` com `transaction_id` vinculado
+4. Se passo 3 falhar: deleta a transação criada (rollback manual)
 
 ### Server Component `/familia/page.tsx`
 
 - `?mes=YYYY-MM` — mês a exibir (padrão = mês corrente)
-- `?view=familiar|pessoal` — view ativa (padrão = familiar)
-- `Promise.all` com 7 queries paralelas:
-  1. `profiles` — nomes dos dois membros da família
-  2. `family_contributions` — contribuições com `effective_from <= lastDay`, ordenadas por data desc
+- `Promise.all` com 3 queries paralelas:
+  1. `profiles` — nomes dos membros da família
+  2. `family_contributions` — aportes no intervalo do mês (`gte date, lte date`)
   3. `transactions` — `scope='family'`, `status!='cancelled'`, no intervalo do mês
-  4. `fixed_incomes` — `scope='personal'`, `is_shared=true`, `user_id != currentUser.id`
-  5. `fixed_expenses` — idem
-  6. `subscriptions` — idem + `is_active=true`
-  7. `credit_cards` — idem + `is_active=true`
 
 **Nota de tipo:** Supabase JS infere joins `category:categories(...)` como array no TypeScript. Cast via `as unknown as FamilyTransaction[]` na passagem de props.
 
@@ -48,29 +52,19 @@ Implementar a Fase 7 completa: tela `/familia` com toggle Familiar/Pessoal, Caix
 
 | Arquivo | Responsabilidade |
 |---|---|
-| `types.ts` | Interfaces, `computeCaixaFamiliar`, `getActiveContribution`, helpers de formatação |
-| `FamiliaView.tsx` | Toggle Familiar/Pessoal, navegação de mês, Caixa Familiar, transações, view Pessoal |
-| `ContribuicaoModal.tsx` | Formulário de configuração da contribuição mensal |
+| `types.ts` | Interfaces `FamilyMember`, `FamilyContribution`, `FamilyTransaction`; `computeCaixaFamiliar`; helpers de formatação |
+| `FamiliaView.tsx` | Navegação de mês, card Caixa Familiar (total por membro + contagem de aportes, totais, saldo livre), lista de transações familiares |
+| `ContribuicaoModal.tsx` | Formulário de aporte: valor, data (padrão = hoje), notas opcionais |
 
 ### Cálculo do Caixa Familiar
 
 | Métrica | Fórmula |
 |---|---|
-| Contribuição ativa por membro | Linha mais recente com `effective_from <= lastDay` |
-| Total contribuído | Soma das contribuições ativas |
+| Total por membro | `SUM(contributions WHERE user_id = member.id)` no mês |
+| Total contribuído | Soma dos totais por membro |
 | Gastos familiares | `SUM(amount WHERE type ∈ {expense, fixed_expense, installment, subscription})` |
 | Receitas familiares | `SUM(amount WHERE type ∈ {income, fixed_income})` |
 | Saldo livre | `Total contribuído − Gastos + Receitas` |
-
-### View Pessoal — itens compartilhados pelo parceiro
-
-Seções exibidas (somente leitura, badge "Somente leitura"):
-- **Despesas Fixas** — valor mensal, dia de vencimento, categoria
-- **Receitas Fixas** — valor mensal, dia de recebimento, categoria
-- **Assinaturas** — valor em BRL, badge USD se moeda original for USD
-- **Cartões de Crédito** — nome e bandeira
-
-Estado vazio quando parceiro não compartilhou nenhum item.
 
 ### Navbar
 
@@ -86,43 +80,48 @@ Mobile atualizado: Início, Transações, **Família**, Assinat., Orçamento + S
 
 | Decisão | Motivo |
 |---|---|
-| Sem nova migration | `family_contributions` (migration 014) já aplicada e suficiente |
-| `effective_from = primeiro dia do mês` | Simplifica UX: uma configuração por mês, atualizável |
-| Pré-filtro no POST | Padrão estabelecido — não usa upsert com ignoreDuplicates |
-| `.neq('user_id', currentUser.id)` para itens compartilhados | RLS `scoped_select` já autoriza leitura pelo parceiro; filtro client-side desnecessário |
+| Removido toggle Familiar/Pessoal | Itens compartilhados pelo parceiro já são visíveis em `/fixas`, `/assinaturas` e `/cartoes` — redundante |
+| Contribuição = movimento financeiro real | Dinheiro sai da conta pessoal e entra no caixa coletivo; `family_contributions` deixa de ser configuração e passa a ser registro de pagamento |
+| Rollback manual no POST | Supabase JS não suporta transações nativas na camada client; delete da transação se o insert de `family_contributions` falhar |
 | Saldo livre inclui receitas familiares | Receitas com `scope='family'` devem compor o caixa |
-| Navegação de mês apenas na view Familiar | View Pessoal não é temporal — mostra estado atual dos itens compartilhados |
+| `date` em vez de `effective_from` | Nova semântica: data do aporte (não "válido a partir de") |
 
 ---
 
 ## Problemas encontrados
 
-- **TypeScript: join Supabase inferido como array** — `category:categories(name, icon, color)` é inferido como `{ name: any; icon: any; color: any; }[]` pelo TypeScript (Supabase sem tipos gerados). Solução: cast `as unknown as FamilyTransaction[]` no page.tsx. Padrão a reutilizar em futuros joins parciais.
+- **TypeScript: join Supabase inferido como array** — `category:categories(name, icon, color)` é inferido como `{ name: any; icon: any; color: any; }[]`. Solução: cast `as unknown as FamilyTransaction[]` no page.tsx. Padrão a reutilizar em futuros joins parciais.
 
 ---
 
 ## Arquivos criados / modificados
 
 ```
+supabase/migrations/
+└── 020_update_family_contributions.sql    ← novo
+
 src/app/(app)/familia/
-├── page.tsx                                   ← novo (Server Component)
+├── page.tsx                               ← novo (Server Component)
 └── _components/
-    ├── types.ts                               ← novo
-    ├── FamiliaView.tsx                        ← novo
-    └── ContribuicaoModal.tsx                  ← novo
+    ├── types.ts                           ← novo
+    ├── FamiliaView.tsx                    ← novo
+    └── ContribuicaoModal.tsx              ← novo
+
 src/app/api/familia/
-└── contribuicao/route.ts                      ← novo (POST)
-src/components/Navbar.tsx                      ← +Família desktop; Parcelas→Família mobile
-docs/roadmap.md                                ← Fase 7 concluída
-docs/diario-dev.md                             ← sessão 010 adicionada
-docs/sessoes/sessao-010.md                     ← este arquivo
+└── contribuicao/route.ts                  ← novo (POST)
+
+src/components/Navbar.tsx                  ← +Família desktop; Parcelas→Família mobile
+docs/roadmap.md                            ← Fase 7 concluída
+docs/banco-de-dados.md                     ← family_contributions atualizado (migration 020)
+docs/diario-dev.md                         ← sessão 010 adicionada
+docs/sessoes/sessao-010.md                 ← este arquivo
 ```
 
 ---
 
 ## Estado do banco ao final da sessão
 
-Sem alterações. Migrations aplicadas: 001–014, 016, 017 (Partes 1–4), 019
+Migrations aplicadas: 001–014, 016, 017 (Partes 1–4), 019, **020**
 Migrations diferidas: 015 (Fase 9), 017 Parte 5 (Fase 9), 018 (Fase 10)
 
 ---

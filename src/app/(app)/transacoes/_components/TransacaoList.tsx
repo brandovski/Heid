@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Category, CreditCard, TransactionStatus } from "@/types/database";
-import type { TransactionWithRelations } from "./types";
+import type { TransactionWithRelations, FaturaGrupo, InvoicePaymentSimple } from "./types";
 import {
   isIncome,
   prevMonth,
@@ -16,11 +16,13 @@ import {
 import TransacaoCard from "./TransacaoCard";
 import TransacaoModal from "./TransacaoModal";
 import PagarModal from "./PagarModal";
+import FaturaGrupoCard from "./FaturaGrupoCard";
 
 interface Props {
   transacoes: TransactionWithRelations[];
   categorias: Pick<Category, "id" | "name" | "icon" | "color">[];
-  cartoes: Pick<CreditCard, "id" | "name" | "brand">[];
+  cartoes: Pick<CreditCard, "id" | "name" | "brand" | "color">[];
+  invoicePayments: InvoicePaymentSimple[];
   mes: string;
   currentUserId: string;
 }
@@ -32,6 +34,7 @@ export default function TransacaoList({
   transacoes,
   categorias,
   cartoes,
+  invoicePayments,
   mes,
 }: Props) {
   const router = useRouter();
@@ -65,8 +68,45 @@ export default function TransacaoList({
     router.refresh();
   }
 
-  // Filtering
-  const filtered = transacoes.filter((t) => {
+  // ── Grupos de fatura por cartão ──────────────────────────────────────────────
+  const cardTxs = transacoes.filter(
+    (t) => t.credit_card_id && t.status !== "cancelled"
+  );
+  const flatTxs = transacoes.filter((t) => !t.credit_card_id);
+
+  const grupoMap = new Map<string, FaturaGrupo>();
+  for (const t of cardTxs) {
+    const cardId = t.credit_card_id!;
+    if (!grupoMap.has(cardId)) {
+      grupoMap.set(cardId, {
+        cartaoId: cardId,
+        cartaoNome: t.credit_card?.name ?? "Cartão",
+        cartaoBrand: t.credit_card?.brand ?? "",
+        cartaoColor: t.credit_card?.color ?? null,
+        transactions: [],
+        total: 0,
+        isPaid: false,
+        payment: null,
+      });
+    }
+    const grupo = grupoMap.get(cardId)!;
+    grupo.transactions.push(t);
+    grupo.total += t.amount;
+  }
+
+  // Enriquecer com dados de pagamento
+  for (const pmt of invoicePayments) {
+    const grupo = grupoMap.get(pmt.credit_card_id);
+    if (grupo) {
+      grupo.isPaid = true;
+      grupo.payment = pmt;
+    }
+  }
+
+  const faturaGrupos = [...grupoMap.values()].filter((g) => g.total > 0);
+
+  // ── Filtering (apenas transações fora de cartão) ──────────────────────────
+  const filtered = flatTxs.filter((t) => {
     if (scopeFilter !== "all" && t.scope !== scopeFilter) return false;
     if (typeFilter === "income" && !isIncome(t.type)) return false;
     if (
@@ -262,8 +302,25 @@ export default function TransacaoList({
         </div>
       </div>
 
-      {/* Lista de transações */}
-      {filtered.length === 0 ? (
+      {/* ── Grupos de fatura (fixos no topo) ── */}
+      {faturaGrupos.length > 0 && (
+        <div className="space-y-2 mb-4">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide px-0.5">
+            Faturas de cartão
+          </p>
+          {faturaGrupos.map((grupo) => (
+            <FaturaGrupoCard
+              key={grupo.cartaoId}
+              grupo={grupo}
+              mes={mes}
+              onPaid={handleSaved}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ── Lista de transações ── */}
+      {filtered.length === 0 && faturaGrupos.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-sm">Nenhuma transação encontrada.</p>
           {transacoes.length === 0 && (
@@ -272,7 +329,7 @@ export default function TransacaoList({
             </p>
           )}
         </div>
-      ) : (
+      ) : filtered.length > 0 ? (
         <div className="space-y-2">
           {filtered.map((t) => (
             <TransacaoCard
@@ -284,7 +341,7 @@ export default function TransacaoList({
             />
           ))}
         </div>
-      )}
+      ) : null}
 
       {/* Modais */}
       {showModal && (

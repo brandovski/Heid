@@ -176,6 +176,13 @@
 - [x] Navegação entre meses no dashboard
 - [x] Loading states e tratamento de erros em todos os componentes
 
+**Melhorias pós-fase (Sessão 012):**
+- [x] Redesign `CartaoCard` — layout tipo cartão de crédito real (`aspect-[8/5]`, cor dinâmica, chip EMV, número mascarado)
+- [x] `FaturaDetalheModal` — modal de detalhe da fatura com navegação de mês, lista de transações e botão "Pagar Fatura"
+- [x] `PagarFaturaModal` — componente compartilhado com UX total/parcial + DatePicker + observações (usado por Dashboard, Cartões e Transações)
+- [x] `POST /api/faturas` — ao pagar fatura faz bulk-update `status = 'paid'` em todas as transactions do cartão no mês
+- [x] `FaturaGrupoCard` em `/transacoes` — agrupa transações de cartão por fatura no topo da lista; expansível; badge Pendente/Pago; botão "Pagar Fatura"
+
 **Critério de conclusão:** dashboard exibe todos os dados corretamente para o mês corrente e meses anteriores. ✅ **Concluído em 2026-02-26**
 
 ---

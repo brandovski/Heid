@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import TransacaoList from "./_components/TransacaoList";
-import type { TransactionWithRelations } from "./_components/types";
+import type { TransactionWithRelations, InvoicePaymentSimple } from "./_components/types";
 
 function getMonthRange(mes: string) {
   const [year, month] = mes.split("-").map(Number);
@@ -28,11 +28,11 @@ export default async function TransacoesPage({
 
   const { firstDay, lastDay } = getMonthRange(mes);
 
-  const [transacoesRes, categoriasRes, cartoesRes] = await Promise.all([
+  const [transacoesRes, categoriasRes, cartoesRes, invoicePaymentsRes] = await Promise.all([
     supabase
       .from("transactions")
       .select(
-        "*, category:categories(id, name, icon, color), credit_card:credit_cards(id, name, brand)"
+        "*, category:categories(id, name, icon, color), credit_card:credit_cards(id, name, brand, color)"
       )
       .gte("date", firstDay)
       .lte("date", lastDay)
@@ -45,9 +45,13 @@ export default async function TransacoesPage({
       .order("name"),
     supabase
       .from("credit_cards")
-      .select("id, name, brand")
+      .select("id, name, brand, color")
       .eq("is_active", true)
       .order("name"),
+    supabase
+      .from("invoice_payments")
+      .select("id, credit_card_id, amount_paid, paid_at")
+      .eq("reference_month", mes),
   ]);
 
   return (
@@ -56,6 +60,7 @@ export default async function TransacoesPage({
         transacoes={(transacoesRes.data ?? []) as unknown as TransactionWithRelations[]}
         categorias={categoriasRes.data ?? []}
         cartoes={cartoesRes.data ?? []}
+        invoicePayments={(invoicePaymentsRes.data ?? []) as InvoicePaymentSimple[]}
         mes={mes}
         currentUserId={user.id}
       />
