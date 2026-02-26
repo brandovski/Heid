@@ -247,6 +247,35 @@ investment_id: string | null;
 
 ---
 
+### [2026-02-26] upsert({ ignoreDuplicates: true }) não funciona com índices parciais
+
+**Contexto:** Cron `generate-monthly` — tentativa de usar `upsert({ ignoreDuplicates: true })` para idempotência.
+
+**Erro:**
+```
+duplicate key value violates unique constraint "idx_transactions_fixed_expense_month"
+```
+
+**Causa:** O Supabase JS gera `ON CONFLICT (id) DO NOTHING` (verifica apenas o PK). Como cada insert usa uma nova UUID, o PK nunca conflita. O índice parcial fica sem cobertura e lança constraint violation normalmente.
+
+**Correção:** pré-filtro antes do insert — buscar quais `fixed_income_id`/`fixed_expense_id`/`subscription_id` já têm transação `auto_generated = true` no mês corrente, filtrar as entidades que já existem, e usar `.insert()` apenas para as novas.
+
+**Regra permanente:** não usar `upsert({ ignoreDuplicates: true })` para idempotência com índices parciais. Sempre pré-filtrar.
+
+---
+
+### [2026-02-26] Middleware bloqueando rotas de cron
+
+**Contexto:** Endpoints `/api/cron/*` retornavam redirect para `/login` ao chamar via curl.
+
+**Causa:** O middleware de autenticação intercepta todas as rotas e redireciona requisições sem sessão. Crons não têm sessão — usam `CRON_SECRET`.
+
+**Correção:** adicionar `"/api/cron"` ao array `publicRoutes` no `src/middleware.ts`.
+
+**Regra permanente:** toda rota de API que usa autenticação própria (cron secret, webhook secret, etc.) deve ser adicionada a `publicRoutes` no middleware.
+
+---
+
 ### [2026-02-25] Dev server com assets 404 após rm -rf .next
 
 **Contexto:** Após limpar o cache e rodar `npm run dev -- --port 3001`, o browser ainda recebia 404 para `layout.css`, `app-pages-internals.js` e `main-app.js`.

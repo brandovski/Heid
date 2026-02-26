@@ -123,9 +123,9 @@
 - [x] Garantir idempotência (verificar existência antes de inserir)
 - [x] Implementar cron `supabase-keepalive` (a cada 3 dias)
 - [x] Configurar `vercel.json` com os schedules dos crons
-- [ ] Testar geração manual via chamada direta ao endpoint
+- [x] Testar geração manual via chamada direta ao endpoint
 
-**Critério de conclusão:** ao acionar manualmente o cron, transações do mês são geradas corretamente e sem duplicatas.
+**Critério de conclusão:** ao acionar manualmente o cron, transações do mês são geradas corretamente e sem duplicatas. ✅ **Concluído em 2026-02-26**
 
 ---
 

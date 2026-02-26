@@ -9,9 +9,9 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 5 — Cron Jobs (implementada; pendente: teste manual)
+**Fase:** Fase 6 — Orçamento Mensal
 **Última sessão:** 2026-02-26
-**Próxima ação:** Fase 6 — Orçamento Mensal (após validação manual dos crons)
+**Próxima ação:** Iniciar Fase 6 — Orçamento Mensal
 
 ### O que está feito
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
@@ -50,7 +50,7 @@
 - [x] Fase 2 — CRUD base concluída
 - [x] Fase 3 — Transações Manuais concluída
 - [x] Fase 4 — Parcelamentos e Assinaturas concluída
-- [x] Implementar Fase 5: Cron Jobs (3 endpoints; pendente: teste manual)
+- [x] Implementar e validar Fase 5: Cron Jobs ✅
 
 ### Referências do ambiente
 - **Supabase project ref:** `djteloswmyjsqeplzkxy`
@@ -100,10 +100,10 @@
 - `fetch-exchange-rate` deve rodar em dia 1 às 05:30 e `generate-monthly` às 06:00 — cotação atualizada antes da geração das transações de assinatura
 
 **Problemas encontrados:**
-- Nenhum — build passou sem erros na primeira tentativa
+- `upsert({ ignoreDuplicates: true })` não funciona com índices parciais via Supabase JS: gera `ON CONFLICT (id) DO NOTHING` (só verifica PK), e o índice parcial ainda lança constraint violation. Corrigido com pré-filtro: busca IDs já existentes no mês antes de inserir e usa `.insert()` apenas para os novos.
+- Middleware bloqueava `/api/cron/*` (redirect para /login). Corrigido adicionando `/api/cron` ao array `publicRoutes`.
 
 **Próxima sessão:**
-- Testar geração manual via chamada direta ao endpoint (com `dev run` + curl)
 - Iniciar Fase 6: Orçamento Mensal
 
 ---
