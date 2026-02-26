@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import { ProgressBar } from "@tremor/react";
+import ProgressBar from "@/components/ui/ProgressBar";
 import GraficoEvolucao from "./GraficoEvolucao";
 import GraficoCategoria from "./GraficoCategoria";
 import FaturaModal from "./FaturaModal";

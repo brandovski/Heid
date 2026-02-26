@@ -140,7 +140,69 @@ Ao chegar na fase correspondente, lembrar de verificar dependências antes de ap
 
 ---
 
-## 2. Padrões de UI / Mobile
+## 2. Biblioteca de UI e Componentes
+
+### 2.0 Dependências de UI — decisões consolidadas
+
+| Biblioteca | Status | Motivo |
+|---|---|---|
+| `@tremor/react` | ❌ **Removida** | Visual opinionado, difícil de customizar, bundle pesado |
+| `recharts` | ✅ **Usada diretamente** | Recharts já era transitivo via Tremor; usar direto dá controle total sem custo de bundle |
+| Tailwind CSS | ✅ | Padrão de estilização de toda a UI |
+
+**Regra permanente:** não adicionar bibliotecas de componentes de UI de terceiros (Tremor, shadcn, Chakra, MUI, etc.). Toda UI é construída com Tailwind + componentes próprios em `src/components/ui/`. Exceção: se o componente for incrivelmente complexo de reimplementar (ex: date picker), avaliar caso a caso.
+
+---
+
+### 2.0.1 Componentes de UI próprios disponíveis
+
+| Componente | Arquivo | Uso |
+|---|---|---|
+| `Modal` | `src/components/ui/Modal.tsx` | Dialogs / bottom sheets |
+| `ProgressBar` | `src/components/ui/ProgressBar.tsx` | Barras de progresso (orçamento, etc.) |
+| `DatePicker` | `src/components/ui/DatePicker.tsx` | Seleção de datas (popover desktop, bottom sheet mobile) |
+| `ScopeSelector` | `src/components/ui/ScopeSelector.tsx` | Toggle Familiar/Pessoal |
+
+---
+
+### 2.0.2 Padrão de gráficos — Recharts com componentes customizados
+
+Gráficos são implementados como componentes `"use client"` individuais na pasta `_components/` de cada page. Cada componente encapsula: `ResponsiveContainer`, gradientes SVG, tooltip customizado (card branco com sombra) e paleta de cores do projeto.
+
+**Paleta de cores para gráficos:**
+
+```typescript
+// Séries temporais (receitas/despesas)
+receitas: "#2563eb" // blue-600
+despesas: "#f43f5e" // rose-500
+
+// Distribuição por categoria (donut/pie — até 10 fatias)
+const DONUT_COLORS = [
+  "#2563eb", "#7c3aed", "#db2777", "#ea580c", "#16a34a",
+  "#0891b2", "#d97706", "#9333ea", "#dc2626", "#0d9488",
+];
+```
+
+**Tooltip padrão:** card branco (`bg-white border border-gray-100 shadow-xl rounded-xl px-4 py-3 text-xs`).
+
+**Referência de implementação:** `src/app/(app)/dashboard/_components/GraficoEvolucao.tsx` e `GraficoCategoria.tsx`.
+
+---
+
+### 2.0.3 ProgressBar
+
+```tsx
+import ProgressBar from "@/components/ui/ProgressBar";
+
+<ProgressBar value={75} color="blue" />   // azul (padrão)
+<ProgressBar value={110} color="red" />   // vermelho (acima do limite)
+```
+
+`value` é clampado entre 0 e 100 automaticamente. `color` aceita `"blue"` | `"red"`.
+
+---
+
+## 3. Padrões de UI / Mobile
 
 ### 2.1 Modal — estrutura padrão
 
@@ -211,9 +273,9 @@ Tabs/segmented controls devem ser `w-full sm:w-fit` no mobile, com botões `flex
 
 ---
 
-## 3. Padrões de TypeScript / Tipos
+## 4. Padrões de TypeScript / Tipos
 
-### 2.1 Campos de entidade sempre tipados como `string | null` para UUIDs opcionais
+### 4.1 Campos de entidade sempre tipados como `string | null` para UUIDs opcionais
 
 ```typescript
 // CORRETO
@@ -223,7 +285,7 @@ investment_id: string | null;
 investment_id?: string;  // undefined != null no banco
 ```
 
-### 2.2 Datas do banco são sempre `string` no TypeScript
+### 4.2 Datas do banco são sempre `string` no TypeScript
 
 O Supabase retorna datas (DATE, TIMESTAMPTZ) como strings. Nunca usar `Date` nas interfaces.
 
@@ -232,7 +294,7 @@ date: string;         // DATE — 'YYYY-MM-DD'
 created_at: string;   // TIMESTAMPTZ — ISO 8601
 ```
 
-### 2.3 Comentar a migration de origem em campos novos
+### 4.3 Comentar a migration de origem em campos novos
 
 ```typescript
 // Investimento vinculado (migration 017)
@@ -241,7 +303,7 @@ investment_id: string | null;
 
 ---
 
-## 3. Registro de Erros e Correções
+## 5. Registro de Erros e Correções
 
 > Log cronológico de erros encontrados em execução. Nunca apagar entradas — apenas adicionar.
 
