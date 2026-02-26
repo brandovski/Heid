@@ -40,14 +40,16 @@ export default async function FamiliaPage({
       .select("id, full_name")
       .eq("family_id", profile.family_id),
 
+    // Aportes realizados no mês selecionado
     supabase
       .from("family_contributions")
-      .select("id, user_id, amount, effective_from, notes, created_at")
+      .select("id, user_id, amount, date, transaction_id, notes, created_at")
       .eq("family_id", profile.family_id)
-      .lte("effective_from", lastDay)
-      .order("effective_from", { ascending: false })
-      .limit(20),
+      .gte("date", firstDay)
+      .lte("date", lastDay)
+      .order("date", { ascending: false }),
 
+    // Transações familiares do mês (debita do caixa)
     supabase
       .from("transactions")
       .select(

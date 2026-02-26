@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Settings2, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Users } from "lucide-react";
 import ContribuicaoModal from "./ContribuicaoModal";
 import {
   FamilyMember,
   FamilyContribution,
   FamilyTransaction,
   computeCaixaFamiliar,
-  computeLastDay,
   formatCurrency,
   formatMonth,
   formatDate,
@@ -66,11 +65,8 @@ export default function FamiliaView({
   const router = useRouter();
   const [isContribuicaoOpen, setIsContribuicaoOpen] = useState(false);
 
-  const lastDay = computeLastDay(currentMonth);
-  const { activeContribs, totalContribuicoes, totalGasto, totalReceita, saldoLivre } =
-    computeCaixaFamiliar(contributions, members, familyTransactions, lastDay);
-
-  const myContribution = activeContribs.get(userId) ?? null;
+  const { memberContribs, totalContribuicoes, totalGasto, totalReceita, saldoLivre } =
+    computeCaixaFamiliar(contributions, members, familyTransactions);
 
   function navigate(delta: number) {
     router.push(`/familia?mes=${shiftMonth(currentMonth, delta)}`);
@@ -102,37 +98,45 @@ export default function FamiliaView({
 
       {/* Caixa Familiar */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-          Caixa Familiar
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+            Caixa Familiar
+          </h2>
+          <button
+            onClick={() => setIsContribuicaoOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+          >
+            <Plus size={13} />
+            Registrar aporte
+          </button>
+        </div>
 
         {/* Contributions per member */}
         <div className="grid grid-cols-2 gap-3">
           {members.map((member) => {
-            const contrib = activeContribs.get(member.id) ?? null;
-            const isMe = member.id === userId;
+            const total = memberContribs.get(member.id) ?? 0;
+            const memberConts = contributions.filter(
+              (c) => c.user_id === member.id
+            );
             return (
               <div
                 key={member.id}
-                className="bg-gray-50 rounded-xl p-3.5 flex flex-col gap-1.5"
+                className="bg-gray-50 rounded-xl p-3.5 flex flex-col gap-1"
               >
                 <p className="text-xs text-gray-500 truncate">
                   {member.full_name ?? "Usuário"}
                 </p>
                 <p className="text-base font-bold text-gray-900">
-                  {contrib ? formatCurrency(contrib.amount) : "—"}
+                  {total > 0 ? formatCurrency(total) : "—"}
                 </p>
-                {!contrib && (
-                  <p className="text-[10px] text-amber-500">Não configurado</p>
+                {memberConts.length > 0 && (
+                  <p className="text-[10px] text-gray-400">
+                    {memberConts.length}{" "}
+                    {memberConts.length === 1 ? "aporte" : "aportes"}
+                  </p>
                 )}
-                {isMe && (
-                  <button
-                    onClick={() => setIsContribuicaoOpen(true)}
-                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition-colors mt-0.5 w-fit"
-                  >
-                    <Settings2 size={11} />
-                    {contrib ? "Alterar" : "Configurar"}
-                  </button>
+                {total === 0 && (
+                  <p className="text-[10px] text-gray-400">Nenhum aporte</p>
                 )}
               </div>
             );
@@ -143,7 +147,7 @@ export default function FamiliaView({
         <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-100">
           {[
             {
-              label: "Total contribuído",
+              label: "Total aportado",
               value: totalContribuicoes,
               color: "text-blue-600",
             },
@@ -246,8 +250,6 @@ export default function FamiliaView({
       <ContribuicaoModal
         isOpen={isContribuicaoOpen}
         onClose={() => setIsContribuicaoOpen(false)}
-        currentContribution={myContribution}
-        currentMonth={currentMonth}
       />
     </div>
   );

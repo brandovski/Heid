@@ -7,7 +7,8 @@ export interface FamilyContribution {
   id: string;
   user_id: string;
   amount: number;
-  effective_from: string;
+  date: string;
+  transaction_id: string | null;
   notes: string | null;
   created_at: string;
 }
@@ -35,38 +36,22 @@ const EXPENSE_TYPES = new Set([
 
 const INCOME_TYPES = new Set(["income", "fixed_income"]);
 
-export function getActiveContribution(
-  contributions: FamilyContribution[],
-  userId: string,
-  lastDay: string
-): FamilyContribution | null {
-  const sorted = contributions
-    .filter((c) => c.user_id === userId && c.effective_from <= lastDay)
-    .sort((a, b) => b.effective_from.localeCompare(a.effective_from));
-  return sorted[0] ?? null;
-}
-
-export function computeLastDay(mes: string): string {
-  const [y, m] = mes.split("-").map(Number);
-  return `${mes}-${String(new Date(y, m, 0).getDate()).padStart(2, "0")}`;
-}
-
 export function computeCaixaFamiliar(
   contributions: FamilyContribution[],
   members: FamilyMember[],
-  familyTransactions: FamilyTransaction[],
-  lastDay: string
+  familyTransactions: FamilyTransaction[]
 ) {
-  const activeContribs = new Map<string, FamilyContribution | null>();
+  // Total aportado no mês por membro
+  const memberContribs = new Map<string, number>();
   for (const member of members) {
-    activeContribs.set(
-      member.id,
-      getActiveContribution(contributions, member.id, lastDay)
-    );
+    const total = contributions
+      .filter((c) => c.user_id === member.id)
+      .reduce((sum, c) => sum + c.amount, 0);
+    memberContribs.set(member.id, total);
   }
 
-  const totalContribuicoes = Array.from(activeContribs.values()).reduce(
-    (sum, c) => sum + (c?.amount ?? 0),
+  const totalContribuicoes = Array.from(memberContribs.values()).reduce(
+    (sum, v) => sum + v,
     0
   );
 
@@ -80,7 +65,12 @@ export function computeCaixaFamiliar(
 
   const saldoLivre = totalContribuicoes - totalGasto + totalReceita;
 
-  return { activeContribs, totalContribuicoes, totalGasto, totalReceita, saldoLivre };
+  return { memberContribs, totalContribuicoes, totalGasto, totalReceita, saldoLivre };
+}
+
+export function computeLastDay(mes: string): string {
+  const [y, m] = mes.split("-").map(Number);
+  return `${mes}-${String(new Date(y, m, 0).getDate()).padStart(2, "0")}`;
 }
 
 export function formatCurrency(value: number): string {

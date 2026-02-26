@@ -22,42 +22,51 @@ export async function POST(request: Request) {
     );
 
   const body = await request.json();
-  const { amount, notes, mes } = body;
+  const { amount, date, notes } = body;
 
   if (!amount || isNaN(Number(amount)) || Number(amount) <= 0)
     return NextResponse.json({ error: "Valor inválido" }, { status: 400 });
 
-  if (!mes || !/^\d{4}-\d{2}$/.test(mes))
-    return NextResponse.json({ error: "Mês inválido" }, { status: 400 });
+  const dateToUse = date ?? new Date().toISOString().split("T")[0];
 
-  const effectiveFrom = `${mes}-01`;
-
-  // Verifica se já existe contribuição para este usuário+família+mês
-  const { data: existing } = await supabase
-    .from("family_contributions")
+  // 1. Cria despesa pessoal (dinheiro sai da conta do usuário)
+  const { data: tx, error: txError } = await supabase
+    .from("transactions")
+    .insert({
+      family_id: profile.family_id,
+      description: "Contribuição ao Caixa Familiar",
+      amount: Number(amount),
+      date: dateToUse,
+      type: "expense",
+      status: "paid",
+      scope: "personal",
+      user_id: user.id,
+      auto_generated: false,
+      paid_at: new Date().toISOString(),
+      notes: notes ?? null,
+    })
     .select("id")
-    .eq("family_id", profile.family_id)
-    .eq("user_id", user.id)
-    .eq("effective_from", effectiveFrom)
-    .maybeSingle();
+    .single();
 
-  if (existing) {
-    const { error } = await supabase
-      .from("family_contributions")
-      .update({ amount: Number(amount), notes: notes ?? null })
-      .eq("id", existing.id);
-    if (error)
-      return NextResponse.json({ error: error.message }, { status: 500 });
-  } else {
-    const { error } = await supabase.from("family_contributions").insert({
+  if (txError)
+    return NextResponse.json({ error: txError.message }, { status: 500 });
+
+  // 2. Registra o aporte no Caixa Familiar vinculando à transação
+  const { error: contribError } = await supabase
+    .from("family_contributions")
+    .insert({
       family_id: profile.family_id,
       user_id: user.id,
       amount: Number(amount),
-      effective_from: effectiveFrom,
+      date: dateToUse,
+      transaction_id: tx.id,
       notes: notes ?? null,
     });
-    if (error)
-      return NextResponse.json({ error: error.message }, { status: 500 });
+
+  if (contribError) {
+    // Rollback: remove a transação criada
+    await supabase.from("transactions").delete().eq("id", tx.id);
+    return NextResponse.json({ error: contribError.message }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

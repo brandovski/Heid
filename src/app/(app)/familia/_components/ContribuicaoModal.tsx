@@ -3,34 +3,32 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/ui/Modal";
-import { FamilyContribution, formatCurrency } from "./types";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  currentContribution: FamilyContribution | null;
-  currentMonth: string;
 }
 
-export default function ContribuicaoModal({
-  isOpen,
-  onClose,
-  currentContribution,
-  currentMonth,
-}: Props) {
+function todayString() {
+  return new Date().toISOString().split("T")[0];
+}
+
+export default function ContribuicaoModal({ isOpen, onClose }: Props) {
   const router = useRouter();
   const [amount, setAmount] = useState("");
+  const [date, setDate] = useState(todayString());
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (isOpen) {
-      setAmount(currentContribution ? String(currentContribution.amount) : "");
-      setNotes(currentContribution?.notes ?? "");
+      setAmount("");
+      setDate(todayString());
+      setNotes("");
       setError("");
     }
-  }, [isOpen, currentContribution]);
+  }, [isOpen]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,12 +40,12 @@ export default function ContribuicaoModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: parseFloat(amount),
+          date,
           notes: notes || null,
-          mes: currentMonth,
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erro ao salvar");
+      if (!res.ok) throw new Error(data.error ?? "Erro ao registrar");
       router.refresh();
       onClose();
     } catch (err) {
@@ -61,7 +59,7 @@ export default function ContribuicaoModal({
 
   return (
     <Modal
-      title="Minha contribuição"
+      title="Registrar aporte"
       onClose={onClose}
       footer={
         <>
@@ -80,25 +78,20 @@ export default function ContribuicaoModal({
               disabled={loading}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              {loading ? "Salvando..." : "Salvar"}
+              {loading ? "Registrando..." : "Registrar"}
             </button>
           </div>
         </>
       }
     >
       <form id="contribuicao-form" onSubmit={handleSubmit} className="space-y-4">
-        {currentContribution && (
-          <p className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
-            Contribuição atual:{" "}
-            <span className="font-medium text-gray-700">
-              {formatCurrency(currentContribution.amount)}/mês
-            </span>
-          </p>
-        )}
+        <p className="text-xs text-gray-500 bg-blue-50 text-blue-700 rounded-lg px-3 py-2">
+          O valor será registrado como despesa pessoal e creditado no Caixa Familiar.
+        </p>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Valor mensal (R$)
+            Valor (R$)
           </label>
           <input
             type="number"
@@ -109,6 +102,19 @@ export default function ContribuicaoModal({
             step="0.01"
             placeholder="0,00"
             autoFocus
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Data
+          </label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
