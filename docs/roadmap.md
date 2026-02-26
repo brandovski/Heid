@@ -35,10 +35,10 @@
 - [x] Migration 014: criar `family_contributions` para o Caixa Familiar
 - [x] Migration 015: criar `projects`, `project_groups`, `project_items`
 - [x] Migration 016: substituir políticas `family_access` por `scoped_select`/`scoped_modify`
-- [ ] Rodar migrations 013, 014, 016 no Supabase (migration 015 aguarda Fase 9)
-- [ ] Atualizar `src/types/database.ts` com novos campos e interfaces
+- [x] Rodar migrations 013, 014, 016 no Supabase (migration 015 aguarda Fase 9)
+- [x] Atualizar `src/types/database.ts` com novos campos e interfaces
 
-**Critério de conclusão:** banco suporta dados pessoais e familiares com RLS correto.
+**Critério de conclusão:** banco suporta dados pessoais e familiares com RLS correto. ✅ **Concluído em 2026-02-25**
 
 ---
 
@@ -47,30 +47,30 @@
 **Objetivo:** usuário consegue cadastrar e gerenciar as entidades fundamentais do sistema.
 
 ### Categorias
-- [ ] Listagem de categorias
-- [ ] Criar categoria (nome, ícone, cor)
-- [ ] Editar categoria
-- [ ] Arquivar categoria (soft delete — não permitir exclusão com vínculos)
+- [x] Listagem de categorias
+- [x] Criar categoria (nome, ícone, cor)
+- [x] Editar categoria
+- [x] Arquivar categoria (soft delete — não permitir exclusão com vínculos)
 
 ### Cartões de Crédito
-- [ ] Listagem de cartões (pessoais e da família)
-- [ ] Criar cartão com seleção de escopo e opção de compartilhamento
-- [ ] Editar cartão
-- [ ] Desativar cartão (is_active = false)
+- [x] Listagem de cartões (pessoais e da família)
+- [x] Criar cartão com seleção de escopo e opção de compartilhamento
+- [x] Editar cartão
+- [x] Desativar cartão (is_active = false)
 
 ### Receitas Fixas
-- [ ] Listagem de receitas fixas (pessoais e da família)
-- [ ] Criar receita fixa com escopo e opção de compartilhamento
-- [ ] Editar receita fixa
-- [ ] Ativar / desativar receita fixa
+- [x] Listagem de receitas fixas (pessoais e da família)
+- [x] Criar receita fixa com escopo e opção de compartilhamento
+- [x] Editar receita fixa
+- [x] Ativar / desativar receita fixa
 
 ### Despesas Fixas
-- [ ] Listagem de despesas fixas (pessoais e da família)
-- [ ] Criar despesa fixa com escopo, compartilhamento e vínculo opcional a cartão
-- [ ] Editar despesa fixa
-- [ ] Ativar / desativar despesa fixa
+- [x] Listagem de despesas fixas (pessoais e da família)
+- [x] Criar despesa fixa com escopo, compartilhamento e vínculo opcional a cartão
+- [x] Editar despesa fixa
+- [x] Ativar / desativar despesa fixa
 
-**Critério de conclusão:** todas as entidades base podem ser criadas com escopo correto, editadas e desativadas sem erros.
+**Critério de conclusão:** todas as entidades base podem ser criadas com escopo correto, editadas e desativadas sem erros. ✅ **Concluído em 2026-02-25**
 
 ---
 

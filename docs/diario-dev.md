@@ -9,9 +9,9 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 2 — CRUD Base
+**Fase:** Fase 3 — Transações Manuais
 **Última sessão:** 2026-02-25
-**Próxima ação:** Fase 2 concluída — iniciar Fase 3 (Transações Manuais)
+**Próxima ação:** Iniciar Fase 3 — Transações Manuais (listagem, criar, editar, mudar status)
 
 ### O que está feito
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
@@ -74,34 +74,43 @@
 
 ### Sessão 005 — 2026-02-25
 
-**Objetivo:** Implementar Fase 2 — CRUD Base (categorias, cartões, receitas e despesas fixas)
+**Objetivo:** Implementar Fase 2 (CRUD Base) + ajustes de UX e mobile pós-teste
 
 **O que foi feito:**
+
+*Fase 2 — CRUD Base:*
 - Instalada dependência `lucide-react` para ícones
 - Criada Navbar com ícones (Dashboard, Categorias, Cartões, Fixas, Sair)
-- Atualizado layout `(app)` para incluir a Navbar
 - Criados componentes compartilhados: `Modal.tsx` e `ScopeSelector.tsx`
-- CRUD completo de **Categorias**: listagem, criar, editar, arquivar (soft delete)
-  - Seletor de cor com 12 presets, campo de emoji para ícone
-- CRUD completo de **Cartões de Crédito**: listagem (grid), criar, editar, desativar
-  - Seletor de bandeira, dias de fechamento/vencimento, limite opcional, 4 últimos dígitos, cor, scope
-- CRUD de **Receitas e Despesas Fixas** em única página `/fixas` com abas (tabs)
-  - Receitas: descrição, valor, dia do mês, categoria, data de início, notas, scope
-  - Despesas: mesmos campos + forma de pagamento (conta ou cartão de crédito)
-- 8 API Routes implementadas (POST e PATCH com [id] para cada entidade)
-  - `family_id` e `user_id` extraídos da sessão autenticada — nunca vêm do formulário
-  - RLS do Supabase aplicado automaticamente via anon key + session
-- Build passando sem erros de TypeScript
-- Commit e push para GitHub
+- CRUD completo de **Categorias**, **Cartões de Crédito**, **Receitas e Despesas Fixas**
+- 8 API Routes com validação, `family_id`/`user_id` via session, RLS automático
+- Página `/fixas` com abas (Receitas | Despesas) em único layout
+
+*Ajustes de UX pós-teste:*
+- `Modal.tsx` refatorado: `max-h-[70vh]`, header/footer fixos, conteúdo scrollável
+- Modal como **bottom sheet** no mobile (`items-end`, `rounded-t-2xl`)
+- Prop `footer` separada nos modais; botões de submit via atributo `form=""`; erro sempre visível no footer
+- `Navbar.tsx`: bottom navigation bar no mobile (`fixed bottom-0`), top bar no desktop
+- `layout.tsx`: `pb-24 sm:pb-0` para não sobrepor bottom nav
+- `FixaCard.tsx`: layout de 2 linhas (nome+valor / metadata+badge+ações)
+- `FixaList.tsx`: tabs `w-full sm:w-fit` com `flex-1` no mobile
+- Padrões de UI/mobile formalizados em `docs/padroes.md` (nova Seção 2)
+
+*Infraestrutura:*
+- Git configurado globalmente: `gabriel.brandao@atus.cloud` / `Gabriel Brandão`
+- 13 commits reescritos com email correto via `git filter-branch`; force push feito
+- `next.config.mjs`: `devIndicators` habilitado no canto inferior direito
+- Erros 404 de cache stale: resolvidos com `rm -rf .next`
 
 **Decisões tomadas:**
-- Categorias sem scope (globais da família), conforme decidido na Fase 1.5
-- Page component (Server) busca dados; List component (Client) gerencia estado de modal
-- Mutações via API Routes (não Server Actions), conforme padrão da arquitetura
-- `router.refresh()` após cada mutação para re-fetch server-side sem reload de página
+- Categorias sem scope (globais da família)
+- Mutações via API Routes (não Server Actions)
+- `router.refresh()` após mutações para re-fetch server-side
+- Modal como bottom sheet no mobile — padrão de apps financeiros (Nubank-like)
 
 **Problemas encontrados:**
-- Nenhum. Build passou limpo na primeira tentativa.
+- Cache stale do `.next` causando erros 404 ao trocar de porta → `rm -rf .next`
+- Timeout aparente no Vercel → na verdade cookie de sessão expirado no browser. Não era bug.
 
 **Próxima sessão:**
 - Iniciar Fase 3: Transações Manuais
