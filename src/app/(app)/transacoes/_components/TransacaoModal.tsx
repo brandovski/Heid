@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import ScopeSelector from "@/components/ui/ScopeSelector";
+import DatePicker from "@/components/ui/DatePicker";
 import type { Category, CreditCard, Scope } from "@/types/database";
 import type { TransactionWithRelations } from "./types";
 
@@ -206,11 +207,10 @@ export default function TransacaoModal({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Data <span className="text-red-500">*</span>
             </label>
-            <input
-              type="date"
+            <DatePicker
               value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={setDate}
+              placeholder="Selecione a data"
             />
           </div>
         </div>
