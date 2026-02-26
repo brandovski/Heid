@@ -1,7 +1,7 @@
 # Sessão 008 — 2026-02-26
 
 **Fase:** Fase 5 — Cron Jobs
-**Resultado:** Fase 5 implementada (pendente: teste manual)
+**Resultado:** Fase 5 implementada e validada ✅
 
 ---
 
@@ -50,7 +50,10 @@ function dateStr(year, month, day): string {
 | `exchange_rate`, `original_amount` | calculados apenas para assinaturas USD |
 | `fixed_income_id`, `fixed_expense_id`, `subscription_id` | FK da entidade-pai; demais = null |
 
-**Idempotência:** `upsert({ ignoreDuplicates: true })` → gera `INSERT ... ON CONFLICT DO NOTHING`. O banco garante unicidade via índices parciais existentes (migration 012):
+**Idempotência:** pré-filtro de IDs existentes + `.insert()` somente para os novos.
+`upsert({ ignoreDuplicates: true })` foi descartado: o Supabase JS gera `ON CONFLICT (id) DO NOTHING` (apenas PK), e os índices parciais ainda lançam constraint violation. Solução documentada em `docs/padroes.md`.
+
+Índices parciais de referência (migration 012):
 - `idx_tx_fixed_income_auto_month` em `(fixed_income_id, year_month_key(date)) WHERE auto_generated = true`
 - `idx_tx_fixed_expense_auto_month` em `(fixed_expense_id, year_month_key(date)) WHERE auto_generated = true`
 - `idx_tx_subscription_auto_month` em `(subscription_id, year_month_key(date)) WHERE auto_generated = true`
@@ -81,7 +84,21 @@ function dateStr(year, month, day): string {
 
 ## Problemas encontrados
 
-Nenhum — build passou sem erros na primeira tentativa.
+**1. Middleware bloqueando `/api/cron/*`**
+- Sintoma: curl retornava `/login%` (redirect para login)
+- Causa: middleware de autenticação intercepta todas as rotas sem sessão
+- Fix: adicionar `"/api/cron"` ao array `publicRoutes` no `src/middleware.ts`
+- Regra permanente documentada em `padroes.md`
+
+**2. `upsert({ ignoreDuplicates: true })` não funciona com índices parciais**
+- Sintoma: segunda execução do cron retornava `errors: ["duplicate key value violates unique constraint ..."]`
+- Causa: Supabase JS gera `ON CONFLICT (id) DO NOTHING` — verifica só o PK, não os índices parciais
+- Fix: pré-filtro de IDs existentes no mês + `.insert()` apenas para os novos
+- Regra permanente documentada em `padroes.md`
+
+**3. Porta errada nos comandos curl de teste**
+- Sintoma: dev server na porta 3001 mas comandos curl apontavam para 3000
+- Fix: usar porta correta; evitar backslash `\` em comandos (usar linha única)
 
 ---
 
@@ -111,8 +128,4 @@ Migrations diferidas: 015 (Fase 9), 017 Parte 5 (Fase 9), 018 (Fase 10)
 
 ## Próxima sessão
 
-**Teste manual + Fase 6 — Orçamento Mensal**
-
-- Testar `GET /api/cron/generate-monthly` via curl com dev server rodando
-- Verificar que transações geradas têm scope/user_id corretos e sem duplicatas
-- Iniciar Fase 6: Orçamento Mensal (listagem, criação, clonar do mês anterior, barras de progresso)
+**Fase 6 — Orçamento Mensal** (iniciada na sessão 009 desta mesma sessão de trabalho)

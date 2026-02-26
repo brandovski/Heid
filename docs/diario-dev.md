@@ -22,7 +22,7 @@
 - [x] Projeto Next.js 14.2.35 criado e buildando sem erros
 - [x] Dependências instaladas: @supabase/ssr, @supabase/supabase-js, @tremor/react, clsx, tailwind-merge
 - [x] Tailwind CSS configurado (com path do Tremor no content)
-- [x] 18 migrations SQL criadas (`supabase/migrations/001-018`)
+- [x] 19 migrations SQL criadas (`supabase/migrations/001-019`)
 - [x] Seed de categorias padrão (`supabase/seed.sql`)
 - [x] Clientes Supabase: browser, server e service role
 - [x] Middleware de proteção de rotas com `getUser()` (seguro)
@@ -36,6 +36,9 @@
 - [x] `src/types/database.ts` atualizado com tipos de investimento e campos de migration 017
 - [x] Fase 3 — CRUD de Transações Manuais (`/transacoes`, filtros, modal, badges de status)
 - [x] `react-day-picker` instalado — `DatePicker` reutilizável com bottom sheet mobile e popover desktop
+- [x] Fase 4 — Parcelamentos e Assinaturas concluída
+- [x] Fase 5 — Cron Jobs validados (middleware fix + idempotência por pré-filtro)
+- [x] Fase 6 — Orçamento Mensal com ProgressBar, toggle escopo, clonar mês anterior
 
 ### O que está pendente
 - [x] Rodar migration 013 no Supabase (aplicada em sessão anterior)
