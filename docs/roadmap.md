@@ -150,14 +150,14 @@
 
 **Objetivo:** tela dedicada à gestão financeira conjunta do casal.
 
-- [x] Tela `/familia` com toggle Pessoal | Familiar na navegação principal
-- [x] Configuração de contribuição mensal (cada usuário define o seu valor no Caixa Familiar)
-- [x] Exibição do Caixa Familiar: contribuição de cada um + total disponível + saldo livre
-- [x] Visão de despesas familiares do mês (scope = 'family')
-- [x] Visualização de itens pessoais compartilhados pelo parceiro (is_shared = true, somente leitura)
-- [x] Indicação clara de quem é dono de cada item pessoal compartilhado
+- [x] Tela `/familia` com navegação por mês
+- [x] Registro de aportes reais ao Caixa Familiar (cria despesa pessoal vinculada via `transaction_id`)
+- [x] Exibição do Caixa Familiar: total aportado por membro no mês + contagem de aportes
+- [x] Totais: total aportado, gastos familiares, saldo livre
+- [x] Visão de transações familiares do mês (scope = 'family')
+- [x] Migration 020: renomeia `effective_from→date`, adiciona FK `transaction_id`, remove unique constraint
 
-**Critério de conclusão:** cada usuário vê sua visão pessoal e a visão familiar, com o Caixa Familiar calculado corretamente. ✅ **Concluído em 2026-02-26**
+**Critério de conclusão:** Caixa Familiar reflete movimentos financeiros reais; saldo calculado dinamicamente. ✅ **Concluído em 2026-02-26**
 
 ---
 
@@ -165,18 +165,18 @@
 
 **Objetivo:** tela principal consolidada com visão financeira completa do mês.
 
-- [ ] Cards de resumo: Receitas, Despesas, Saldo realizado, A receber, A pagar
-- [ ] Toggle Pessoal | Familiar nos cards de resumo
-- [ ] Gráfico de evolução dos últimos 6 meses (`<AreaChart />`)
-- [ ] Gráfico de distribuição por categoria (`<DonutChart />`)
-- [ ] Seção de orçamento por categoria com `<ProgressBar />`
-- [ ] Cards de faturas por cartão com status e botão de pagamento
-- [ ] Modal de registro de pagamento de fatura
-- [ ] Tabela de próximos lançamentos (próximos 7–10 `pending`)
-- [ ] Navegação entre meses no dashboard
-- [ ] Loading states e tratamento de erros em todos os componentes
+- [x] Cards de resumo: Receitas, Despesas, Saldo realizado, A receber, A pagar
+- [x] Toggle Pessoal | Familiar nos cards de resumo
+- [x] Gráfico de evolução dos últimos 6 meses (`<AreaChart />`)
+- [x] Gráfico de distribuição por categoria (`<DonutChart />`)
+- [x] Seção de orçamento por categoria com `<ProgressBar />`
+- [x] Cards de faturas por cartão com status e botão de pagamento
+- [x] Modal de registro de pagamento de fatura
+- [x] Tabela de próximos lançamentos (próximos 7–10 `pending`)
+- [x] Navegação entre meses no dashboard
+- [x] Loading states e tratamento de erros em todos os componentes
 
-**Critério de conclusão:** dashboard exibe todos os dados corretamente para o mês corrente e meses anteriores.
+**Critério de conclusão:** dashboard exibe todos os dados corretamente para o mês corrente e meses anteriores. ✅ **Concluído em 2026-02-26**
 
 ---
 

@@ -9,11 +9,12 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 8 — Dashboard
+**Fase:** Fase 9 — Projetos
 **Última sessão:** 2026-02-26
-**Próxima ação:** Iniciar Fase 8 — Dashboard
+**Próxima ação:** Iniciar Fase 9 — Projetos
 
 ### O que está feito
+- [x] Fase 8 — Dashboard completo (`/dashboard`, 6 queries, 4 componentes, `POST /api/faturas`)
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
 - [x] Roadmap atualizado para 11 fases + Fase 1.5 (`docs/roadmap.md`)
 - [x] Arquitetura atualizada com Seção 7 (Escopo e Visibilidade) (`docs/arquitetura.md`)
@@ -22,7 +23,7 @@
 - [x] Projeto Next.js 14.2.35 criado e buildando sem erros
 - [x] Dependências instaladas: @supabase/ssr, @supabase/supabase-js, @tremor/react, clsx, tailwind-merge
 - [x] Tailwind CSS configurado (com path do Tremor no content)
-- [x] 19 migrations SQL criadas (`supabase/migrations/001-019`)
+- [x] 20 migrations SQL criadas (`supabase/migrations/001-020`)
 - [x] Seed de categorias padrão (`supabase/seed.sql`)
 - [x] Clientes Supabase: browser, server e service role
 - [x] Middleware de proteção de rotas com `getUser()` (seguro)
@@ -82,42 +83,66 @@
 
 ---
 
+### Sessão 011 — 2026-02-26
+
+**Objetivo:** Implementar Fase 8 — Dashboard
+
+**O que foi feito:**
+
+*API Route (1 arquivo):*
+- `POST /api/faturas` — insere em `invoice_payments`; retorna 409 se `UNIQUE(credit_card_id, reference_month)` já existir
+
+*Server Component (`/dashboard/page.tsx`):*
+- `?mes=YYYY-MM` (padrão = mês corrente) + `?escopo=family|personal` (padrão = family)
+- `Promise.all` com 6 queries paralelas: transações do mês, transações históricas (6 meses), orçamentos, cartões, pagamentos de fatura, próximos lançamentos
+- Guard: se `profile.family_id` ausente, exibe aviso sem executar queries
+
+*Client Components (3 arquivos em `_components/`):*
+- `types.ts` — interfaces `TransactionRow`, `HistoricalTxRow`, `UpcomingRow`, `BudgetRow`, `CreditCardRow`, `InvoicePaymentRow`, `DashboardSummary`, `MonthlyTotal`, `CategoryAmount`, `BudgetWithStats`, `InvoiceCardData`; funções `computeSummary`, `computeMonthlyTotals`, `computeCategoryDistribution`, `computeBudgetStats`, `computeInvoiceCards`; helpers `formatCurrency`, `formatMonth`, `formatDate`, `shiftMonth`, `last6Months`
+- `DashboardView.tsx` — header + toggle escopo + navegação de mês; 5 cards de resumo (Receitas/Despesas/Saldo/A receber/A pagar); `<AreaChart />` de evolução (últimos 6 meses); `<DonutChart />` de despesas por categoria; seção de orçamento com `<ProgressBar />` (top 5 + link "ver tudo"); cards de faturas por cartão com status e botão "Registrar pagamento"; tabela de próximos lançamentos pending
+- `FaturaModal.tsx` — formulário com valor (default = total do mês no cartão) e observações; `POST /api/faturas` + `router.refresh()` + `onClose()`
+
+**Decisões tomadas:**
+- `historicalTransactions` é uma query leve (só `amount, date, type, status`) — não carrega `category` nem `credit_card_id` para economizar banda
+- Seção de faturas usa todos os cartões ativos (RLS define visibilidade); filtra exibição para cartões com movimentação no mês ou pagamento registrado
+- Próximos lançamentos: sempre a partir de `todayStr` (independente do mês navegado); respeita o toggle de escopo
+- `computeInvoiceCards` usa as `transactions` do mês corrente (já scoped) para calcular o total por cartão
+
+**Próxima sessão:**
+- Iniciar Fase 9: Projetos (requer rodar migration 015 no Supabase antes de iniciar)
+
+---
+
 ### Sessão 010 — 2026-02-26
 
 **Objetivo:** Implementar Fase 7 — Visão Familiar / Caixa Familiar
 
 **O que foi feito:**
 
-*Sem migration:* Tabela `family_contributions` já existia (migration 014 aplicada).
+*Migration 020:*
+- `020_update_family_contributions.sql` — renomeia `effective_from→date`, adiciona `transaction_id FK`, remove unique constraint, adiciona índice por `(family_id, date)`
+- Modelo revisado: cada `family_contributions` = aporte real (não configuração); cria despesa pessoal vinculada
 
 *API Route (1 arquivo):*
-- `POST /api/familia/contribuicao` — cria ou atualiza contribuição mensal do usuário logado; `effective_from = primeiro dia do mês`; verifica existência antes de inserir (padrão pré-filtro)
+- `POST /api/familia/contribuicao` — 2 passos: (1) cria transação pessoal `expense/personal/paid`; (2) insere `family_contributions` com `transaction_id`; rollback manual se passo 2 falhar
 
 *Server Component (`/familia/page.tsx`):*
-- `?mes=YYYY-MM` e `?view=familiar|pessoal`
-- Busca paralela (`Promise.all`): profiles dos dois membros + contribuições + transações familiares + itens pessoais compartilhados (fixed_incomes, fixed_expenses, subscriptions, credit_cards com `is_shared=true AND user_id != currentUser.id`)
+- `?mes=YYYY-MM` (padrão = mês corrente)
+- `Promise.all` com 3 queries: profiles + aportes do mês + transações familiares do mês
 
-*Client Components (4 arquivos em `_components/`):*
-- `types.ts` — interfaces: `FamilyMember`, `FamilyContribution`, `FamilyTransaction`, `SharedFixedIncome`, `SharedFixedExpense`, `SharedSubscription`, `SharedCreditCard`; helpers: `getActiveContribution`, `computeLastDay`, `computeCaixaFamiliar`, `formatCurrency`, `formatMonth`, `formatDate`, `shiftMonth`
-- `FamiliaView.tsx` — toggle Familiar/Pessoal via URL param; navegação de mês (Familiar); Caixa Familiar card (contribuições por membro, totais, saldo livre); lista de transações familiares; view Pessoal com seções por tipo (somente leitura)
-- `ContribuicaoModal.tsx` — modal simples: valor + notas; `POST /api/familia/contribuicao`
+*Client Components (3 arquivos em `_components/`):*
+- `types.ts` — interfaces `FamilyMember`, `FamilyContribution`, `FamilyTransaction`; `computeCaixaFamiliar` (soma aportes no mês por membro); helpers de formatação
+- `FamiliaView.tsx` — navegação de mês; card Caixa Familiar (total + contagem por membro, totais, saldo livre); lista de transações familiares
+- `ContribuicaoModal.tsx` — formulário: valor, data (padrão = hoje), notas opcionais
 
 *Navbar:*
-- Desktop: 9 itens (+Família com ícone Users, posição 7)
-- Mobile: Parcelas → Família (Parcelas é configuração; Família é consulta frequente)
+- Desktop: +Família (Users, posição 7)
+- Mobile: Parcelas → Família
 
 **Decisões tomadas:**
-- Sem migration necessária — `family_contributions` já existia
-- Contribuição do mês = linha mais recente com `effective_from <= lastDay`; salvar na primeira data do mês (upsert simulado com pré-filtro)
-- `saldoLivre = totalContribuicoes - totalGasto + totalReceita` (receitas familiares somam ao caixa)
-- Itens pessoais compartilhados: query com `.neq('user_id', currentUser.id)` — RLS `scoped_select` já autoriza a leitura pelo parceiro
-- Supabase JS infere join `category:categories(...)` como array no TypeScript → cast `as unknown as FamilyTransaction[]` na passagem de props
-
-**Problemas encontrados:**
-- Inferência de tipo do Supabase JS para joins (categor como array em vez de objeto). Padrão de correção: `as unknown as FamilyTransaction[]` no page.tsx.
-
-**Revisão pós-sessão:**
-- Lógica do Caixa Familiar revisada: `family_contributions` passou de "configuração mensal" para "registro de aporte efetivo". Cada aporte cria uma despesa pessoal vinculada via `transaction_id`. Migration 020 aplicada.
+- Toggle Familiar/Pessoal removido — itens compartilhados já visíveis em `/fixas`, `/assinaturas`, `/cartoes`
+- Contribuição = movimento real: sai da conta pessoal, entra no caixa coletivo
+- Supabase JS infere join `category:categories(...)` como array → cast `as unknown as FamilyTransaction[]`
 
 **Próxima sessão:**
 - Iniciar Fase 8: Dashboard
