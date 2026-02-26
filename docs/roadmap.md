@@ -133,16 +133,16 @@
 
 **Objetivo:** usuário consegue definir e acompanhar o orçamento por categoria.
 
-- [ ] Listagem do orçamento do mês com barra de progresso (`<ProgressBar />`)
-- [ ] Orçamento pessoal e familiar separados (toggle)
-- [ ] Detectar ausência de orçamento no mês e exibir modal de criação
-- [ ] Opção "Clonar do mês anterior"
-- [ ] Adicionar / editar / remover categoria do orçamento
-- [ ] Cálculo: gasto realizado vs. comprometido vs. planejado
-- [ ] Destaque visual para categorias acima do limite
-- [ ] Navegação entre meses
+- [x] Listagem do orçamento do mês com barra de progresso (`<ProgressBar />`)
+- [x] Orçamento pessoal e familiar separados (toggle)
+- [x] Detectar ausência de orçamento no mês e exibir modal de criação
+- [x] Opção "Clonar do mês anterior"
+- [x] Adicionar / editar / remover categoria do orçamento
+- [x] Cálculo: gasto realizado vs. comprometido vs. planejado
+- [x] Destaque visual para categorias acima do limite
+- [x] Navegação entre meses
 
-**Critério de conclusão:** orçamento pessoal e familiar criados e acompanhados com barras de progresso corretas.
+**Critério de conclusão:** orçamento pessoal e familiar criados e acompanhados com barras de progresso corretas. ✅ **Concluído em 2026-02-26**
 
 ---
 

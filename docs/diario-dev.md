@@ -9,9 +9,9 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 6 — Orçamento Mensal
+**Fase:** Fase 7 — Visão Familiar / Caixa Familiar
 **Última sessão:** 2026-02-26
-**Próxima ação:** Iniciar Fase 6 — Orçamento Mensal
+**Próxima ação:** Iniciar Fase 7 — Visão Familiar e Caixa Familiar
 
 ### O que está feito
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
@@ -51,6 +51,7 @@
 - [x] Fase 3 — Transações Manuais concluída
 - [x] Fase 4 — Parcelamentos e Assinaturas concluída
 - [x] Implementar e validar Fase 5: Cron Jobs ✅
+- [x] Implementar Fase 6: Orçamento Mensal ✅
 
 ### Referências do ambiente
 - **Supabase project ref:** `djteloswmyjsqeplzkxy`
@@ -73,6 +74,50 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 009 — 2026-02-26
+
+**Objetivo:** Implementar Fase 6 — Orçamento Mensal
+
+**O que foi feito:**
+
+*Migration:*
+- `019_fix_budget_unique_constraint.sql` — removida `UNIQUE(family_id, reference_month, category_id)` e substituída por dois índices parciais: um para `scope='family'` e outro para `scope='personal'`; aplicada via Management API
+
+*API Routes (3 arquivos):*
+- `POST /api/orcamento` — cria item de orçamento; retorna 409 se categoria já orçada
+- `POST /api/orcamento/clonar` — busca orçamentos do mês anterior; pré-filtra categorias já existentes no destino; insere apenas as novas (padrão pré-filtro, evita conflito com índice parcial)
+- `PATCH /api/orcamento/[id]` — edita `planned_amount` e `notes`
+- `DELETE /api/orcamento/[id]` — remove categoria do orçamento
+
+*Server Component (`/orcamento/page.tsx`):*
+- URL params `?mes=YYYY-MM` e `?escopo=family|personal`
+- Busca paralela (`Promise.all`): budgets + transações de despesa + categorias ativas
+- Filtra transações por scope; para personal, também filtra por user_id
+
+*Client Components (4 arquivos em `_components/`):*
+- `types.ts` — `BudgetEntry`, `BudgetWithStats`, `CategoryStats`, helpers `computeStats`, `formatCurrency`, `formatMonth`, `shiftMonth`
+- `OrcamentoList.tsx` — toggle Familiar/Pessoal, navegação de mês, card de totais (Planejado/Pago/Comprometido/Disponível), estado vazio com CTAs "Clonar do mês anterior" e "Criar do zero", botão "Adicionar categoria"
+- `OrcamentoCard.tsx` — `<ProgressBar />` Tremor, valores gasto/comprometido/planejado, badge "Acima do limite" em vermelho, exclusão com confirmação inline
+- `OrcamentoModal.tsx` — criar (seletor de categoria filtrando as já orçadas) / editar (categoria bloqueada)
+
+*Navbar:*
+- Desktop: 8 itens (+Orçamento com ícone PieChart)
+- Mobile: Fixas substituída por Orçamento (Fixas é configuração; Orçamento é uso diário)
+
+**Decisões tomadas:**
+- Toggle Familiar/Pessoal altera URL param `?escopo` → server re-fetch (consistente com navegação de mês)
+- "Clonar" usa pré-filtro (mesmo padrão de `generate-monthly`) — não usa upsert com ignoreDuplicates
+- Exclusão de item: confirmação inline no card (sem modal separado) para fluxo mais rápido
+- Cálculo de "disponível" = planejado − pago − comprometido; negativo → vermelho
+
+**Problemas encontrados:**
+- `Modal` não tem prop `isOpen` — resolvido com `if (!isOpen) return null` no topo do `OrcamentoModal`
+
+**Próxima sessão:**
+- Iniciar Fase 7: Visão Familiar e Caixa Familiar
 
 ---
 
