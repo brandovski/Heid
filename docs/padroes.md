@@ -140,7 +140,78 @@ Ao chegar na fase correspondente, lembrar de verificar dependências antes de ap
 
 ---
 
-## 2. Padrões de TypeScript / Tipos
+## 2. Padrões de UI / Mobile
+
+### 2.1 Modal — estrutura padrão
+
+Todo modal usa o componente `src/components/ui/Modal.tsx` com três zonas:
+
+| Zona | Classe | Comportamento |
+|---|---|---|
+| Header (título + fechar) | `shrink-0` | Sempre visível, não rola |
+| Conteúdo (campos) | `flex-1 overflow-y-auto` | Scrollável quando conteúdo excede altura |
+| Footer (botões + erro) | `shrink-0` | Sempre visível, não rola |
+
+**Altura máxima:** `max-h-[70vh]` — nunca excede 70% da viewport.
+
+**Prop `footer`:** os botões de ação e a mensagem de erro vão **sempre** no `footer`, não no `children`. Isso garante que os botões estejam sempre visíveis.
+
+**Botão de submit fora do `<form>`:** usar o atributo HTML `form="<id>"` no botão para associá-lo ao formulário sem precisar estar dentro dele:
+```tsx
+// Formulário nos children
+<form id="meu-form" onSubmit={handleSubmit}>...</form>
+
+// Botão no footer
+<button type="submit" form="meu-form">Salvar</button>
+```
+
+**Mobile:** no mobile (`< sm`), o modal é exibido como **bottom sheet** (sobe de baixo, `rounded-t-2xl`). No desktop, é dialog centralizado (`sm:rounded-xl`).
+
+---
+
+### 2.2 Navbar — dual layout mobile/desktop
+
+- **Desktop (`sm:`):** top navbar horizontal com texto + ícone
+- **Mobile (default):** bottom navigation bar fixo (`fixed bottom-0`), somente ícone + label curto
+
+O layout `(app)` adiciona `pb-24 sm:pb-0` ao `<main>` para evitar sobreposição com a bottom nav no mobile.
+
+---
+
+### 2.3 Touch targets
+
+Botões de ação interativa devem ter área mínima de toque de **44×44px** em mobile. Usar `p-1.5` (24px) + margem implícita do layout para atingir o mínimo de forma confortável.
+
+---
+
+### 2.4 Grids responsivos
+
+Padrão para listagens de cards:
+```
+grid-cols-1          → mobile (< sm)
+sm:grid-cols-2       → tablet
+lg:grid-cols-3       → desktop
+```
+
+---
+
+### 2.5 Cards de lista com dois níveis de informação
+
+Para cards com muita informação (ex: FixaCard), usar layout de **2 linhas**:
+- **Linha 1:** ícone + descrição/nome + valor principal
+- **Linha 2:** metadados secundários (dia, categoria) + badges + botões de ação
+
+Evitar colocar mais de 3 elementos na mesma linha horizontal em mobile.
+
+---
+
+### 2.6 Tabs full-width em mobile
+
+Tabs/segmented controls devem ser `w-full sm:w-fit` no mobile, com botões `flex-1` para ocupar todo o espaço disponível. No desktop, ficam com tamanho natural (`w-fit`).
+
+---
+
+## 3. Padrões de TypeScript / Tipos
 
 ### 2.1 Campos de entidade sempre tipados como `string | null` para UUIDs opcionais
 

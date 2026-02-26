@@ -33,13 +33,9 @@ interface Props {
 export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
   const [name, setName] = useState(cartao?.name ?? "");
   const [brand, setBrand] = useState(cartao?.brand ?? "Visa");
-  const [closingDay, setClosingDay] = useState(
-    cartao?.closing_day?.toString() ?? ""
-  );
+  const [closingDay, setClosingDay] = useState(cartao?.closing_day?.toString() ?? "");
   const [dueDay, setDueDay] = useState(cartao?.due_day?.toString() ?? "");
-  const [creditLimit, setCreditLimit] = useState(
-    cartao?.credit_limit?.toString() ?? ""
-  );
+  const [creditLimit, setCreditLimit] = useState(cartao?.credit_limit?.toString() ?? "");
   const [lastFour, setLastFour] = useState(cartao?.last_four_digits ?? "");
   const [color, setColor] = useState(cartao?.color ?? "");
   const [scope, setScope] = useState<Scope>(cartao?.scope ?? "family");
@@ -88,8 +84,33 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
   }
 
   return (
-    <Modal title={cartao ? "Editar Cartão" : "Novo Cartão"} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <Modal
+      title={cartao ? "Editar Cartão" : "Novo Cartão"}
+      onClose={onClose}
+      footer={
+        <div>
+          {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              form="cartao-form"
+              disabled={loading}
+              className="flex-1 py-2.5 px-4 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {loading ? "Salvando..." : "Salvar"}
+            </button>
+          </div>
+        </div>
+      }
+    >
+      <form id="cartao-form" onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Nome <span className="text-red-500">*</span>
@@ -99,7 +120,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Nubank"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -110,12 +131,10 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
           <select
             value={brand}
             onChange={(e) => setBrand(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {CARD_BRANDS.map((b) => (
-              <option key={b} value={b}>
-                {b}
-              </option>
+              <option key={b} value={b}>{b}</option>
             ))}
           </select>
         </div>
@@ -132,7 +151,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={closingDay}
               onChange={(e) => setClosingDay(e.target.value)}
               placeholder="Dia"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -146,7 +165,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={dueDay}
               onChange={(e) => setDueDay(e.target.value)}
               placeholder="Dia"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -163,7 +182,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={creditLimit}
               onChange={(e) => setCreditLimit(e.target.value)}
               placeholder="Ex: 5000"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -176,7 +195,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={lastFour}
               onChange={(e) => setLastFour(e.target.value.replace(/\D/g, ""))}
               placeholder="1234"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -185,11 +204,11 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Cor do cartão
           </label>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2.5 flex-wrap">
             <button
               type="button"
               onClick={() => setColor("")}
-              className={`w-7 h-7 rounded-full border-2 transition-all ${
+              className={`w-8 h-8 rounded-full border-2 transition-all ${
                 !color ? "border-blue-500 scale-110" : "border-gray-200"
               } bg-gray-100`}
               title="Sem cor"
@@ -199,7 +218,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
                 key={c}
                 type="button"
                 onClick={() => setColor(c)}
-                className={`w-7 h-7 rounded-full border-2 transition-all ${
+                className={`w-8 h-8 rounded-full border-2 transition-all ${
                   color === c ? "border-blue-500 scale-110" : "border-transparent"
                 }`}
                 style={{ backgroundColor: c }}
@@ -215,25 +234,6 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
           onScopeChange={setScope}
           onIsSharedChange={setIsShared}
         />
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <div className="flex gap-3 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            {loading ? "Salvando..." : "Salvar"}
-          </button>
-        </div>
       </form>
     </Modal>
   );

@@ -23,36 +23,68 @@ export default function Navbar() {
     router.refresh();
   }
 
+  const isActive = (href: string) => pathname.startsWith(href);
+
   return (
-    <nav className="bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-1">
-            <span className="text-lg font-bold text-gray-900 mr-6">Couple</span>
-            {navItems.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  pathname.startsWith(href)
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
-              >
-                <Icon size={16} />
-                {label}
-              </Link>
-            ))}
+    <>
+      {/* Desktop — top navbar */}
+      <nav className="hidden sm:block bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-1">
+              <span className="text-lg font-bold text-gray-900 mr-6">Couple</span>
+              {navItems.map(({ href, label, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive(href)
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
+                >
+                  <Icon size={16} />
+                  {label}
+                </Link>
+              ))}
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <LogOut size={16} />
+              Sair
+            </button>
           </div>
+        </div>
+      </nav>
+
+      {/* Mobile — bottom navigation */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 safe-area-pb">
+        <div className="flex items-center justify-around h-16">
+          {navItems.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
+                isActive(href)
+                  ? "text-blue-600"
+                  : "text-gray-400 hover:text-gray-700"
+              }`}
+            >
+              <Icon size={20} strokeWidth={isActive(href) ? 2.5 : 1.75} />
+              <span className="text-[10px] font-medium">{label}</span>
+            </Link>
+          ))}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors"
+            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-gray-400 hover:text-red-500 transition-colors"
           >
-            <LogOut size={16} />
-            Sair
+            <LogOut size={20} strokeWidth={1.75} />
+            <span className="text-[10px] font-medium">Sair</span>
           </button>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }

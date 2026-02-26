@@ -36,40 +36,38 @@ export default function FixaCard({ item, tab, categorias, onEdit, onSaved }: Pro
 
   return (
     <div
-      className={`flex items-center justify-between px-4 py-3 rounded-xl border ${
+      className={`px-4 py-3 rounded-xl border ${
         item.is_active
           ? "bg-white border-gray-200"
           : "bg-gray-50 border-gray-100 opacity-60"
       }`}
     >
-      <div className="flex items-center gap-3 min-w-0">
-        {categoria && (
-          <span className="text-lg shrink-0">{categoria.icon ?? "📁"}</span>
-        )}
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-900 truncate">
-            {item.description}
-          </p>
-          <p className="text-xs text-gray-400">
-            Dia {item.day_of_month}
-            {categoria ? ` · ${categoria.name}` : ""}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3 shrink-0 ml-3">
-        <span className={`text-sm font-semibold ${amountColor}`}>
+      {/* Linha 1: ícone + descrição + valor */}
+      <div className="flex items-center gap-3">
+        <span className="text-lg shrink-0 w-7 text-center">
+          {categoria?.icon ?? "📁"}
+        </span>
+        <p className="flex-1 text-sm font-medium text-gray-900 truncate">
+          {item.description}
+        </p>
+        <span className={`text-sm font-semibold shrink-0 ${amountColor}`}>
           {item.amount.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
           })}
         </span>
-        <span
-          className={`text-xs px-2 py-0.5 rounded-full font-medium ${scopeColor}`}
-        >
+      </div>
+
+      {/* Linha 2: metadata + badge + ações */}
+      <div className="flex items-center gap-2 mt-1.5 ml-10">
+        <p className="flex-1 text-xs text-gray-400 truncate">
+          Dia {item.day_of_month}
+          {categoria ? ` · ${categoria.name}` : ""}
+        </p>
+        <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0 ${scopeColor}`}>
           {scopeLabel}
         </span>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 shrink-0">
           {item.is_active && (
             <button
               onClick={() => onEdit(item)}

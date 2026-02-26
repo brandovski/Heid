@@ -40,9 +40,7 @@ export default function FixaModal({
 
   const [description, setDescription] = useState(item?.description ?? "");
   const [amount, setAmount] = useState(item?.amount?.toString() ?? "");
-  const [dayOfMonth, setDayOfMonth] = useState(
-    item?.day_of_month?.toString() ?? ""
-  );
+  const [dayOfMonth, setDayOfMonth] = useState(item?.day_of_month?.toString() ?? "");
   const [categoryId, setCategoryId] = useState(item?.category_id ?? "");
   const [startDate, setStartDate] = useState(
     item?.start_date ?? new Date().toISOString().split("T")[0]
@@ -51,13 +49,10 @@ export default function FixaModal({
   const [scope, setScope] = useState<Scope>(item?.scope ?? "family");
   const [isShared, setIsShared] = useState(item?.is_shared ?? false);
 
-  // Somente despesas
-  const [paymentMethod, setPaymentMethod] = useState<
-    "account" | "credit_card"
-  >(expense?.payment_method ?? "account");
-  const [creditCardId, setCreditCardId] = useState(
-    expense?.credit_card_id ?? ""
+  const [paymentMethod, setPaymentMethod] = useState<"account" | "credit_card">(
+    expense?.payment_method ?? "account"
   );
+  const [creditCardId, setCreditCardId] = useState(expense?.credit_card_id ?? "");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -113,16 +108,39 @@ export default function FixaModal({
   }
 
   const title = isDespesa
-    ? item
-      ? "Editar Despesa Fixa"
-      : "Nova Despesa Fixa"
-    : item
-    ? "Editar Receita Fixa"
-    : "Nova Receita Fixa";
+    ? item ? "Editar Despesa Fixa" : "Nova Despesa Fixa"
+    : item ? "Editar Receita Fixa" : "Nova Receita Fixa";
+
+  const formId = "fixa-form";
 
   return (
-    <Modal title={title} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <Modal
+      title={title}
+      onClose={onClose}
+      footer={
+        <div>
+          {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              form={formId}
+              disabled={loading}
+              className="flex-1 py-2.5 px-4 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {loading ? "Salvando..." : "Salvar"}
+            </button>
+          </div>
+        </div>
+      }
+    >
+      <form id={formId} onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Descrição <span className="text-red-500">*</span>
@@ -132,7 +150,7 @@ export default function FixaModal({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={isDespesa ? "Ex: Aluguel" : "Ex: Salário"}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -148,7 +166,7 @@ export default function FixaModal({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0,00"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -162,7 +180,7 @@ export default function FixaModal({
               value={dayOfMonth}
               onChange={(e) => setDayOfMonth(e.target.value)}
               placeholder="1–31"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -174,7 +192,7 @@ export default function FixaModal({
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Sem categoria</option>
             {categorias.map((c) => (
@@ -204,7 +222,7 @@ export default function FixaModal({
                       setPaymentMethod(value);
                       if (value === "account") setCreditCardId("");
                     }}
-                    className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
+                    className={`py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
                       paymentMethod === value
                         ? "bg-blue-50 border-blue-500 text-blue-700"
                         : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -224,7 +242,7 @@ export default function FixaModal({
                 <select
                   value={creditCardId}
                   onChange={(e) => setCreditCardId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Selecione um cartão</option>
                   {cartoes.map((c) => (
@@ -246,7 +264,7 @@ export default function FixaModal({
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -259,7 +277,7 @@ export default function FixaModal({
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
         </div>
 
@@ -269,25 +287,6 @@ export default function FixaModal({
           onScopeChange={setScope}
           onIsSharedChange={setIsShared}
         />
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <div className="flex gap-3 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            {loading ? "Salvando..." : "Salvar"}
-          </button>
-        </div>
       </form>
     </Modal>
   );

@@ -53,10 +53,10 @@ export default function FixaList({
   return (
     <div>
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-full sm:w-fit">
         <button
           onClick={() => setTab("receitas")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             tab === "receitas"
               ? "bg-white text-green-700 shadow-sm"
               : "text-gray-600 hover:text-gray-900"
@@ -67,7 +67,7 @@ export default function FixaList({
         </button>
         <button
           onClick={() => setTab("despesas")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             tab === "despesas"
               ? "bg-white text-red-700 shadow-sm"
               : "text-gray-600 hover:text-gray-900"
