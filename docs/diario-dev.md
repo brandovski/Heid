@@ -9,9 +9,9 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 4 — Parcelamentos e Assinaturas
+**Fase:** Fase 5 — Cron Jobs
 **Última sessão:** 2026-02-25
-**Próxima ação:** Iniciar Fase 4 — Parcelamentos (criar grupo + gerar N parcelas) e Assinaturas (CRUD + integração câmbio)
+**Próxima ação:** Iniciar Fase 5 — Cron jobs: fetch-exchange-rate, generate-monthly (fixas + assinaturas), supabase-keepalive
 
 ### O que está feito
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
@@ -49,7 +49,8 @@
 - [x] Commit e push de todas as alterações desta sessão
 - [x] Fase 2 — CRUD base concluída
 - [x] Fase 3 — Transações Manuais concluída
-- [ ] Iniciar Fase 4: Parcelamentos e Assinaturas
+- [x] Fase 4 — Parcelamentos e Assinaturas concluída
+- [ ] Iniciar Fase 5: Cron Jobs
 
 ### Referências do ambiente
 - **Supabase project ref:** `djteloswmyjsqeplzkxy`
@@ -72,6 +73,57 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 007 — 2026-02-25
+
+**Objetivo:** Implementar Fase 4 — Parcelamentos e Assinaturas completa
+
+**O que foi feito:**
+
+*API Routes (5 arquivos):*
+- `POST /api/parcelamentos` — cria `installment_group` + gera N transações `installment` em lote; distribui centavos restantes na última parcela; datas calculadas com clamping correto para meses curtos (ex: dia 31 → dia 28/29 em fevereiro)
+- `DELETE /api/parcelamentos/[id]` — cancela todas as parcelas `pending` do grupo (soft cancel; parcelas pagas permanecem)
+- `GET /api/cotacao` — proxy para AwesomeAPI (`USD-BRL`); timeout 5s; retorna `{ rate }` ou `503`
+- `POST /api/assinaturas` — cria assinatura; aceita BRL ou USD; `amount_brl` calculado no frontend com rate da API
+- `PATCH /api/assinaturas/[id]` — edita campos da assinatura
+- `DELETE /api/assinaturas/[id]` — cancela assinatura (`is_active = false`, `cancelled_at = now()`)
+
+*Server Components (2 arquivos):*
+- `/parcelamentos/page.tsx` — busca grupos + transações do tipo `installment` (todos os meses); computa progresso no client
+- `/assinaturas/page.tsx` — busca assinaturas com joins em credit_card e category
+
+*Client Components (8 arquivos):*
+
+Parcelamentos:
+- `types.ts` — `InstallmentGroupWithRelations`, `InstallmentSummary`, helpers `computeSummary`, `groupStatus`, `formatCurrency`, `formatDate`
+- `ParcelamentoList.tsx` — filtro por status (Em andamento / Concluídos / Todos)
+- `ParcelamentoCard.tsx` — barra de progresso das parcelas + próxima data + botão cancelar restantes
+- `ParcelamentoModal.tsx` — formulário de criação; preview do valor da parcela em tempo real
+
+Assinaturas:
+- `types.ts` — `SubscriptionWithRelations`, helpers de formatação
+- `AssinaturaList.tsx` — filtro Ativas / Todas; card de total mensal ativo
+- `AssinaturaCard.tsx` — badge USD quando moeda estrangeira; valor BRL + original USD
+- `AssinaturaModal.tsx` — criação/edição; auto-fetch de cotação ao selecionar USD; fallback para input manual de BRL se API indisponível
+
+*Navbar:*
+- Desktop: 7 itens (+ Parcelas + Assinaturas)
+- Mobile: 5 itens fixos (Início, Transações, Parcelas, Assinat., Fixas) — Categorias e Cartões removidos do mobile por serem itens de configuração menos frequentes
+
+**Decisões tomadas:**
+- Distribuição de centavos: último parcela absorve o arredondamento (ex: R$ 100/3 → R$ 33,33 + R$ 33,33 + R$ 33,34)
+- Datas de parcelas: clamping para último dia do mês quando o dia original não existe (ex: 31/jan + 1 mês → 28/fev)
+- AwesomeAPI chamada do frontend via `/api/cotacao` (proxy); montante BRL enviado ao server já calculado; `exchange_estimated` marcado se inserido manualmente
+- Parcelamentos listados sem filtro por mês (todos os grupos ativos são exibidos)
+- Mobile nav reorganizada: Categorias/Cartões só no desktop (configuração); Parcelas/Assinaturas no mobile (uso frequente)
+
+**Problemas encontrados:**
+- Nenhum — build passou sem erros na primeira tentativa
+
+**Próxima sessão:**
+- Iniciar Fase 5: Cron Jobs (fetch-exchange-rate, generate-monthly, supabase-keepalive)
 
 ---
 

@@ -97,20 +97,20 @@
 **Objetivo:** usuário consegue cadastrar compras parceladas e assinaturas recorrentes.
 
 ### Parcelamentos
-- [ ] Cadastrar compra parcelada (total, nº parcelas, data da primeira parcela, cartão, categoria, escopo)
-- [ ] Geração automática das N transações do tipo `installment` ao cadastrar
-- [ ] Listagem de grupos de parcelamento com status das parcelas
-- [ ] Cancelar parcelas restantes de um grupo
+- [x] Cadastrar compra parcelada (total, nº parcelas, data da primeira parcela, cartão, categoria, escopo)
+- [x] Geração automática das N transações do tipo `installment` ao cadastrar
+- [x] Listagem de grupos de parcelamento com status das parcelas
+- [x] Cancelar parcelas restantes de um grupo
 
 ### Assinaturas
-- [ ] Listagem de assinaturas ativas
-- [ ] Cadastrar assinatura (nome, moeda, valor, dia de cobrança, cartão, categoria, escopo)
-- [ ] Editar assinatura
-- [ ] Cancelar assinatura (`cancelled_at = now()`, `is_active = false`)
-- [ ] Integração com AwesomeAPI para cotação USD→BRL
-- [ ] Lógica de fallback quando a API de câmbio estiver indisponível
+- [x] Listagem de assinaturas ativas
+- [x] Cadastrar assinatura (nome, moeda, valor, dia de cobrança, cartão, categoria, escopo)
+- [x] Editar assinatura
+- [x] Cancelar assinatura (`cancelled_at = now()`, `is_active = false`)
+- [x] Integração com AwesomeAPI para cotação USD→BRL
+- [x] Lógica de fallback quando a API de câmbio estiver indisponível
 
-**Critério de conclusão:** parcelamentos geram transações corretamente; assinaturas em USD convertem com cotação real.
+**Critério de conclusão:** parcelamentos geram transações corretamente; assinaturas em USD convertem com cotação real. ✅ **Concluído em 2026-02-25**
 
 ---
 

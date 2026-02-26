@@ -2,14 +2,35 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Tag, CreditCard, Repeat, ArrowLeftRight, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Tag,
+  CreditCard,
+  Repeat,
+  ArrowLeftRight,
+  Layers,
+  RefreshCw,
+  LogOut,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-const navItems = [
+// Todos os itens aparecem no desktop
+const desktopNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/transacoes", label: "Transações", icon: ArrowLeftRight },
+  { href: "/parcelamentos", label: "Parcelas", icon: Layers },
+  { href: "/assinaturas", label: "Assinaturas", icon: RefreshCw },
+  { href: "/fixas", label: "Fixas", icon: Repeat },
   { href: "/categorias", label: "Categorias", icon: Tag },
   { href: "/cartoes", label: "Cartões", icon: CreditCard },
+];
+
+// Mobile: apenas os mais frequentes (5 itens)
+const mobileNavItems = [
+  { href: "/dashboard", label: "Início", icon: LayoutDashboard },
+  { href: "/transacoes", label: "Transações", icon: ArrowLeftRight },
+  { href: "/parcelamentos", label: "Parcelas", icon: Layers },
+  { href: "/assinaturas", label: "Assinat.", icon: RefreshCw },
   { href: "/fixas", label: "Fixas", icon: Repeat },
 ];
 
@@ -34,7 +55,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-1">
               <span className="text-lg font-bold text-gray-900 mr-6">Couple</span>
-              {navItems.map(({ href, label, icon: Icon }) => (
+              {desktopNavItems.map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}
                   href={href}
@@ -63,7 +84,7 @@ export default function Navbar() {
       {/* Mobile — bottom navigation */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 safe-area-pb">
         <div className="flex items-center justify-around h-16">
-          {navItems.map(({ href, label, icon: Icon }) => (
+          {mobileNavItems.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
