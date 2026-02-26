@@ -9,9 +9,9 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 5 — Cron Jobs
-**Última sessão:** 2026-02-25
-**Próxima ação:** Iniciar Fase 5 — Cron jobs: fetch-exchange-rate, generate-monthly (fixas + assinaturas), supabase-keepalive
+**Fase:** Fase 5 — Cron Jobs (implementada; pendente: teste manual)
+**Última sessão:** 2026-02-26
+**Próxima ação:** Fase 6 — Orçamento Mensal (após validação manual dos crons)
 
 ### O que está feito
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
@@ -50,7 +50,7 @@
 - [x] Fase 2 — CRUD base concluída
 - [x] Fase 3 — Transações Manuais concluída
 - [x] Fase 4 — Parcelamentos e Assinaturas concluída
-- [ ] Iniciar Fase 5: Cron Jobs
+- [x] Implementar Fase 5: Cron Jobs (3 endpoints; pendente: teste manual)
 
 ### Referências do ambiente
 - **Supabase project ref:** `djteloswmyjsqeplzkxy`
@@ -73,6 +73,38 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 008 — 2026-02-26
+
+**Objetivo:** Implementar Fase 5 — Cron Jobs
+
+**O que foi feito:**
+
+*API Routes (3 arquivos):*
+- `GET /api/cron/fetch-exchange-rate` — busca cotação USD/BRL da AwesomeAPI; atualiza `amount_brl` de todas as assinaturas ativas em USD; timeout 5s; retorna `{ rate, updated }` ou `503`
+- `GET /api/cron/generate-monthly` — gera transações mensais para `fixed_incomes`, `fixed_expenses` e `subscriptions` ativas; datas com clamping para meses curtos (ex: dia 31 → dia 28 em fevereiro); idempotente via `upsert({ ignoreDuplicates: true })` + índices únicos do banco; retorna `{ ok, month, attempted, errors }` com HTTP 207 se houver erros parciais
+- `GET /api/cron/supabase-keepalive` — query leve em `profiles` para manter o projeto Supabase gratuito ativo; retorna `{ ok, ts }`
+
+*Padrões adotados:*
+- `createServiceClient()` em todos os crons (bypassa RLS; acessa dados de toda a família)
+- Validação do `CRON_SECRET` via header `Authorization: Bearer ...`; skip em dev (quando env var não está definida)
+- `ignoreDuplicates: true` no upsert → gera `ON CONFLICT DO NOTHING` → idempotência garantida pelos índices únicos existentes
+- Filtros de data em `fixed_incomes`/`fixed_expenses`: `start_date <= lastDay AND (end_date IS NULL OR end_date >= firstDay)`
+- `exchange_rate` e `original_amount` preenchidos nas transações de assinatura USD
+
+**Decisões tomadas:**
+- Todos os três crons usam `GET` (Vercel cron jobs só disparam GET)
+- `generate-monthly` retorna HTTP 207 se alguma das 3 etapas falhar, mas as demais prosseguem (falha parcial não aborta o job inteiro)
+- `fetch-exchange-rate` deve rodar em dia 1 às 05:30 e `generate-monthly` às 06:00 — cotação atualizada antes da geração das transações de assinatura
+
+**Problemas encontrados:**
+- Nenhum — build passou sem erros na primeira tentativa
+
+**Próxima sessão:**
+- Testar geração manual via chamada direta ao endpoint (com `dev run` + curl)
+- Iniciar Fase 6: Orçamento Mensal
 
 ---
 

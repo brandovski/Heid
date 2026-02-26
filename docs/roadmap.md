@@ -118,11 +118,11 @@
 
 **Objetivo:** automações mensais funcionam de forma confiável e idempotente.
 
-- [ ] Implementar cron `fetch-exchange-rate` (dia 1, 05:30)
-- [ ] Implementar cron `generate-monthly` (dia 1, 06:00) — respeita `scope` e `user_id`
-- [ ] Garantir idempotência (verificar existência antes de inserir)
-- [ ] Implementar cron `supabase-keepalive` (a cada 3 dias)
-- [ ] Configurar `vercel.json` com os schedules dos crons
+- [x] Implementar cron `fetch-exchange-rate` (dia 1, 05:30)
+- [x] Implementar cron `generate-monthly` (dia 1, 06:00) — respeita `scope` e `user_id`
+- [x] Garantir idempotência (verificar existência antes de inserir)
+- [x] Implementar cron `supabase-keepalive` (a cada 3 dias)
+- [x] Configurar `vercel.json` com os schedules dos crons
 - [ ] Testar geração manual via chamada direta ao endpoint
 
 **Critério de conclusão:** ao acionar manualmente o cron, transações do mês são geradas corretamente e sem duplicatas.
