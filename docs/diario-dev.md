@@ -116,6 +116,9 @@
 **Problemas encontrados:**
 - Inferência de tipo do Supabase JS para joins (categor como array em vez de objeto). Padrão de correção: `as unknown as FamilyTransaction[]` no page.tsx.
 
+**Revisão pós-sessão:**
+- Lógica do Caixa Familiar revisada: `family_contributions` passou de "configuração mensal" para "registro de aporte efetivo". Cada aporte cria uma despesa pessoal vinculada via `transaction_id`. Migration 020 aplicada.
+
 **Próxima sessão:**
 - Iniciar Fase 8: Dashboard
 
