@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import { AreaChart, DonutChart, ProgressBar } from "@tremor/react";
+import { ProgressBar } from "@tremor/react";
+import GraficoEvolucao from "./GraficoEvolucao";
+import GraficoCategoria from "./GraficoCategoria";
 import FaturaModal from "./FaturaModal";
 import {
   EscopoType,
@@ -156,18 +158,20 @@ export default function DashboardView({
 
         {/* Evolução — últimos 6 meses */}
         <div className="lg:col-span-3 bg-white rounded-xl border border-gray-100 p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">
-            Evolução — últimos 6 meses
-          </h2>
-          <AreaChart
-            data={monthlyTotals}
-            index="Mês"
-            categories={["Receitas", "Despesas"]}
-            colors={["blue", "rose"]}
-            valueFormatter={formatCurrency}
-            showAnimation={false}
-            className="h-52"
-          />
+          <div className="flex items-center gap-4 mb-5">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+              <span className="text-xs text-gray-500">Receitas</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+              <span className="text-xs text-gray-500">Despesas</span>
+            </div>
+            <h2 className="text-sm font-semibold text-gray-700 ml-auto">
+              Últimos 6 meses
+            </h2>
+          </div>
+          <GraficoEvolucao data={monthlyTotals} />
         </div>
 
         {/* Despesas por categoria */}
@@ -176,33 +180,9 @@ export default function DashboardView({
             Despesas por categoria
           </h2>
           {categoryDistribution.length > 0 ? (
-            <>
-              <DonutChart
-                data={categoryDistribution}
-                index="name"
-                category="amount"
-                valueFormatter={formatCurrency}
-                showAnimation={false}
-                className="h-36"
-              />
-              <div className="mt-4 space-y-1.5">
-                {categoryDistribution.slice(0, 5).map((cat) => (
-                  <div
-                    key={cat.name}
-                    className="flex items-center justify-between text-xs"
-                  >
-                    <span className="text-gray-600 truncate max-w-[140px]">
-                      {cat.name}
-                    </span>
-                    <span className="font-medium text-gray-800 ml-2 shrink-0">
-                      {formatCurrency(cat.amount)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </>
+            <GraficoCategoria data={categoryDistribution} />
           ) : (
-            <div className="h-36 flex items-center justify-center">
+            <div className="h-44 flex items-center justify-center">
               <p className="text-sm text-gray-400">Nenhuma despesa registrada</p>
             </div>
           )}
