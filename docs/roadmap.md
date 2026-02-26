@@ -78,17 +78,17 @@
 
 **Objetivo:** usuário consegue lançar, visualizar e gerenciar transações avulsas.
 
-- [ ] Listagem de transações com filtros (mês, tipo, status, categoria, escopo)
-- [ ] Criar transação de receita avulsa (`income`) com seleção de escopo
-- [ ] Criar transação de despesa avulsa (`expense`) com seleção de escopo
-- [ ] Marcar transação como `paid` (com data de pagamento opcional)
-- [ ] Marcar transação como `cancelled`
-- [ ] Editar transação lançada manualmente
-- [ ] Excluir transação (somente manuais; automáticas apenas cancelam)
-- [ ] Distinção visual de status (`pending` / `paid` / `cancelled`) com badges
-- [ ] Toggle de visão: Pessoal | Familiar
+- [x] Listagem de transações com filtros (mês, tipo, status, categoria, escopo)
+- [x] Criar transação de receita avulsa (`income`) com seleção de escopo
+- [x] Criar transação de despesa avulsa (`expense`) com seleção de escopo
+- [x] Marcar transação como `paid` (com data de pagamento opcional)
+- [x] Marcar transação como `cancelled`
+- [x] Editar transação lançada manualmente
+- [x] Excluir transação (somente manuais; automáticas apenas cancelam)
+- [x] Distinção visual de status (`pending` / `paid` / `cancelled`) com badges
+- [x] Toggle de visão: Pessoal | Familiar
 
-**Critério de conclusão:** fluxo completo de lançamento e gestão de status funciona para transações manuais com escopo.
+**Critério de conclusão:** fluxo completo de lançamento e gestão de status funciona para transações manuais com escopo. ✅ **Concluído em 2026-02-25**
 
 ---
 

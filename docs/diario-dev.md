@@ -9,9 +9,9 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 3 — Transações Manuais
+**Fase:** Fase 4 — Parcelamentos e Assinaturas
 **Última sessão:** 2026-02-25
-**Próxima ação:** Iniciar Fase 3 — Transações Manuais (listagem, criar, editar, mudar status)
+**Próxima ação:** Iniciar Fase 4 — Parcelamentos (criar grupo + gerar N parcelas) e Assinaturas (CRUD + integração câmbio)
 
 ### O que está feito
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
@@ -46,7 +46,8 @@
 - [ ] Migration 018 (investment_id em transactions) — diferida para início da Fase 10
 - [x] Commit e push de todas as alterações desta sessão
 - [x] Fase 2 — CRUD base concluída
-- [ ] Iniciar Fase 3: Transações Manuais
+- [x] Fase 3 — Transações Manuais concluída
+- [ ] Iniciar Fase 4: Parcelamentos e Assinaturas
 
 ### Referências do ambiente
 - **Supabase project ref:** `djteloswmyjsqeplzkxy`
@@ -69,6 +70,47 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 006 — 2026-02-25
+
+**Objetivo:** Implementar Fase 3 — Transações Manuais completa
+
+**O que foi feito:**
+
+*API Routes (2 arquivos):*
+- `POST /api/transacoes` — cria transação manual (`income`/`expense`), extrai `family_id`/`user_id` da sessão, `auto_generated = false`
+- `PATCH /api/transacoes/[id]` — edita campos e/ou muda status (paid/cancelled/pending); `paid_at` preenchido automaticamente ao marcar como pago
+- `DELETE /api/transacoes/[id]` — exclui apenas se `auto_generated = false`, caso contrário retorna 403
+
+*Server Component (`/transacoes/page.tsx`):*
+- Navegação por mês via URL param `?mes=YYYY-MM` (padrão = mês corrente)
+- Busca transactions com join `category:categories` e `credit_card:credit_cards` via Supabase select alias
+- Busca categorias e cartões ativos para o formulário
+
+*Client Components (5 arquivos em `_components/`):*
+- `types.ts` — `TransactionWithRelations`, helpers de filtragem, formatação e navegação de mês
+- `TransacaoList.tsx` — filtros (escopo Tudo/Pessoal/Familiar, tipo, status, categoria), resumo do mês (receitas/despesas/saldo), navegação de mês, gerenciamento de modais
+- `TransacaoCard.tsx` — layout 2 linhas; badge de status + escopo + tipo; ações contextuais por status: Editar (manual), Pagar (pending), Cancelar (não cancelado), Excluir (manual + cancelado)
+- `TransacaoModal.tsx` — criar/editar; tipo Receita/Despesa (bloqueado na edição); campos: descrição, valor, data, categoria, forma de pagamento, cartão, notas, escopo
+- `PagarModal.tsx` — confirma pagamento com data opcional (padrão = hoje)
+
+*Navbar:*
+- Adicionado link "Transações" com ícone `ArrowLeftRight` (2ª posição)
+
+**Decisões tomadas:**
+- Mês gerenciado via URL param (server-side re-fetch a cada troca de mês) — mais simples e consistente com Next.js App Router
+- `types.ts` isolado na pasta `_components/` para compartilhar tipos e helpers entre os 4 componentes sem poluir `src/types/database.ts`
+- Excluir = apenas transações manuais canceladas (botão aparece só nesse estado)
+- Cancelar = disponível para qualquer status exceto `cancelled` (tanto manual quanto automática)
+- Saldo na barra de resumo exclui transações canceladas do cálculo
+
+**Problemas encontrados:**
+- Nenhum — build passou sem erros na primeira tentativa
+
+**Próxima sessão:**
+- Iniciar Fase 4: Parcelamentos e Assinaturas
 
 ---
 
