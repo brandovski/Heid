@@ -247,6 +247,22 @@ investment_id: string | null;
 
 ---
 
+### [2026-02-25] Dev server com assets 404 após rm -rf .next
+
+**Contexto:** Após limpar o cache e rodar `npm run dev -- --port 3001`, o browser ainda recebia 404 para `layout.css`, `app-pages-internals.js` e `main-app.js`.
+
+**Causa:** Havia um processo Node anterior travado em background ocupando a porta 3001. O novo `npm run dev` falhava silenciosamente com `EADDRINUSE`, e o browser continuava apontando para o processo antigo (com `.next` já deletado).
+
+**Resolução:** Fechar completamente o terminal (não só o processo), abrir um novo e rodar:
+```bash
+rm -rf .next && npm run dev -- --port 3001
+```
+Aguardar a mensagem `Ready in Xms` antes de acessar o app.
+
+**Regra permanente:** se `rm -rf .next` não resolver assets 404, fechar o terminal inteiro antes de tentar novamente.
+
+---
+
 ### [2026-02-25] date_trunc em índice rejeitado como STABLE
 
 **Contexto:** Migration 017, criação de índice único de idempotência em `investment_transactions`.

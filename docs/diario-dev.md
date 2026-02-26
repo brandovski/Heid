@@ -34,6 +34,8 @@
 - [x] Repositório GitHub criado: `gabrielbrandao-atus/couple`
 - [x] Migrations 001–012 aplicadas no Supabase
 - [x] `src/types/database.ts` atualizado com tipos de investimento e campos de migration 017
+- [x] Fase 3 — CRUD de Transações Manuais (`/transacoes`, filtros, modal, badges de status)
+- [x] `react-day-picker` instalado — `DatePicker` reutilizável com bottom sheet mobile e popover desktop
 
 ### O que está pendente
 - [x] Rodar migration 013 no Supabase (aplicada em sessão anterior)
