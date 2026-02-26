@@ -1,0 +1,64 @@
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import TransacaoList from "./_components/TransacaoList";
+import type { TransactionWithRelations } from "./_components/types";
+
+function getMonthRange(mes: string) {
+  const [year, month] = mes.split("-").map(Number);
+  const firstDay = `${year}-${String(month).padStart(2, "0")}-01`;
+  const lastDay = new Date(year, month, 0).toISOString().split("T")[0];
+  return { firstDay, lastDay };
+}
+
+export default async function TransacoesPage({
+  searchParams,
+}: {
+  searchParams: { mes?: string };
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const today = new Date();
+  const mes =
+    searchParams.mes ??
+    `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+
+  const { firstDay, lastDay } = getMonthRange(mes);
+
+  const [transacoesRes, categoriasRes, cartoesRes] = await Promise.all([
+    supabase
+      .from("transactions")
+      .select(
+        "*, category:categories(id, name, icon, color), credit_card:credit_cards(id, name, brand)"
+      )
+      .gte("date", firstDay)
+      .lte("date", lastDay)
+      .order("date", { ascending: false })
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("categories")
+      .select("id, name, icon, color")
+      .eq("is_active", true)
+      .order("name"),
+    supabase
+      .from("credit_cards")
+      .select("id, name, brand")
+      .eq("is_active", true)
+      .order("name"),
+  ]);
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <TransacaoList
+        transacoes={(transacoesRes.data ?? []) as unknown as TransactionWithRelations[]}
+        categorias={categoriasRes.data ?? []}
+        cartoes={cartoesRes.data ?? []}
+        mes={mes}
+        currentUserId={user.id}
+      />
+    </div>
+  );
+}

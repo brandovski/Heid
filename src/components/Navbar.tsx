@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Tag, CreditCard, Repeat, LogOut } from "lucide-react";
+import { LayoutDashboard, Tag, CreditCard, Repeat, ArrowLeftRight, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/transacoes", label: "Transações", icon: ArrowLeftRight },
   { href: "/categorias", label: "Categorias", icon: Tag },
   { href: "/cartoes", label: "Cartões", icon: CreditCard },
   { href: "/fixas", label: "Fixas", icon: Repeat },
