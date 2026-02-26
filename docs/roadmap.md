@@ -150,14 +150,14 @@
 
 **Objetivo:** tela dedicada à gestão financeira conjunta do casal.
 
-- [ ] Tela `/family` com toggle Pessoal | Familiar na navegação principal
-- [ ] Configuração de contribuição mensal (cada usuário define o seu valor no Caixa Familiar)
-- [ ] Exibição do Caixa Familiar: contribuição de cada um + total disponível + saldo livre
-- [ ] Visão de despesas familiares do mês (scope = 'family')
-- [ ] Visualização de itens pessoais compartilhados pelo parceiro (is_shared = true, somente leitura)
-- [ ] Indicação clara de quem é dono de cada item pessoal compartilhado
+- [x] Tela `/familia` com toggle Pessoal | Familiar na navegação principal
+- [x] Configuração de contribuição mensal (cada usuário define o seu valor no Caixa Familiar)
+- [x] Exibição do Caixa Familiar: contribuição de cada um + total disponível + saldo livre
+- [x] Visão de despesas familiares do mês (scope = 'family')
+- [x] Visualização de itens pessoais compartilhados pelo parceiro (is_shared = true, somente leitura)
+- [x] Indicação clara de quem é dono de cada item pessoal compartilhado
 
-**Critério de conclusão:** cada usuário vê sua visão pessoal e a visão familiar, com o Caixa Familiar calculado corretamente.
+**Critério de conclusão:** cada usuário vê sua visão pessoal e a visão familiar, com o Caixa Familiar calculado corretamente. ✅ **Concluído em 2026-02-26**
 
 ---
 

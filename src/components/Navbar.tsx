@@ -11,6 +11,7 @@ import {
   Layers,
   RefreshCw,
   PieChart,
+  Users,
   LogOut,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -23,15 +24,16 @@ const desktopNavItems = [
   { href: "/assinaturas", label: "Assinaturas", icon: RefreshCw },
   { href: "/fixas", label: "Fixas", icon: Repeat },
   { href: "/orcamento", label: "Orçamento", icon: PieChart },
+  { href: "/familia", label: "Família", icon: Users },
   { href: "/categorias", label: "Categorias", icon: Tag },
   { href: "/cartoes", label: "Cartões", icon: CreditCard },
 ];
 
-// Mobile: itens de uso frequente (Fixas é configuração → substituída por Orçamento)
+// Mobile: itens de uso frequente (Parcelas é configuração → substituída por Família)
 const mobileNavItems = [
   { href: "/dashboard", label: "Início", icon: LayoutDashboard },
   { href: "/transacoes", label: "Transações", icon: ArrowLeftRight },
-  { href: "/parcelamentos", label: "Parcelas", icon: Layers },
+  { href: "/familia", label: "Família", icon: Users },
   { href: "/assinaturas", label: "Assinat.", icon: RefreshCw },
   { href: "/orcamento", label: "Orçamento", icon: PieChart },
 ];
