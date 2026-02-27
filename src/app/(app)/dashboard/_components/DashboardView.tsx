@@ -8,6 +8,7 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import GraficoEvolucao from "./GraficoEvolucao";
 import GraficoCategoria from "./GraficoCategoria";
 import FaturaModal from "./FaturaModal";
+import FluxoWidget from "./FluxoWidget";
 import {
   EscopoType,
   TransactionRow,
@@ -154,6 +155,14 @@ export default function DashboardView({
           </div>
         ))}
       </div>
+
+      {/* ── Fluxo Widget ── */}
+      <FluxoWidget
+        transactions={transactions}
+        creditCards={creditCards}
+        currentMonth={currentMonth}
+        escopo={escopo}
+      />
 
       {/* ── Charts ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

@@ -41,6 +41,7 @@ export interface CreditCardRow {
   id: string;
   name: string;
   color: string | null;
+  due_day: number;
   scope: string;
   user_id: string | null;
   is_shared: boolean;

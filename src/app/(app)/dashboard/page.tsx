@@ -152,7 +152,7 @@ export default async function DashboardPage({
     budgetsQ,
     supabase
       .from("credit_cards")
-      .select("id, name, color, scope, user_id, is_shared")
+      .select("id, name, color, due_day, scope, user_id, is_shared")
       .eq("family_id", profile.family_id)
       .eq("is_active", true)
       .order("name"),
