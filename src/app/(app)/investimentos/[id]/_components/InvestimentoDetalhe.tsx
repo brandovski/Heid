@@ -9,6 +9,7 @@ import TransacaoModal from "./TransacaoModal";
 import SnapshotModal from "./SnapshotModal";
 import GraficoEvolucao from "./GraficoEvolucao";
 import type { Investment, InvestmentTransaction, InvestmentSnapshot } from "../../_components/types";
+import FluxoProjecao from "./FluxoProjecao";
 import {
   INVESTMENT_TYPE_LABELS,
   formatCurrency,
@@ -22,6 +23,8 @@ interface ProjectItemRef {
   id: string;
   name: string;
   actual_amount: number | null;
+  budget_amount?: number | null;
+  expected_payment_date?: string | null;
   status: string;
 }
 
@@ -276,6 +279,15 @@ export default function InvestimentoDetalhe({
             ))}
           </div>
         </div>
+      )}
+
+      {/* Projeção de Saldo */}
+      {investment.monthly_contribution_amount != null && saldoAtual != null && (
+        <FluxoProjecao
+          saldoAtual={saldoAtual}
+          monthlyContribution={investment.monthly_contribution_amount}
+          projectItems={projectItems}
+        />
       )}
 
       {/* Modals */}
