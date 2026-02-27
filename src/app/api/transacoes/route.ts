@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("family_id")
+    .select("family_id, share_with_partner")
     .eq("id", user.id)
     .single();
 
@@ -43,6 +43,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const resolvedScope = scope ?? "personal";
+
+  // Para transações pessoais, herdar preferência de compartilhamento do perfil
+  const isShared =
+    resolvedScope === "personal" ? (profile.share_with_partner ?? false) : false;
+
   const { data, error } = await supabase
     .from("transactions")
     .insert({
@@ -55,8 +61,9 @@ export async function POST(req: NextRequest) {
       category_id: category_id ?? null,
       credit_card_id: credit_card_id ?? null,
       notes: notes ?? null,
-      scope: scope ?? "family",
-      user_id: scope === "personal" ? user.id : null,
+      scope: resolvedScope,
+      user_id: resolvedScope === "personal" ? user.id : null,
+      is_shared: isShared,
       auto_generated: false,
     })
     .select()
