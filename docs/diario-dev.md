@@ -10,7 +10,7 @@
 ## Estado Atual do Projeto
 
 **Fase:** Pré-Fase 9 — Projetos
-**Última sessão:** Sessão 015 — 2026-02-27
+**Última sessão:** Sessão 016 — 2026-02-27
 **Próxima ação:** Iniciar Fase 9 — Projetos (rodar migration 015 e depois 017 Parte 5 no Supabase antes de iniciar)
 
 ### O que está feito
@@ -19,6 +19,7 @@
 - [x] Correções pós-escopo (Sessão 014): migration 022 — coluna `is_shared` em transactions + backfill + cláusula RLS; data fix no cartão "Itaú Click"; migration 021 — policy `profiles_select_family_members`
 - [x] Navbar mobile glassmorphism (Sessão 015): flutuante bottom-5 com bg-white/60, backdrop-blur-xl, rounded-2xl, item ativo com pill bg-white/80; layout pb-32
 - [x] Commits organizados e repositório limpo (Sessão 015): 8 commits atômicos por feature, push realizado, Vercel buildando
+- [x] Revisão abrangente da documentação (Sessão 016): `regras-de-negocio.md`, `arquitetura.md`, `roadmap.md` atualizados para refletir decisões das sessões 005–015 (Tremor→Recharts, modelo de compartilhamento, is_shared em transactions, orçamento sempre pessoal, toggle com nomes reais, schema family_contributions, unicidade budgets, rotas em português, perfil, tabelas de investimentos)
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
 - [x] Roadmap atualizado para 11 fases + Fase 1.5 (`docs/roadmap.md`)
 - [x] Arquitetura atualizada com Seção 7 (Escopo e Visibilidade) (`docs/arquitetura.md`)
@@ -84,6 +85,50 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 016 — 2026-02-27
+
+**Objetivo:** Revisão abrangente da documentação — sincronizar `regras-de-negocio.md`, `arquitetura.md` e `roadmap.md` com as decisões implementadas nas sessões 005–015
+
+**O que foi feito:**
+
+*`docs/regras-de-negocio.md`:*
+- Seção 2: substituído Tremor por Recharts + componentes próprios em `src/components/ui/`
+- Seção 2.1 removida (sobre Tremor — obsoleta)
+- Seção 3.5.1: adicionados tipos `investment_deposit` e `investment_withdrawal`
+- Seção 3.5.2: adicionados campos `family_id`, `scope`, `user_id`, `is_shared`, `investment_id`; regra de compartilhamento automático via `profiles.share_with_partner`
+- Seções 3.6, 3.7, 3.8: adicionados campos de escopo (`scope`, `user_id`, `is_shared`, `family_id`) nos campos das tabelas
+- Seção 3.9: adicionados campos de escopo; unicidade atualizada para dois índices parciais (migration 019); orçamento documentado como sempre pessoal
+- Seção 3.10 (nova): Perfil — `full_name`, `share_with_partner`, tela `/perfil`, avatar de iniciais, logout
+- Seção 5: todas as referências a Tremor substituídas por Recharts e componentes próprios; toggle do dashboard documentado com nomes reais ("Gabriel | Heide")
+- Seção 6.1: adicionadas tabelas `investments`, `investment_transactions`, `investment_snapshots`
+- Seção 8: estrutura de pastas atualizada com rotas em português, sem Tremor, componentes `ui/` reais
+- Seção 9: expandida para 12 linhas (Fase 1 a 11 + Fase 1.5), com status de cada fase
+- Seção 10.2: modelo de compartilhamento atualizado (toggle global via `share_with_partner`, `is_shared` granular só em cartões)
+- Seção 10.3: removido "toggle global no topo"; documentado comportamento por tela
+- Seção 10.4: schema `family_contributions` atualizado (`effective_from→date`, `transaction_id FK`); contribuição documentada como movimento real
+
+*`docs/arquitetura.md`:*
+- Seção 2.5: substituída decisão Tremor por Recharts com motivo correto
+- Seção 3.1: removida referência a "wrappers sobre Tremor"; listados componentes reais de `src/components/ui/`
+- Seção 3.3: substituída menção "Tremor Charts" por "Recharts"
+- Seção 7.3: atualizada para refletir `is_shared` próprio em transactions (migration 022); visibilidade não herdada de entidade-pai
+- Seção 7.4: schema `family_contributions` atualizado; contribuição documentada como movimento real
+- Timestamp: `2026-02-25` → `2026-02-27`
+
+*`docs/roadmap.md`:*
+- Fase 6: item de toggle "Orçamento pessoal e familiar separados" marcado com nota de remoção (Sessão 013)
+
+**Decisões tomadas:**
+- Revisão de documentação tratada como sessão própria (016) para rastreabilidade
+
+**Problemas encontrados:**
+- Nenhum (apenas escrita/edição de markdown)
+
+**Próxima sessão:**
+- Iniciar Fase 9: Projetos (rodar migration 015 e depois 017 Parte 5 no Supabase antes de iniciar)
 
 ---
 

@@ -79,11 +79,11 @@
 
 **Motivo:** evita inconsistências de dados. O período de competência é determinado pelo `closing_day` do cartão, e qualquer transação adicionada retroativamente é automaticamente refletida na fatura correta.
 
-### 2.5 Tremor para UI de dados
+### 2.5 Recharts em vez de Tremor
 
-**Decisão:** Tremor em vez de Chart.js, Recharts ou Victory.
+**Decisão:** Recharts diretamente, sem Tremor.
 
-**Motivo:** oferece componentes de dashboard prontos (cards, gráficos, tabelas, badges) com visual consistente e integração nativa com Tailwind. Reduz o esforço de montar dashboards do zero.
+**Motivo:** Tremor foi avaliado e removido por ter visual opinionado e difícil de customizar para o design específico do Couple. Recharts já era uma dependência transitiva do Tremor e oferece controle total sobre aparência. Toda UI de componentes é construída com Tailwind CSS + componentes próprios em `src/components/ui/`.
 
 ---
 
@@ -92,15 +92,22 @@
 ### 3.1 Estrutura de componentes
 
 ```
-components/
-├── ui/              # Wrappers e customizações sobre Tremor
-├── dashboard/       # Componentes específicos do dashboard
-├── transactions/    # Listagem, formulários, badges de status
-├── cards/           # Cards de crédito e faturas
-└── budget/          # Barras de progresso de orçamento
+src/components/
+├── ui/                    # Componentes próprios genéricos e reutilizáveis
+│   ├── Modal.tsx          # Dialog / bottom sheet mobile
+│   ├── ProgressBar.tsx    # Barras de progresso de orçamento
+│   ├── DatePicker.tsx     # Seleção de datas (popover desktop, bottom sheet mobile)
+│   ├── ScopeSelector.tsx  # Toggle Familiar/Pessoal
+│   └── PagarFaturaModal.tsx # Modal de pagamento de fatura (compartilhado)
+├── dashboard/             # Componentes específicos do dashboard
+├── transacoes/            # Listagem, formulários, badges de status
+├── cartoes/               # Cards de crédito e faturas
+├── orcamento/             # Barras de progresso de orçamento
+├── familia/               # Tela Familiar / Caixa Familiar
+└── projetos/              # Projetos, grupos, itens
 ```
 
-**Regra:** componentes de `ui/` são genéricos e reutilizáveis. Componentes de módulo (`dashboard/`, `transactions/`, etc.) são específicos e podem conter lógica de negócio.
+**Regra:** componentes de `ui/` são genéricos e reutilizáveis. Componentes de módulo são específicos e podem conter lógica de negócio.
 
 ### 3.2 Nomenclatura
 
@@ -125,7 +132,7 @@ components/
 - Formulários e inputs
 - Modais e drawers
 - Hooks de estado (`useState`, `useEffect`)
-- Bibliotecas que requerem DOM (Tremor Charts são client-side)
+- Bibliotecas que requerem DOM (Recharts é client-side)
 
 ### 3.4 Tratamento de erros
 
@@ -221,20 +228,20 @@ Categorias e `invoice_payments` são sempre **familiares** — sem escopo pessoa
 
 ### 7.3 Visibilidade de transações
 
-Transações não têm `is_shared` próprio. A visibilidade de transações pessoais pelo parceiro é **herdada da entidade-pai** (cartão, receita fixa, etc.):
+Transações possuem `is_shared` **próprio** (migration 022). A visibilidade não é mais herdada da entidade-pai — é armazenada diretamente na transação.
+
+O campo `is_shared` é definido **automaticamente pelo servidor** com base em `profiles.share_with_partner` do dono da transação no momento da criação ou edição. O cliente não edita `is_shared` individualmente por transação.
 
 ```sql
--- Parceiro vê transação pessoal SE a entidade-pai está compartilhada
-scope = 'personal' AND family_id = auth_family_id() AND (
-  credit_card_id IN (SELECT id FROM credit_cards WHERE is_shared = true AND user_id != auth.uid())
-  -- ... mesma lógica para fixed_incomes, fixed_expenses, subscriptions, installment_groups
-)
+-- Política RLS: parceiro vê transações pessoais compartilhadas
+scope = 'personal' AND family_id = auth_family_id() AND is_shared = true
 ```
 
 ### 7.4 Caixa Familiar (`family_contributions`)
 
-- Cada usuário define um valor de contribuição mensal (`effective_from` como data de vigência)
-- Saldo do Caixa Familiar: `SUM(contribuições do mês) - SUM(transactions.amount WHERE scope='family')`
+- Contribuição = movimento financeiro real (não configuração): cada aporte cria uma despesa pessoal vinculada via `transaction_id` FK (migration 020)
+- Schema atualizado: `effective_from` renomeado para `date`; adicionado `transaction_id UUID FK`
+- Saldo do Caixa Familiar: `SUM(amount WHERE mês) - SUM(transactions.amount WHERE scope='family' AND mês)`
 - Calculado dinamicamente — não armazenado
 
 ### 7.5 Toggle de visão na UI
@@ -252,4 +259,4 @@ Itens de projeto têm `payment_origin`:
 
 ---
 
-*Atualizado em: 2026-02-25*
+*Atualizado em: 2026-02-27*

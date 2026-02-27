@@ -34,7 +34,8 @@ O **Couple** é uma aplicação web pessoal desenvolvida para dois usuários (ca
 |---|---|
 | Frontend | Next.js 14+ (App Router) com TypeScript |
 | Estilização | Tailwind CSS |
-| Gráficos / UI | **Tremor** |
+| Gráficos | **Recharts** (gráficos direto) |
+| Componentes UI | Componentes próprios em `src/components/ui/` |
 | Backend / API | Next.js API Routes (TypeScript) |
 | Banco de Dados | Supabase (PostgreSQL gerenciado) |
 | Autenticação | Supabase Auth (e-mail + senha) |
@@ -43,17 +44,6 @@ O **Couple** é uma aplicação web pessoal desenvolvida para dois usuários (ca
 | Hospedagem BD + Auth | Supabase (plano Free ou Pro ~$25/mês) |
 | Cron Jobs | Vercel Cron Functions (gratuito) |
 | Câmbio (USD→BRL) | AwesomeAPI (gratuita, sem autenticação) |
-
-### 2.1 Sobre o Tremor
-
-O Tremor é a biblioteca de componentes escolhida para dashboards e gráficos. Componentes utilizados no projeto:
-
-- `<AreaChart />` — evolução de receitas e despesas nos últimos 6 meses
-- `<BarChart />` — comparativo mensal de categorias
-- `<DonutChart />` — distribuição de gastos por categoria
-- `<ProgressBar />` — acompanhamento de orçamento por categoria
-- `<Card />`, `<Metric />`, `<Text />`, `<Badge />` — cards de resumo do dashboard
-- `<Table />` — listagem de transações e faturas
 
 ---
 
@@ -121,16 +111,22 @@ Transações representam toda e qualquer movimentação financeira registrada na
 | `subscription` | Automática (cron) | Assinatura recorrente no cartão |
 | `fixed_income` | Automática (cron) | Gerada a partir de uma Receita Fixa |
 | `fixed_expense` | Automática (cron) | Gerada a partir de uma Despesa Fixa |
+| `investment_deposit` | Manual / cron | Aporte em investimento (saída financeira) |
+| `investment_withdrawal` | Manual | Resgate de investimento (entrada financeira) |
 
 #### 3.5.2 Campos da Transação
 
 | Campo | Tipo | Descrição |
 |---|---|---|
 | `id` | UUID | Identificador único |
+| `family_id` | UUID (FK) | Vínculo com a família |
+| `scope` | enum | `personal` \| `family` |
+| `user_id` | UUID (FK, nullable) | Dono da transação (NULL se family) |
+| `is_shared` | boolean | Parceiro pode visualizar (definido automaticamente pelo servidor) |
 | `description` | string | Texto livre |
 | `amount` | numeric | Valor em BRL |
 | `date` | date | Data de competência |
-| `type` | enum | `income \| expense \| installment \| subscription \| fixed_income \| fixed_expense` |
+| `type` | enum | `income \| expense \| installment \| subscription \| fixed_income \| fixed_expense \| investment_deposit \| investment_withdrawal` |
 | `status` | enum | `pending \| paid \| cancelled` |
 | `category_id` | UUID (FK) | Referência à categoria |
 | `credit_card_id` | UUID (FK, nullable) | Preenchido para transações no cartão |
@@ -138,6 +134,7 @@ Transações representam toda e qualquer movimentação financeira registrada na
 | `subscription_id` | UUID (FK, nullable) | Referencia a assinatura geradora |
 | `fixed_income_id` | UUID (FK, nullable) | Referencia a receita fixa geradora |
 | `fixed_expense_id` | UUID (FK, nullable) | Referencia a despesa fixa geradora |
+| `investment_id` | UUID (FK, nullable) | Referencia o investimento vinculado (Fase 10) |
 | `exchange_rate` | numeric (nullable) | Cotação usada na conversão (assinaturas em moeda estrangeira) |
 | `original_amount` | numeric (nullable) | Valor na moeda original |
 | `original_currency` | string (nullable) | Ex: `USD` |
@@ -146,6 +143,8 @@ Transações representam toda e qualquer movimentação financeira registrada na
 | `notes` | string (nullable) | Observações livres |
 | `created_at` | timestamp | Auditoria |
 | `updated_at` | timestamp | Auditoria |
+
+**Regra de compartilhamento:** o campo `is_shared` é definido **automaticamente pelo servidor** com base em `profiles.share_with_partner` do dono no momento da criação ou edição. Não é editável pelo cliente individualmente por transação.
 
 #### 3.5.3 Status e Visualização de Lançamentos Futuros
 
@@ -166,7 +165,7 @@ Toda transação com `date` no futuro (maior que a data atual) é criada com sta
 
 ### 3.6 Cartões de Crédito
 
-**Campos:** `id`, `name`, `brand` (Visa, Mastercard, etc.), `closing_day` (dia de fechamento), `due_day` (dia de vencimento), `credit_limit`, `last_four_digits`, `color` (identificação visual), `is_active`
+**Campos:** `id`, `family_id`, `scope` (`personal` | `family`), `user_id` (nullable), `is_shared`, `name`, `brand` (Visa, Mastercard, etc.), `closing_day` (dia de fechamento), `due_day` (dia de vencimento), `credit_limit`, `last_four_digits`, `color` (identificação visual), `is_active`
 
 #### 3.6.1 Cálculo da Fatura
 
@@ -192,7 +191,7 @@ A fatura de um cartão para um determinado mês de referência (`YYYY-MM`) é ca
 
 Assinaturas são cobranças recorrentes mensais vinculadas a um cartão de crédito. Não possuem data de término definida e não consomem limite além do valor mensal cobrado.
 
-**Campos:** `id`, `name`, `amount_brl` (último valor convertido em BRL), `original_currency` (`BRL` ou `USD`), `amount_original` (valor na moeda original), `billing_day` (dia de cobrança), `credit_card_id`, `category_id`, `start_date`, `cancelled_at` (nullable), `notes`, `is_active`
+**Campos:** `id`, `family_id`, `scope` (`personal` | `family`), `user_id` (nullable), `is_shared`, `name`, `amount_brl` (último valor convertido em BRL), `original_currency` (`BRL` ou `USD`), `amount_original` (valor na moeda original), `billing_day` (dia de cobrança), `credit_card_id`, `category_id`, `start_date`, `cancelled_at` (nullable), `notes`, `is_active`
 
 #### 3.7.1 Assinaturas em Moeda Estrangeira
 
@@ -212,7 +211,7 @@ O cron job do dia 1 verifica todas as assinaturas ativas (`is_active = true` e `
 
 ### 3.8 Parcelamentos
 
-**Tabela `installment_groups`:** `id`, `description`, `total_amount`, `installments_count`, `first_installment_date`, `credit_card_id`, `category_id`, `notes`
+**Tabela `installment_groups`:** `id`, `family_id`, `scope` (`personal` | `family`), `user_id` (nullable), `description`, `total_amount`, `installments_count`, `first_installment_date`, `credit_card_id`, `category_id`, `notes`
 
 **Regras:**
 - Ao cadastrar um parcelamento, o sistema cria automaticamente `N` transações do tipo `installment`, uma por mês a partir de `first_installment_date`, com `amount = total_amount / installments_count`
@@ -224,9 +223,13 @@ O cron job do dia 1 verifica todas as assinaturas ativas (`is_active = true` e `
 
 ### 3.9 Orçamento Mensal
 
-**Tabela `budgets`:** `id`, `reference_month` (YYYY-MM), `category_id`, `planned_amount`, `notes`
+**Tabela `budgets`:** `id`, `family_id`, `scope` (`personal` | `family`), `user_id` (nullable), `reference_month` (YYYY-MM), `category_id`, `planned_amount`, `notes`
 
-**Regra de unicidade:** não é possível ter dois orçamentos para a mesma categoria no mesmo mês (`UNIQUE(reference_month, category_id)`).
+**Regra de unicidade:** dois índices parciais independentes por escopo (migration 019):
+- `UNIQUE(reference_month, category_id, user_id) WHERE scope = 'personal'`
+- `UNIQUE(reference_month, category_id, family_id) WHERE scope = 'family'`
+
+**Escopo do orçamento:** o orçamento é **sempre pessoal** — não existe toggle de Familiar/Pessoal na tela de orçamento. Cada usuário gerencia seu próprio orçamento.
 
 #### 3.9.1 Criação do Orçamento Mensal
 
@@ -239,7 +242,7 @@ Após a criação inicial, adicionar uma nova categoria ao orçamento é feito d
 
 #### 3.9.2 Acompanhamento do Orçamento
 
-Para cada categoria do orçamento do mês corrente, o sistema exibe via `<ProgressBar />` do Tremor:
+Para cada categoria do orçamento do mês corrente, o sistema exibe via `<ProgressBar />` próprio (`src/components/ui/ProgressBar.tsx`):
 
 | Métrica | Cálculo |
 |---|---|
@@ -248,7 +251,26 @@ Para cada categoria do orçamento do mês corrente, o sistema exibe via `<Progre
 | Valor comprometido | Soma de transações `pending` da categoria no mês |
 | Progresso | `(gasto + comprometido) / planejado × 100` |
 
-Categorias que ultrapassaram o orçamento são destacadas em vermelho (`color="red"` no Tremor).
+Categorias que ultrapassaram o orçamento são destacadas em vermelho.
+
+### 3.10 Perfil
+
+**Tela `/perfil`** — cada usuário gerencia seus próprios dados de exibição e preferência de compartilhamento.
+
+**Campos relevantes da tabela `profiles`:**
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `user_id` | UUID (FK → auth.users) | Chave primária |
+| `family_id` | UUID | Vínculo com a família |
+| `full_name` | TEXT | Nome exibido na UI (ex: "Gabriel", "Heide") |
+| `share_with_partner` | BOOLEAN | Toggle global: transações pessoais ficam visíveis ao parceiro |
+
+**Funcionalidades da tela:**
+- Avatar de iniciais gerado a partir do `full_name`
+- Exibição do nome completo e e-mail do usuário
+- Toggle **Compartilhar com [nome do parceiro]** — persiste em `profiles.share_with_partner`; afeta automaticamente `is_shared` em transações pessoais ao criar/editar
+- Logout via Supabase Auth
 
 ---
 
@@ -270,7 +292,11 @@ Todas as automações são implementadas como **Vercel Cron Functions** (gratuit
 
 O dashboard é a tela principal do sistema e apresenta uma visão consolidada das finanças do mês corrente, com navegação para meses anteriores.
 
-### 5.1 Cards de Resumo — `<Card />` + `<Metric />` (Tremor)
+**Toggle do dashboard:** alterna entre a visão do usuário autenticado e a do parceiro, usando os **nomes reais** de cada um (ex: "Gabriel | Heide"). O URL param `?escopo=personal` exibe dados do usuário logado; `?escopo=parceiro` exibe dados do parceiro (transações com `is_shared = true`).
+
+### 5.1 Cards de Resumo
+
+Componentes Tailwind CSS próprios (sem biblioteca de UI externa).
 
 | Card | Cálculo |
 |---|---|
@@ -280,30 +306,30 @@ O dashboard é a tela principal do sistema e apresenta uma visão consolidada da
 | A receber | Soma de transações de receita com `status = pending` no mês |
 | A pagar | Soma de transações de despesa com `status = pending` no mês |
 
-### 5.2 Gráfico de Evolução — `<AreaChart />` (Tremor)
+### 5.2 Gráfico de Evolução — `<AreaChart />` (Recharts)
 
-Exibe receitas e despesas dos últimos 6 meses para visualização de tendência. Dados: `[{ month, income, expense }]`.
+Exibe receitas e despesas dos últimos 6 meses para visualização de tendência. Dados: `[{ month, income, expense }]`. Implementado com wrapper customizado sobre Recharts.
 
-### 5.3 Distribuição por Categoria — `<DonutChart />` (Tremor)
+### 5.3 Distribuição por Categoria — `<PieChart />` / `<Cell />` (Recharts)
 
 Distribuição percentual dos gastos do mês por categoria. Exibido ao lado dos cards de resumo.
 
-### 5.4 Orçamento por Categoria — `<ProgressBar />` (Tremor)
+### 5.4 Orçamento por Categoria — `<ProgressBar />` próprio
 
-Lista de todas as categorias com orçamento no mês, exibindo `planned_amount`, valor gasto, valor comprometido e barra de progresso. Categorias acima do limite em vermelho.
+Lista de todas as categorias com orçamento no mês, exibindo `planned_amount`, valor gasto, valor comprometido e barra de progresso. Componente em `src/components/ui/ProgressBar.tsx`. Categorias acima do limite em vermelho.
 
-### 5.5 Faturas dos Cartões — `<Card />` (Tremor)
+### 5.5 Faturas dos Cartões
 
 Um card por cartão ativo exibindo:
 - Nome e bandeira do cartão
 - Valor total da fatura do mês (calculado dinamicamente)
 - Data de vencimento
-- Status com `<Badge />`: `Em Aberto` (amarelo) / `Paga` (verde) / `Vencida` (vermelho)
-- Botão de ação rápida: **"Registrar Pagamento"**
+- Badge de status: `Em Aberto` (amarelo) / `Paga` (verde) / `Vencida` (vermelho) — componente Tailwind próprio
+- Botão de ação rápida: **"Pagar Fatura"** (abre `PagarFaturaModal`)
 
-### 5.6 Próximos Lançamentos — `<Table />` (Tremor)
+### 5.6 Próximos Lançamentos
 
-Lista dos próximos 7 a 10 lançamentos com `status = pending`, ordenados por `date` ascendente, exibindo descrição, categoria, valor e data prevista.
+Tabela HTML com classes Tailwind. Lista dos próximos 7 a 10 lançamentos com `status = pending`, ordenados por `date` ascendente, exibindo descrição, categoria, valor e data prevista.
 
 ---
 
@@ -327,6 +353,9 @@ Lista dos próximos 7 a 10 lançamentos com `status = pending`, ordenados por `d
 | `projects` | Projetos do casal (viagem, casamento, compras maiores etc.) |
 | `project_groups` | Grupos/categorias de gastos dentro de um projeto |
 | `project_items` | Itens a considerar dentro de cada grupo do projeto |
+| `investments` | Investimentos financeiros pessoais ou familiares |
+| `investment_transactions` | Aportes e resgates de cada investimento |
+| `investment_snapshots` | Histórico de saldo de mercado dos investimentos (append-only) |
 
 ### 6.2 Políticas de RLS
 
@@ -374,70 +403,79 @@ couple/
 │   │   └── login/
 │   ├── (app)/
 │   │   ├── dashboard/
-│   │   ├── transactions/
-│   │   ├── cards/
-│   │   │   └── [id]/           # Detalhe da fatura de um cartão
-│   │   ├── budget/
-│   │   ├── fixed/
-│   │   │   ├── incomes/
-│   │   │   └── expenses/
-│   │   ├── subscriptions/
-│   │   ├── family/             # Visão e orçamento familiar
-│   │   ├── projects/           # Lista de projetos
-│   │   │   └── [id]/           # Detalhe de um projeto
-│   │   └── settings/
-│   │       └── categories/
+│   │   ├── transacoes/          # (não "transactions")
+│   │   ├── cartoes/             # (não "cards")
+│   │   │   └── [id]/            # Detalhe da fatura de um cartão
+│   │   ├── orcamento/           # (não "budget") — sempre pessoal
+│   │   ├── fixas/               # (não "fixed/incomes" + "fixed/expenses")
+│   │   ├── assinaturas/
+│   │   ├── familia/             # Caixa Familiar e transações familiares
+│   │   ├── projetos/            # Lista de projetos (Fase 9)
+│   │   │   └── [id]/            # Detalhe de um projeto
+│   │   ├── categorias/          # (não "settings/categories")
+│   │   └── perfil/              # Perfil do usuário e toggle de compartilhamento
 │   └── api/
-│       ├── transactions/
-│       ├── cards/
-│       ├── budget/
-│       ├── fixed/
-│       ├── subscriptions/
-│       ├── family/
-│       ├── projects/
+│       ├── transacoes/
+│       ├── cartoes/
+│       ├── faturas/
+│       ├── orcamento/
+│       ├── fixas/
+│       ├── assinaturas/
+│       ├── familia/
+│       ├── projetos/
+│       ├── perfil/
 │       └── cron/
 │           ├── generate-monthly/
 │           ├── fetch-exchange-rate/
 │           └── keepalive/
-├── components/
-│   ├── ui/                  # Componentes base (wrappers do Tremor)
-│   ├── dashboard/
-│   ├── transactions/
-│   ├── cards/
-│   ├── budget/
-│   ├── family/
-│   └── projects/
-├── lib/
-│   ├── supabase/            # Client + server client
-│   ├── utils/
-│   │   ├── currency.ts      # Formatação BRL, conversão câmbio
-│   │   ├── date.ts          # Helpers de data / fuso horário
-│   │   └── invoice.ts       # Cálculo de período de competência de fatura
-│   └── api/
-│       └── exchange.ts      # Integração AwesomeAPI
-├── hooks/
-├── types/
-│   └── index.ts             # Tipos TypeScript globais
+├── src/
+│   ├── components/
+│   │   ├── ui/                  # Componentes próprios reutilizáveis
+│   │   │   ├── Modal.tsx
+│   │   │   ├── ProgressBar.tsx
+│   │   │   ├── DatePicker.tsx
+│   │   │   ├── ScopeSelector.tsx
+│   │   │   └── PagarFaturaModal.tsx
+│   │   ├── dashboard/
+│   │   ├── transacoes/
+│   │   ├── cartoes/
+│   │   ├── orcamento/
+│   │   ├── familia/
+│   │   └── projetos/
+│   ├── lib/
+│   │   ├── supabase/            # Client + server client
+│   │   ├── utils/
+│   │   │   ├── currency.ts      # Formatação BRL, conversão câmbio
+│   │   │   ├── date.ts          # Helpers de data / fuso horário
+│   │   │   └── invoice.ts       # Cálculo de período de competência de fatura
+│   │   └── api/
+│   │       └── exchange.ts      # Integração AwesomeAPI
+│   ├── hooks/
+│   └── types/
+│       └── database.ts          # Tipos TypeScript globais
 └── supabase/
-    ├── migrations/          # Arquivos SQL versionados
-    └── seed.sql             # Dados iniciais (categorias padrão)
+    ├── migrations/              # Arquivos SQL versionados
+    └── seed.sql                 # Dados iniciais (categorias padrão)
 ```
 
 ---
 
 ## 9. Ordem de Implementação
 
-| Fase | Entregável | Detalhes |
+| Fase | Entregável | Status |
 |---|---|---|
-| 1 | Setup inicial | Supabase + migrations + RLS + Next.js + autenticação |
-| 2 | CRUD base + Escopo | Categorias, cartões, receitas fixas, despesas fixas — já com suporte a escopo pessoal/família |
-| 3 | Transações manuais | Lançamento, listagem com filtros, mudança de status, seleção de escopo |
-| 4 | Parcelamentos e assinaturas | Geração de parcelas, cadastro de assinaturas + integração câmbio |
-| 5 | Cron jobs | Geração automática mensal de transações |
-| 6 | Orçamento mensal | CRUD, clonagem do mês anterior, acompanhamento com Tremor |
-| 7 | Visão Familiar + Caixa Familiar | Toggle Pessoal/Família, tela de contribuições, dashboard familiar |
-| 8 | Dashboard | Cards de resumo, AreaChart, DonutChart, faturas, próximos lançamentos |
-| 9 | Projetos | CRUD de projetos, grupos, itens, tipos de pagamento, integração com transações |
+| 1 | Setup inicial — Supabase + migrations + RLS + Next.js + autenticação | ✅ Concluído |
+| 1.5 | Modelo de Escopo — campos `scope`/`user_id`/`is_shared` + migrations 013–016 | ✅ Concluído |
+| 2 | CRUD base — Categorias, cartões, receitas fixas, despesas fixas com escopo | ✅ Concluído |
+| 3 | Transações manuais — lançamento, listagem, filtros, mudança de status | ✅ Concluído |
+| 4 | Parcelamentos e assinaturas — geração de parcelas + integração câmbio USD/BRL | ✅ Concluído |
+| 5 | Cron jobs — geração automática mensal idempotente | ✅ Concluído |
+| 6 | Orçamento mensal — CRUD, clonagem do mês anterior, acompanhamento (sempre pessoal) | ✅ Concluído |
+| 7 | Visão Familiar / Caixa Familiar — aportes reais, saldo dinâmico | ✅ Concluído |
+| 8 | Dashboard — cards, Recharts, faturas, próximos lançamentos, perfil | ✅ Concluído |
+| 9 | Projetos — CRUD de projetos, grupos, itens, tipos de pagamento, integração transações | ⬜ Próxima |
+| 10 | Investimentos — CRUD, aportes/resgates, snapshots, projeções, integração projetos | ⬜ Pendente |
+| 11 | Fluxo Futuro / Calendário Financeiro — visão temporal de compromissos | ⬜ Pendente |
 
 ---
 
@@ -466,41 +504,48 @@ Cada entidade financeira pertence a um de dois escopos:
 
 ### 10.2 Compartilhamento Voluntário
 
-Um usuário pode marcar qualquer entidade pessoal como `is_shared = true`. O efeito:
-- O parceiro **visualiza** o item e suas transações vinculadas
-- O parceiro **não pode editar ou excluir** (somente o dono)
-- Caso prático: "quero que meu parceiro veja as parcelas do meu cartão pessoal"
+O compartilhamento de transações pessoais é controlado por **`profiles.share_with_partner`** — um toggle global por usuário, configurado na tela `/perfil`. Quando ativado:
+- Todas as transações pessoais do usuário recebem `is_shared = true` automaticamente ao criar/editar
+- O parceiro **visualiza** essas transações (somente leitura)
+- O parceiro **não pode editar ou excluir**
 
-### 10.3 Interface — Toggle Pessoal / Família
+Para `credit_cards`, o controle de `is_shared` é **granular por cartão** — o usuário define individualmente se cada cartão pessoal é visível ao parceiro.
 
-A interface oferece um toggle global no topo da aplicação:
+### 10.3 Interface — Comportamento por Tela
 
-- **Pessoal:** exibe dados do usuário autenticado + itens compartilhados com ele pelo parceiro
-- **Família:** exibe apenas dados com `scope = 'family'`
+Não existe toggle global único no topo da aplicação. Cada tela tem seu próprio comportamento:
 
-O contexto do toggle é mantido durante a navegação e resolvido no servidor via cookie de sessão.
+| Tela | Comportamento |
+|---|---|
+| `/transacoes` | Abas "Meu" / "[nome do parceiro]"; toggle "Compartilhar com [parceiro]" no perfil persiste em `share_with_partner` |
+| `/dashboard` | Toggle "[nome do usuário] \| [nome do parceiro]" (ex: "Gabriel \| Heide"); URL param `?escopo=personal\|parceiro` |
+| `/orcamento` | Sempre pessoal — sem toggle |
+| `/familia` | Sempre familiar — sem toggle |
+| `/cartoes` | Lista cartões do usuário + cartões familiares + cartões do parceiro com `is_shared = true` |
 
 ### 10.4 Caixa Familiar
 
-O caixa familiar é o "fundo conjunto" do casal. Cada usuário configura uma contribuição mensal.
+O caixa familiar representa o fundo conjunto do casal. Contribuições são **movimentos financeiros reais** (não configurações): cada aporte cria uma despesa pessoal vinculada ao Caixa Familiar.
 
 **Tabela `family_contributions`:**
 
 | Campo | Tipo | Descrição |
 |---|---|---|
+| `id` | UUID | Identificador único |
+| `family_id` | UUID | Vínculo com a família |
 | `user_id` | UUID | Quem está contribuindo |
-| `amount` | NUMERIC(12,2) | Valor da contribuição mensal |
-| `effective_from` | DATE | A partir de quando essa contribuição vale |
+| `amount` | NUMERIC(12,2) | Valor do aporte |
+| `date` | DATE | Data do aporte (renomeado de `effective_from` na migration 020) |
+| `transaction_id` | UUID (FK, nullable) | Referência à despesa pessoal gerada (adicionado migration 020) |
 | `notes` | TEXT | Observações opcionais |
 
 **Cálculo do caixa:**
-- Saldo disponível = soma das contribuições dos dois usuários no mês − despesas com `scope = 'family'` no mês
+- Saldo disponível = soma dos `amount` dos aportes do mês − despesas com `scope = 'family'` no mês
 
-**Tela Familiar exibe:**
-- Contribuição de cada parceiro no mês
-- Total disponível no caixa
-- Total gasto do caixa
-- Saldo restante
+**Tela `/familia` exibe:**
+- Total aportado por membro no mês + contagem de aportes
+- Total gasto do caixa (transações com `scope = 'family'`)
+- Saldo livre
 
 ### 10.5 Origem do Pagamento
 

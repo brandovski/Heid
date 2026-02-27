@@ -133,8 +133,8 @@
 
 **Objetivo:** usuário consegue definir e acompanhar o orçamento por categoria.
 
-- [x] Listagem do orçamento do mês com barra de progresso (`<ProgressBar />`)
-- [x] Orçamento pessoal e familiar separados (toggle)
+- [x] Listagem do orçamento do mês com barra de progresso (`<ProgressBar />` próprio)
+- [x] Orçamento pessoal e familiar separados (toggle) — **toggle removido na Sessão 013; orçamento é agora sempre pessoal**
 - [x] Detectar ausência de orçamento no mês e exibir modal de criação
 - [x] Opção "Clonar do mês anterior"
 - [x] Adicionar / editar / remover categoria do orçamento
