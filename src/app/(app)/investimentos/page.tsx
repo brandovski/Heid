@@ -16,7 +16,7 @@ export default async function InvestimentosPage() {
   ] = await Promise.all([
     supabase.from("investments").select("*").order("created_at", { ascending: true }),
     supabase.from("investment_transactions").select("*").order("date", { ascending: false }),
-    supabase.from("investment_snapshots").select("*").order("date", { ascending: false }),
+    supabase.from("investment_snapshots").select("*").order("date", { ascending: false }).order("created_at", { ascending: false }),
   ]);
 
   return (

@@ -21,7 +21,7 @@ interface Props {
 
 export default function InvestimentoCard({ investment, transactions, snapshots, onEdit }: Props) {
   const totalAportado = calcTotalAportado(transactions);
-  const saldoAtual = calcSaldoAtual(snapshots);
+  const saldoAtual = calcSaldoAtual(snapshots, transactions);
   const rentReais = calcRentabilidadeReais(snapshots, transactions);
   const rentPct = calcRentabilidadePct(snapshots, transactions);
   const goalPct = saldoAtual != null && investment.goal_amount

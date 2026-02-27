@@ -29,7 +29,8 @@ export default async function InvestimentoDetalhePage({
       .from("investment_snapshots")
       .select("*")
       .eq("investment_id", params.id)
-      .order("date", { ascending: false }),
+      .order("date", { ascending: false })
+      .order("created_at", { ascending: false }),
     supabase
       .from("project_items")
       .select("id, name, actual_amount, status")

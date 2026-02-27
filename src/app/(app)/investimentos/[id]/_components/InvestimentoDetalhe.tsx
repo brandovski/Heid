@@ -51,7 +51,7 @@ export default function InvestimentoDetalhe({
   const [modal, setModal] = useState<Modal>({ type: "none" });
 
   const totalAportado = calcTotalAportado(transactions);
-  const saldoAtual = calcSaldoAtual(snapshots);
+  const saldoAtual = calcSaldoAtual(snapshots, transactions);
   const rentReais = calcRentabilidadeReais(snapshots, transactions);
   const rentPct = calcRentabilidadePct(snapshots, transactions);
   const goalPct =

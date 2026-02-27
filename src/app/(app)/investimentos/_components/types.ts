@@ -25,17 +25,30 @@ export function calcTotalAportado(transactions: InvestmentTransaction[]): number
   }, 0);
 }
 
-export function calcSaldoAtual(snapshots: InvestmentSnapshot[]): number | null {
-  if (snapshots.length === 0) return null;
+export function calcSaldoAtual(
+  snapshots: InvestmentSnapshot[],
+  transactions: InvestmentTransaction[]
+): number | null {
+  if (snapshots.length === 0 && transactions.length === 0) return null;
+
+  if (snapshots.length === 0) {
+    return calcTotalAportado(transactions);
+  }
+
   // snapshots sorted DESC by date — first is most recent
-  return snapshots[0].value;
+  const last = snapshots[0];
+  const afterNet = transactions
+    .filter((tx) => tx.created_at > last.created_at)
+    .reduce((s, tx) => (tx.type === "deposit" ? s + tx.amount : s - tx.amount), 0);
+
+  return last.value + afterNet;
 }
 
 export function calcRentabilidadeReais(
   snapshots: InvestmentSnapshot[],
   transactions: InvestmentTransaction[]
 ): number | null {
-  const saldo = calcSaldoAtual(snapshots);
+  const saldo = calcSaldoAtual(snapshots, transactions);
   if (saldo === null) return null;
   const aportado = calcTotalAportado(transactions);
   return saldo - aportado;
