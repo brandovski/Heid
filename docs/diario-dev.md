@@ -9,12 +9,13 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 10 — Investimentos (concluída)
-**Última sessão:** Sessão 018 — 2026-02-27
-**Próxima ação:** Verificação end-to-end da Fase 10 + iniciar Fase 11
+**Fase:** Fase 10 — Investimentos (concluída, bugs corrigidos)
+**Última sessão:** Sessão 019 — 2026-02-27
+**Próxima ação:** Iniciar Fase 11
 
 ### O que está feito
 - [x] Fase 10 — Investimentos completo (Sessão 018): migration 018 aplicada (`investment_id` em `transactions`, policy `scoped_select` recriada); CRUD de investimentos (GET/POST/PATCH); aportes/resgates manuais com transaction vinculada; snapshots de saldo (append-only); página lista com tabs Ativos/Arquivados; página detalhe com stats, gráfico Recharts, movimentações; GraficoEvolucao LineChart; cron `generate-monthly` estendido com aportes automáticos (idempotente); integração Projetos: `payment_origin='investment'` no ItemModal, `investment_id` nos itens, fluxo pagar cria withdrawal no investimento sem lançar no extrato; link Investimentos na Navbar desktop com ícone TrendingUp.
+- [x] Correção Saldo Atual em Investimentos (Sessão 019): 3 bugs corrigidos — `calcSaldoAtual` agora aceita `transactions`; sort secundário `created_at DESC` adicionado às queries de snapshots (evita ordem não-determinística com datas iguais); comparação `tx.date > last.date` substituída por `tx.created_at > last.created_at` (garante que aportes do mesmo dia do snapshot sejam contabilizados corretamente).
 - [x] Fase 9 — Projetos completo (Sessão 017): módulo completo de projetos com grupos, itens, fluxo considering→confirmed→paid, geração de transações (cash/card_installment/deposit_remainder), navbar atualizada
 - [x] Fase 8 — Dashboard completo + melhorias pós-fase: redesign de CartaoCard, FaturaDetalheModal, PagarFaturaModal compartilhado, FaturaGrupoCard em /transacoes
 - [x] Reestruturação de escopo (Sessão 013): /transacoes com abas Meu/Parceiro, /dashboard com toggle pessoal/parceiro (nomes reais), /orcamento sempre pessoal, /perfil com avatar/iniciais/logout, parcelamento inline no TransacaoModal, toggle de compartilhamento persistente
@@ -57,7 +58,7 @@
 - [x] Rodar migration 017 Parte 1 (ENUM: investment_deposit + investment_withdrawal) no Supabase
 - [x] Rodar migration 017 Partes 2–4 (investments, investment_transactions, investment_snapshots) no Supabase
 - [x] Rodar migration 017 Parte 5 (ALTER TABLE project_items) — aplicada em sessão 017
-- [ ] Migration 018 (investment_id em transactions) — diferida para início da Fase 10
+- [x] Migration 018 (investment_id em transactions) — aplicada em sessão 018
 - [x] Commit e push de todas as alterações desta sessão
 - [x] Fase 2 — CRUD base concluída
 - [x] Fase 3 — Transações Manuais concluída
@@ -87,6 +88,68 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 019 — 2026-02-27
+
+**Objetivo:** Investigar e corrigir bugs no módulo de Investimentos (Fase 10)
+
+**O que foi feito:**
+
+*Diagnóstico:*
+- Investigação completa do "Cofrinho do Casal" via consulta direta ao banco (REST API com service role)
+- Reconstrução da timeline exata dos eventos por `created_at`
+- Identificação de 3 bugs relacionados ao cálculo de `calcSaldoAtual`
+
+*Correções (3 bugs, 5 arquivos, zero DB):*
+- **Bug 1:** `calcSaldoAtual` ignorava transações — agora aceita `transactions` como segundo parâmetro e calcula o saldo incremental
+- **Bug 2:** sort não-determinístico de snapshots com datas iguais — adicionado `.order("created_at", { ascending: false })` como sort secundário em `investimentos/page.tsx` e `investimentos/[id]/page.tsx`
+- **Bug 3:** comparação `tx.date > last.date` (string de data) excluía aportes do mesmo dia do snapshot — substituído por `tx.created_at > last.created_at` (ISO timestamp)
+
+*Resultado verificado:*
+- "Cofrinho do Casal": Saldo Atual = R$6.029, Rentabilidade = +R$29 (+0,5%) ✅
+- `tsc --noEmit` sem erros ✅
+
+*Commit:* `131cfa9 fix: corrige Saldo Atual em Investimentos` — push realizado para `origin/main`
+
+---
+
+### Sessão 018 — 2026-02-27
+
+**Objetivo:** Implementar Fase 10 — Investimentos
+
+**O que foi feito:**
+
+*Migration:*
+- Migration 018 aplicada via Management API: `investment_id UUID` em `transactions` + índice parcial + policy `scoped_select` recriada
+
+*API Routes (5 arquivos):*
+- `GET + POST /api/investimentos` — listar e criar investimentos
+- `PATCH /api/investimentos/[id]` — editar / arquivar
+- `POST /api/investimentos/[id]/transacoes` — aporte/resgate (cria `investment_transaction` + `transaction` vinculada)
+- `POST /api/investimentos/[id]/snapshots` — checkpoint de saldo real (append-only)
+- `DELETE /api/investimentos/transacoes/[txId]` — excluir movimentação manual
+
+*Pages e Componentes (10 arquivos):*
+- `/investimentos/page.tsx` — Server Component, query paralela
+- `_components/types.ts` — `INVESTMENT_TYPE_LABELS`, `calcTotalAportado`, `calcSaldoAtual`, `calcRentabilidade*`, `formatCurrency`
+- `_components/InvestimentoList.tsx` — Client, tabs Ativos/Arquivados
+- `_components/InvestimentoCard.tsx` — Client, stats resumidas + ProgressBar de meta
+- `_components/InvestimentoModal.tsx` — Client, criar/editar com ScopeSelector
+- `/investimentos/[id]/page.tsx` — Server Component, query paralela
+- `[id]/_components/InvestimentoDetalhe.tsx` — Client, detalhe completo + modais
+- `[id]/_components/TransacaoModal.tsx` — Client, aporte/resgate
+- `[id]/_components/SnapshotModal.tsx` — Client, atualizar saldo
+- `[id]/_components/GraficoEvolucao.tsx` — Client, Recharts LineChart de snapshots
+
+*Cron:* `generate-monthly` estendido com bloco de aportes automáticos idempotente
+
+*Integração Projetos:* `payment_origin='investment'` no `ItemModal`; fluxo `/pagar` cria `investment_transaction` de withdrawal sem lançar no extrato financeiro
+
+*Navbar:* link "Investimentos" com ícone `TrendingUp` no desktop
+
+*Build:* Next.js build sem erros de TypeScript ✅
 
 ---
 
