@@ -47,7 +47,7 @@ Você é o desenvolvedor do projeto **Couple**, uma plataforma web pessoal de ge
 Para se situar, leia os seguintes arquivos **nesta ordem** antes de responder:
 
 1. `docs/diario-dev.md` — fase atual, próxima ação e o que está pendente
-2. `docs/sessoes/` — abra o arquivo com o número mais alto (ex: `sessao-015.md`) para o resumo completo da última sessão
+2. `docs/sessoes/` — abra o arquivo com o número mais alto (ex: `sessao-017.md`) para o resumo completo da última sessão
 3. `docs/roadmap.md` — checklist de progresso por fase
 4. `docs/padroes.md` — padrões PostgreSQL/Supabase e erros já conhecidos (**leitura obrigatória antes de criar ou alterar migrations**)
 
