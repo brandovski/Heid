@@ -277,4 +277,4 @@
 
 ---
 
-*Atualizado em: 2026-02-25*
+*Atualizado em: 2026-02-27*

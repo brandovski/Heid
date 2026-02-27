@@ -9,14 +9,16 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Correções e melhorias de UX (pós-reestruturação de escopo)
-**Última sessão:** 2026-02-27
-**Próxima ação:** Iniciar Fase 9 — Projetos (requer rodar migration 015 antes)
+**Fase:** Pré-Fase 9 — Projetos
+**Última sessão:** Sessão 015 — 2026-02-27
+**Próxima ação:** Iniciar Fase 9 — Projetos (rodar migration 015 e depois 017 Parte 5 no Supabase antes de iniciar)
 
 ### O que está feito
 - [x] Fase 8 — Dashboard completo + melhorias pós-fase: redesign de CartaoCard, FaturaDetalheModal, PagarFaturaModal compartilhado, FaturaGrupoCard em /transacoes
-- [x] UX fixes (Sessão 2): tab nome real em /transacoes, modal familiar simplificado, Modal desktop com overlay fixed + overflow-hidden + sm:rounded-2xl, Navbar reescrita (Cartões dropdown, perfil link, mobile 5-item + botão perfil fixo), página /perfil com avatar/iniciais/logout, link "Gerenciar Transações Fixas" em /transacoes
-- [x] Correções RLS e Cartões Pessoais (Sessão 3): migration 021 — policy `profiles_select_family_members` para permitir leitura cruzada de perfis da mesma família (corrige saldo negativo em /familia e nome "Parceiro" em /transacoes + /dashboard); CartaoModal sem ScopeSelector (cartões sempre pessoais); CartaoCard sem badges scope/compartilhado
+- [x] Reestruturação de escopo (Sessão 013): /transacoes com abas Meu/Parceiro, /dashboard com toggle pessoal/parceiro (nomes reais), /orcamento sempre pessoal, /perfil com avatar/iniciais/logout, parcelamento inline no TransacaoModal, toggle de compartilhamento persistente
+- [x] Correções pós-escopo (Sessão 014): migration 022 — coluna `is_shared` em transactions + backfill + cláusula RLS; data fix no cartão "Itaú Click"; migration 021 — policy `profiles_select_family_members`
+- [x] Navbar mobile glassmorphism (Sessão 015): flutuante bottom-5 com bg-white/60, backdrop-blur-xl, rounded-2xl, item ativo com pill bg-white/80; layout pb-32
+- [x] Commits organizados e repositório limpo (Sessão 015): 8 commits atômicos por feature, push realizado, Vercel buildando
 - [x] Regras de negócio documentadas com seções de Escopo, Projetos e Investimentos (`docs/regras-de-negocio.md`)
 - [x] Roadmap atualizado para 11 fases + Fase 1.5 (`docs/roadmap.md`)
 - [x] Arquitetura atualizada com Seção 7 (Escopo e Visibilidade) (`docs/arquitetura.md`)
@@ -82,6 +84,37 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 015 — 2026-02-27
+
+**Objetivo:** Navbar mobile glassmorphism + organização de commits acumulados das sessões 006–014
+
+**O que foi feito:**
+
+*Navbar mobile — glassmorphism:*
+- `Navbar.tsx` — container mobile: `fixed bottom-5 left-4 right-4`, `bg-white/60 backdrop-blur-xl`, `rounded-2xl`, `shadow-lg shadow-black/10`, `border border-white/50`; item ativo: `bg-white/80 rounded-xl text-blue-600`
+- `layout.tsx` — `pb-24` → `pb-32` para compensar altura flutuante
+
+*Organização de commits:*
+- 8 commits atômicos criados organizando todo o trabalho das sessões 006–014 que havia ficado sem commit
+- Push realizado; build do Vercel restaurado (estava falhando por imports de arquivos não comitados)
+
+*Documentação:*
+- Sessões 013, 014 e 015 criadas retroativamente em `docs/sessoes/`
+- `padroes.md` atualizado (seção 2.2 Navbar)
+- `roadmap.md`, `session-start-prompt.md`, `diario-dev.md` atualizados
+
+**Decisões tomadas:**
+- `bottom-5 left-4 right-4` em vez de `bottom-0 left-0 right-0`: navbar flutuante é padrão visual mais moderno e exibe o conteúdo passando "atrás" do glass
+- `pb-32` no layout: margem generosa para evitar sobreposição mesmo com scroll bounce no iOS
+
+**Problemas encontrados:**
+- Vercel build falhava: código comitado (ex: `dashboard/page.tsx`) importava diretórios nunca comitados (ex: `dashboard/_components/`) — resolvido comitando tudo em lote organizado
+
+**Próxima sessão:**
+- Iniciar Fase 9: Projetos (rodar migration 015 e depois 017 Parte 5 no Supabase antes de iniciar)
 
 ---
 

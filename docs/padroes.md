@@ -235,9 +235,33 @@ Todo modal usa o componente `src/components/ui/Modal.tsx` com três zonas:
 ### 2.2 Navbar — dual layout mobile/desktop
 
 - **Desktop (`sm:`):** top navbar horizontal com texto + ícone
-- **Mobile (default):** bottom navigation bar fixo (`fixed bottom-0`), somente ícone + label curto
+- **Mobile (default):** bottom navigation **flutuante** com glassmorphism
 
-O layout `(app)` adiciona `pb-24 sm:pb-0` ao `<main>` para evitar sobreposição com a bottom nav no mobile.
+#### Propriedades do container mobile
+
+```
+fixed bottom-5 left-4 right-4 z-40
+bg-white/60 backdrop-blur-xl
+rounded-2xl
+shadow-lg shadow-black/10
+border border-white/50
+```
+
+#### Item ativo
+
+```
+bg-white/80 rounded-xl text-blue-600
+strokeWidth={2.5}  // ícone mais espesso
+```
+
+#### Item inativo
+
+```
+text-gray-400 hover:text-gray-700
+strokeWidth={1.75}
+```
+
+O layout `(app)` adiciona `pb-32 sm:pb-8` ao `<main>` para compensar a altura flutuante (~84px) com folga confortável.
 
 ---
 
