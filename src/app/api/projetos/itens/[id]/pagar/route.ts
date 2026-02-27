@@ -217,6 +217,34 @@ export async function POST(
       deposit_transaction_id: depositTx.id,
       remainder_transaction_id: remainderTx.id,
     });
+  } else if (item.payment_origin === "investment") {
+    if (!item.investment_id) {
+      return NextResponse.json({ error: "Investimento não vinculado ao item" }, { status: 400 });
+    }
+
+    // Create withdrawal investment_transaction (no financial transaction in extrato)
+    const { error: invTxError } = await supabase
+      .from("investment_transactions")
+      .insert({
+        investment_id: item.investment_id,
+        family_id: profile.family_id,
+        type: "withdrawal" as const,
+        amount: item.actual_amount,
+        date: today,
+        notes: `Pagamento: ${item.name}`,
+        auto_generated: false,
+      });
+
+    if (invTxError) return NextResponse.json({ error: invTxError.message }, { status: 500 });
+
+    const { error: updateError } = await supabase
+      .from("project_items")
+      .update({ status: "paid" })
+      .eq("id", params.id);
+
+    if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+
+    return NextResponse.json({ ok: true });
   }
 
   return NextResponse.json({ error: "Tipo de pagamento inválido" }, { status: 400 });

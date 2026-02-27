@@ -5,6 +5,8 @@ import Modal from "@/components/ui/Modal";
 import DatePicker from "@/components/ui/DatePicker";
 import type { ProjectItem, ProjectGroup, ProjectItemWithRelations } from "../../_components/types";
 import { formatCurrency } from "../../_components/types";
+import type { Investment } from "@/app/(app)/investimentos/_components/types";
+import { INVESTMENT_TYPE_LABELS } from "@/app/(app)/investimentos/_components/types";
 
 interface CreditCard {
   id: string;
@@ -22,6 +24,7 @@ interface Props {
   groups: ProjectGroup[];
   categories: Category[];
   creditCards: CreditCard[];
+  eligibleInvestments: Investment[];
   item?: ProjectItemWithRelations;
   defaultGroupId?: string;
   mode?: "create" | "edit" | "confirm";
@@ -30,7 +33,7 @@ interface Props {
 }
 
 type PaymentType = "cash" | "card_installment" | "deposit_remainder";
-type PaymentOrigin = "personal" | "family";
+type PaymentOrigin = "personal" | "family" | "investment";
 type CashMethod = "debit" | "pix" | "cash" | "transfer";
 
 const PAYMENT_TYPE_OPTIONS: { value: PaymentType; label: string }[] = [
@@ -51,6 +54,7 @@ export default function ItemModal({
   groups,
   categories,
   creditCards,
+  eligibleInvestments,
   item,
   defaultGroupId,
   mode = "create",
@@ -66,7 +70,10 @@ export default function ItemModal({
   const [budgetAmount, setBudgetAmount] = useState(item?.budget_amount != null ? String(item.budget_amount) : "");
   const [actualAmount, setActualAmount] = useState(item?.actual_amount != null ? String(item.actual_amount) : "");
   const [paymentType, setPaymentType] = useState<PaymentType | "">(item?.payment_type ?? "");
-  const [paymentOrigin, setPaymentOrigin] = useState<PaymentOrigin>("personal");
+  const [paymentOrigin, setPaymentOrigin] = useState<PaymentOrigin>(
+    (item?.payment_origin as PaymentOrigin | null) ?? "personal"
+  );
+  const [investmentId, setInvestmentId] = useState(item?.investment_id ?? "");
   const [paymentMethod, setPaymentMethod] = useState<CashMethod | "">(item?.payment_method ?? "");
   const [creditCardId, setCreditCardId] = useState(item?.credit_card_id ?? "");
   const [installmentsCount, setInstallmentsCount] = useState(item?.installments_count ? String(item.installments_count) : "2");
@@ -109,6 +116,12 @@ export default function ItemModal({
     setSaving(true);
     setError("");
 
+    if (paymentType && paymentOrigin === "investment" && !investmentId) {
+      setError("Selecione um investimento");
+      setSaving(false);
+      return;
+    }
+
     const payload: Record<string, unknown> = {
       project_group_id: groupId,
       project_id: projectId,
@@ -117,6 +130,7 @@ export default function ItemModal({
       budget_amount: budgetAmount ? parseFloat(budgetAmount) : null,
       payment_type: paymentType || null,
       payment_origin: paymentType ? paymentOrigin : null,
+      investment_id: paymentType && paymentOrigin === "investment" ? investmentId || null : null,
       payment_method: paymentType === "cash" ? paymentMethod || null : null,
       credit_card_id: paymentType === "card_installment" ? creditCardId || null : null,
       installments_count: paymentType === "card_installment" ? parseInt(installmentsCount) : null,
@@ -278,24 +292,57 @@ export default function ItemModal({
 
             {/* Payment-type-specific fields */}
             {paymentType && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Origem do Pagamento</label>
-                <div className="flex gap-2">
-                  {(["personal", "family"] as const).map((o) => (
-                    <button
-                      key={o}
-                      type="button"
-                      onClick={() => setPaymentOrigin(o)}
-                      className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
-                        paymentOrigin === o
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
-                      }`}
-                    >
-                      {o === "personal" ? "Pessoal" : "Caixa Familiar"}
-                    </button>
-                  ))}
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Origem do Pagamento</label>
+                  <div className="flex gap-2 flex-wrap">
+                    {(["personal", "family"] as const).map((o) => (
+                      <button
+                        key={o}
+                        type="button"
+                        onClick={() => setPaymentOrigin(o)}
+                        className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                          paymentOrigin === o
+                            ? "bg-blue-600 text-white border-blue-600"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                        }`}
+                      >
+                        {o === "personal" ? "Pessoal" : "Caixa Familiar"}
+                      </button>
+                    ))}
+                    {eligibleInvestments.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setPaymentOrigin("investment")}
+                        className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                          paymentOrigin === "investment"
+                            ? "bg-blue-600 text-white border-blue-600"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                        }`}
+                      >
+                        Investimento
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {paymentOrigin === "investment" && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Investimento</label>
+                    <select
+                      value={investmentId}
+                      onChange={(e) => setInvestmentId(e.target.value)}
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Selecione...</option>
+                      {eligibleInvestments.map((inv) => (
+                        <option key={inv.id} value={inv.id}>
+                          {inv.name} ({INVESTMENT_TYPE_LABELS[inv.type]})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             )}
 

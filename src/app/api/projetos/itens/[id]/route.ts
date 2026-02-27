@@ -46,6 +46,7 @@ export async function PATCH(
     remainder_date,
     category_id,
     notes,
+    investment_id,
   } = body;
 
   const updates: Record<string, unknown> = {};
@@ -62,6 +63,7 @@ export async function PATCH(
   if (remainder_date !== undefined) updates.remainder_date = remainder_date ?? null;
   if (category_id !== undefined) updates.category_id = category_id ?? null;
   if (notes !== undefined) updates.notes = notes?.trim() ?? null;
+  if (investment_id !== undefined) updates.investment_id = investment_id ?? null;
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nenhum campo para atualizar" }, { status: 400 });

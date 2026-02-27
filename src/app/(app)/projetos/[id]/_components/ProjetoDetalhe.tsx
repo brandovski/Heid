@@ -18,6 +18,7 @@ import {
   STATUS_LABELS,
   STATUS_COLORS,
 } from "../../_components/types";
+import type { Investment } from "@/app/(app)/investimentos/_components/types";
 
 interface Category { id: string; name: string; }
 interface CreditCard { id: string; name: string; brand: string; color: string | null; }
@@ -27,6 +28,7 @@ interface Props {
   groups: ProjectGroupWithItems[];
   categories: Category[];
   creditCards: CreditCard[];
+  eligibleInvestments: Investment[];
 }
 
 type ModalState =
@@ -40,6 +42,7 @@ export default function ProjetoDetalhe({
   groups: initialGroups,
   categories,
   creditCards,
+  eligibleInvestments,
 }: Props) {
   const [project, setProject] = useState<Project>(initialProject);
   const [groups, setGroups] = useState<ProjectGroupWithItems[]>(initialGroups);
@@ -280,6 +283,7 @@ export default function ProjetoDetalhe({
           groups={plainGroups}
           categories={categories}
           creditCards={creditCards}
+          eligibleInvestments={eligibleInvestments}
           item={modal.item}
           defaultGroupId={modal.defaultGroupId}
           mode={modal.mode}

@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
     remainder_date,
     category_id,
     notes,
+    investment_id,
   } = await req.json();
 
   if (!project_group_id || !project_id || !name?.trim()) {
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
       remainder_date: remainder_date ?? null,
       category_id: category_id ?? null,
       notes: notes?.trim() ?? null,
+      investment_id: investment_id ?? null,
       status: "considering",
     })
     .select()

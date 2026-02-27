@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import ProjetoDetalhe from "./_components/ProjetoDetalhe";
 import type { Project, ProjectGroup, ProjectGroupWithItems, ProjectItemWithRelations } from "../_components/types";
+import type { Investment } from "@/app/(app)/investimentos/_components/types";
 
 export default async function ProjetoDetalhePage({
   params,
@@ -20,6 +21,7 @@ export default async function ProjetoDetalhePage({
     { data: items },
     { data: categories },
     { data: creditCards },
+    { data: eligibleInvestments },
   ] = await Promise.all([
     supabase.from("projects").select("*").eq("id", params.id).single(),
     supabase
@@ -35,6 +37,11 @@ export default async function ProjetoDetalhePage({
       .order("created_at", { ascending: true }),
     supabase.from("categories").select("id, name").eq("is_active", true).order("name"),
     supabase.from("credit_cards").select("id, name, brand, color").eq("is_active", true).order("name"),
+    supabase
+      .from("investments")
+      .select("id, name, type, scope, is_eligible_for_projects, is_active")
+      .eq("is_eligible_for_projects", true)
+      .eq("is_active", true),
   ]);
 
   if (!project) notFound();
@@ -54,6 +61,7 @@ export default async function ProjetoDetalhePage({
         groups={groupsWithItems}
         categories={categories ?? []}
         creditCards={creditCards ?? []}
+        eligibleInvestments={(eligibleInvestments ?? []) as Investment[]}
       />
     </div>
   );

@@ -9,11 +9,12 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 10 — Investimentos (próxima)
-**Última sessão:** Sessão 017 — 2026-02-27
-**Próxima ação:** Iniciar Fase 10 — Investimentos (rodar migration 018 no Supabase antes de iniciar)
+**Fase:** Fase 10 — Investimentos (concluída)
+**Última sessão:** Sessão 018 — 2026-02-27
+**Próxima ação:** Verificação end-to-end da Fase 10 + iniciar Fase 11
 
 ### O que está feito
+- [x] Fase 10 — Investimentos completo (Sessão 018): migration 018 aplicada (`investment_id` em `transactions`, policy `scoped_select` recriada); CRUD de investimentos (GET/POST/PATCH); aportes/resgates manuais com transaction vinculada; snapshots de saldo (append-only); página lista com tabs Ativos/Arquivados; página detalhe com stats, gráfico Recharts, movimentações; GraficoEvolucao LineChart; cron `generate-monthly` estendido com aportes automáticos (idempotente); integração Projetos: `payment_origin='investment'` no ItemModal, `investment_id` nos itens, fluxo pagar cria withdrawal no investimento sem lançar no extrato; link Investimentos na Navbar desktop com ícone TrendingUp.
 - [x] Fase 9 — Projetos completo (Sessão 017): módulo completo de projetos com grupos, itens, fluxo considering→confirmed→paid, geração de transações (cash/card_installment/deposit_remainder), navbar atualizada
 - [x] Fase 8 — Dashboard completo + melhorias pós-fase: redesign de CartaoCard, FaturaDetalheModal, PagarFaturaModal compartilhado, FaturaGrupoCard em /transacoes
 - [x] Reestruturação de escopo (Sessão 013): /transacoes com abas Meu/Parceiro, /dashboard com toggle pessoal/parceiro (nomes reais), /orcamento sempre pessoal, /perfil com avatar/iniciais/logout, parcelamento inline no TransacaoModal, toggle de compartilhamento persistente

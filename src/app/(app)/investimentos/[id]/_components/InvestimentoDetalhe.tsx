@@ -1,0 +1,320 @@
+"use client";
+
+import { useState } from "react";
+import { ArrowLeft, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import Link from "next/link";
+import ProgressBar from "@/components/ui/ProgressBar";
+import InvestimentoModal from "../../_components/InvestimentoModal";
+import TransacaoModal from "./TransacaoModal";
+import SnapshotModal from "./SnapshotModal";
+import GraficoEvolucao from "./GraficoEvolucao";
+import type { Investment, InvestmentTransaction, InvestmentSnapshot } from "../../_components/types";
+import {
+  INVESTMENT_TYPE_LABELS,
+  formatCurrency,
+  calcTotalAportado,
+  calcSaldoAtual,
+  calcRentabilidadeReais,
+  calcRentabilidadePct,
+} from "../../_components/types";
+
+interface ProjectItemRef {
+  id: string;
+  name: string;
+  actual_amount: number | null;
+  status: string;
+}
+
+interface Props {
+  investment: Investment;
+  transactions: InvestmentTransaction[];
+  snapshots: InvestmentSnapshot[];
+  projectItems: ProjectItemRef[];
+}
+
+type Modal =
+  | { type: "none" }
+  | { type: "edit" }
+  | { type: "aporte" }
+  | { type: "resgate" }
+  | { type: "snapshot" };
+
+export default function InvestimentoDetalhe({
+  investment: initialInvestment,
+  transactions: initialTxs,
+  snapshots: initialSnaps,
+  projectItems,
+}: Props) {
+  const [investment, setInvestment] = useState<Investment>(initialInvestment);
+  const [transactions, setTransactions] = useState<InvestmentTransaction[]>(initialTxs);
+  const [snapshots, setSnapshots] = useState<InvestmentSnapshot[]>(initialSnaps);
+  const [modal, setModal] = useState<Modal>({ type: "none" });
+
+  const totalAportado = calcTotalAportado(transactions);
+  const saldoAtual = calcSaldoAtual(snapshots);
+  const rentReais = calcRentabilidadeReais(snapshots, transactions);
+  const rentPct = calcRentabilidadePct(snapshots, transactions);
+  const goalPct =
+    saldoAtual != null && investment.goal_amount
+      ? (saldoAtual / investment.goal_amount) * 100
+      : null;
+  const comprometido = projectItems.reduce((s, i) => s + (i.actual_amount ?? 0), 0);
+
+  async function reloadData() {
+    const [txRes, snapRes] = await Promise.all([
+      fetch(`/api/investimentos/${investment.id}/transacoes`).catch(() => null),
+      fetch(`/api/investimentos/${investment.id}/snapshots`).catch(() => null),
+    ]);
+    // Reload via full page refresh to keep it simple and consistent
+    window.location.reload();
+  }
+
+  async function handleDeleteTx(txId: string) {
+    if (!confirm("Excluir esta movimentação e a transação financeira vinculada?")) return;
+    const res = await fetch(`/api/investimentos/transacoes/${txId}`, { method: "DELETE" });
+    if (res.ok) {
+      setTransactions((prev) => prev.filter((t) => t.id !== txId));
+    } else {
+      const d = await res.json();
+      alert(d.error ?? "Erro ao excluir");
+    }
+  }
+
+  const rentPositive = rentReais != null && rentReais >= 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Back + Header */}
+      <div>
+        <Link href="/investimentos" className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-3 transition-colors">
+          <ArrowLeft size={14} />
+          Investimentos
+        </Link>
+
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-xl font-bold text-gray-900">{investment.name}</h1>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium">
+                {INVESTMENT_TYPE_LABELS[investment.type]}
+              </span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">
+                {investment.scope === "family" ? "Familiar" : "Pessoal"}
+              </span>
+              {!investment.is_active && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 font-medium">
+                  Arquivado
+                </span>
+              )}
+            </div>
+            {investment.description && (
+              <p className="text-sm text-gray-500 mt-1">{investment.description}</p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setModal({ type: "edit" })}
+            className="px-3 py-1.5 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Editar
+          </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="bg-white border border-gray-200 rounded-xl p-3">
+          <p className="text-xs text-gray-500 mb-1">Total Aportado</p>
+          <p className="text-base font-bold text-gray-900">{formatCurrency(totalAportado)}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-3">
+          <p className="text-xs text-gray-500 mb-1">Saldo Atual</p>
+          <p className="text-base font-bold text-gray-900">
+            {saldoAtual != null ? formatCurrency(saldoAtual) : "—"}
+          </p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-3 col-span-2 sm:col-span-1">
+          <p className="text-xs text-gray-500 mb-1">Rentabilidade</p>
+          {rentReais != null ? (
+            <div className="flex items-center gap-1.5">
+              {rentReais > 0 ? (
+                <TrendingUp size={14} className="text-green-600 shrink-0" />
+              ) : rentReais < 0 ? (
+                <TrendingDown size={14} className="text-red-500 shrink-0" />
+              ) : (
+                <Minus size={14} className="text-gray-400 shrink-0" />
+              )}
+              <p className={`text-base font-bold ${rentPositive ? "text-green-700" : "text-red-600"}`}>
+                {rentPositive ? "+" : ""}{formatCurrency(rentReais)}
+              </p>
+              {rentPct != null && (
+                <span className={`text-xs font-medium ${rentPositive ? "text-green-600" : "text-red-500"}`}>
+                  ({rentPct.toFixed(1)}%)
+                </span>
+              )}
+            </div>
+          ) : (
+            <p className="text-base font-bold text-gray-400">—</p>
+          )}
+        </div>
+      </div>
+
+      {/* Goal progress */}
+      {goalPct != null && (
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <div className="flex justify-between text-sm mb-2">
+            <span className="font-medium text-gray-700">Meta</span>
+            <span className="text-gray-500">
+              {formatCurrency(saldoAtual!)} / {formatCurrency(investment.goal_amount!)} ({goalPct.toFixed(1)}%)
+            </span>
+          </div>
+          <ProgressBar value={goalPct} />
+        </div>
+      )}
+
+      {/* Action buttons */}
+      {investment.is_active && (
+        <div className="flex gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setModal({ type: "aporte" })}
+            className="px-3 py-1.5 text-sm font-medium text-green-700 border border-green-300 rounded-lg hover:bg-green-50 transition-colors"
+          >
+            + Registrar Aporte
+          </button>
+          <button
+            type="button"
+            onClick={() => setModal({ type: "resgate" })}
+            className="px-3 py-1.5 text-sm font-medium text-orange-700 border border-orange-300 rounded-lg hover:bg-orange-50 transition-colors"
+          >
+            − Registrar Resgate
+          </button>
+          <button
+            type="button"
+            onClick={() => setModal({ type: "snapshot" })}
+            className="px-3 py-1.5 text-sm font-medium text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+          >
+            Atualizar Saldo
+          </button>
+        </div>
+      )}
+
+      {/* Evolução */}
+      <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">Evolução do Saldo</h2>
+        <GraficoEvolucao snapshots={snapshots} />
+      </div>
+
+      {/* Movimentações */}
+      <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">Movimentações</h2>
+        {transactions.length === 0 ? (
+          <p className="text-sm text-gray-400 py-4 text-center">Nenhuma movimentação registrada.</p>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {transactions.map((tx) => (
+              <div key={tx.id} className="flex items-center justify-between py-2.5">
+                <div className="flex items-center gap-2.5">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${tx.type === "deposit" ? "bg-green-500" : "bg-orange-400"}`} />
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">
+                      {tx.type === "deposit" ? "Aporte" : "Resgate"}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(tx.date + "T12:00:00").toLocaleDateString("pt-BR")}
+                      {tx.auto_generated && " · Automático"}
+                      {tx.notes && ` · ${tx.notes}`}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`text-sm font-semibold ${tx.type === "deposit" ? "text-green-700" : "text-orange-600"}`}>
+                    {tx.type === "deposit" ? "+" : "−"}{formatCurrency(tx.amount)}
+                  </span>
+                  {!tx.auto_generated && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteTx(tx.id)}
+                      className="text-xs text-red-400 hover:text-red-600 transition-colors"
+                    >
+                      Excluir
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Comprometido com Projetos */}
+      {projectItems.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">
+            Comprometido com Projetos
+            <span className="ml-2 text-xs font-normal text-gray-400">
+              {formatCurrency(comprometido)} total
+            </span>
+          </h2>
+          <div className="divide-y divide-gray-100">
+            {projectItems.map((item) => (
+              <div key={item.id} className="flex items-center justify-between py-2.5">
+                <p className="text-sm text-gray-800">{item.name}</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    {item.actual_amount != null ? formatCurrency(item.actual_amount) : "—"}
+                  </span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                    item.status === "paid"
+                      ? "bg-green-50 text-green-700"
+                      : "bg-blue-50 text-blue-700"
+                  }`}>
+                    {item.status === "paid" ? "Pago" : "Confirmado"}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Modals */}
+      {modal.type === "edit" && (
+        <InvestimentoModal
+          investment={investment}
+          onClose={() => setModal({ type: "none" })}
+          onSaved={(saved) => { setInvestment(saved); setModal({ type: "none" }); }}
+        />
+      )}
+
+      {modal.type === "aporte" && (
+        <TransacaoModal
+          investmentId={investment.id}
+          investmentName={investment.name}
+          defaultType="deposit"
+          onClose={() => setModal({ type: "none" })}
+          onSaved={reloadData}
+        />
+      )}
+
+      {modal.type === "resgate" && (
+        <TransacaoModal
+          investmentId={investment.id}
+          investmentName={investment.name}
+          defaultType="withdrawal"
+          onClose={() => setModal({ type: "none" })}
+          onSaved={reloadData}
+        />
+      )}
+
+      {modal.type === "snapshot" && (
+        <SnapshotModal
+          investmentId={investment.id}
+          investmentName={investment.name}
+          onClose={() => setModal({ type: "none" })}
+          onSaved={reloadData}
+        />
+      )}
+    </div>
+  );
+}

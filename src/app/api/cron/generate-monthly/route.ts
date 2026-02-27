@@ -210,6 +210,88 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // ── Aportes automáticos de investimentos ───────────────────────────────────
+
+  let totalInvestments = 0;
+
+  // Pré-filtro: investment_transactions auto_generated já geradas no mês corrente
+  const { data: existingInvTxs, error: existingInvErr } = await supabase
+    .from("investment_transactions")
+    .select("investment_id")
+    .eq("auto_generated", true)
+    .gte("date", firstDay)
+    .lte("date", lastDay);
+
+  if (existingInvErr) {
+    errors.push(`investment_transactions fetch: ${existingInvErr.message}`);
+  } else {
+    const existingInvIds = new Set(
+      existingInvTxs?.map((t) => t.investment_id).filter(Boolean) ?? []
+    );
+
+    const { data: investments, error: invErr } = await supabase
+      .from("investments")
+      .select("*")
+      .eq("is_active", true)
+      .not("monthly_contribution_amount", "is", null);
+
+    if (invErr) {
+      errors.push(`investments fetch: ${invErr.message}`);
+    } else if (investments?.length) {
+      const toProcess = investments.filter((inv) => !existingInvIds.has(inv.id));
+
+      for (const inv of toProcess) {
+        const txDate = dateStr(year, month, inv.monthly_contribution_day ?? 1);
+
+        // Insert financial transaction
+        const { data: tx, error: txErr } = await supabase
+          .from("transactions")
+          .insert({
+            family_id: inv.family_id,
+            description: `Aporte automático: ${inv.name}`,
+            amount: inv.monthly_contribution_amount,
+            date: txDate,
+            type: "investment_deposit" as const,
+            status: "paid" as const,
+            paid_at: new Date().toISOString(),
+            scope: inv.scope,
+            user_id: inv.user_id,
+            is_shared: false,
+            auto_generated: true,
+            investment_id: inv.id,
+          })
+          .select()
+          .single();
+
+        if (txErr) {
+          errors.push(`investment tx insert (${inv.id}): ${txErr.message}`);
+          continue;
+        }
+
+        // Insert investment_transaction
+        const { error: invTxErr } = await supabase
+          .from("investment_transactions")
+          .insert({
+            investment_id: inv.id,
+            family_id: inv.family_id,
+            type: "deposit" as const,
+            amount: inv.monthly_contribution_amount,
+            date: txDate,
+            transaction_id: tx.id,
+            auto_generated: true,
+          });
+
+        if (invTxErr) {
+          errors.push(`investment_transaction insert (${inv.id}): ${invTxErr.message}`);
+          // Rollback financial transaction
+          await supabase.from("transactions").delete().eq("id", tx.id);
+        } else {
+          totalInvestments++;
+        }
+      }
+    }
+  }
+
   const status = errors.length > 0 ? 207 : 200;
   return NextResponse.json(
     {
@@ -219,6 +301,7 @@ export async function GET(req: NextRequest) {
         fixed_incomes: totalIncomes,
         fixed_expenses: totalExpenses,
         subscriptions: totalSubscriptions,
+        investments: totalInvestments,
       },
       errors,
     },

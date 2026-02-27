@@ -14,6 +14,7 @@ import {
   Layers,
   RefreshCw,
   Target,
+  TrendingUp,
 } from "lucide-react";
 
 const mobileNavItems = [
@@ -157,6 +158,18 @@ export default function Navbar() {
               >
                 <Target size={16} />
                 Projetos
+              </Link>
+
+              <Link
+                href="/investimentos"
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive("/investimentos")
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <TrendingUp size={16} />
+                Investimentos
               </Link>
             </div>
 
