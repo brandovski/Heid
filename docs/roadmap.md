@@ -97,20 +97,20 @@
 **Objetivo:** usuário consegue cadastrar compras parceladas e assinaturas recorrentes.
 
 ### Parcelamentos
-- [ ] Cadastrar compra parcelada (total, nº parcelas, data da primeira parcela, cartão, categoria, escopo)
-- [ ] Geração automática das N transações do tipo `installment` ao cadastrar
-- [ ] Listagem de grupos de parcelamento com status das parcelas
-- [ ] Cancelar parcelas restantes de um grupo
+- [x] Cadastrar compra parcelada (total, nº parcelas, data da primeira parcela, cartão, categoria, escopo)
+- [x] Geração automática das N transações do tipo `installment` ao cadastrar
+- [x] Listagem de grupos de parcelamento com status das parcelas
+- [x] Cancelar parcelas restantes de um grupo
 
 ### Assinaturas
-- [ ] Listagem de assinaturas ativas
-- [ ] Cadastrar assinatura (nome, moeda, valor, dia de cobrança, cartão, categoria, escopo)
-- [ ] Editar assinatura
-- [ ] Cancelar assinatura (`cancelled_at = now()`, `is_active = false`)
-- [ ] Integração com AwesomeAPI para cotação USD→BRL
-- [ ] Lógica de fallback quando a API de câmbio estiver indisponível
+- [x] Listagem de assinaturas ativas
+- [x] Cadastrar assinatura (nome, moeda, valor, dia de cobrança, cartão, categoria, escopo)
+- [x] Editar assinatura
+- [x] Cancelar assinatura (`cancelled_at = now()`, `is_active = false`)
+- [x] Integração com AwesomeAPI para cotação USD→BRL
+- [x] Lógica de fallback quando a API de câmbio estiver indisponível
 
-**Critério de conclusão:** parcelamentos geram transações corretamente; assinaturas em USD convertem com cotação real.
+**Critério de conclusão:** parcelamentos geram transações corretamente; assinaturas em USD convertem com cotação real. ✅ **Concluído em 2026-02-25**
 
 ---
 
@@ -118,14 +118,14 @@
 
 **Objetivo:** automações mensais funcionam de forma confiável e idempotente.
 
-- [ ] Implementar cron `fetch-exchange-rate` (dia 1, 05:30)
-- [ ] Implementar cron `generate-monthly` (dia 1, 06:00) — respeita `scope` e `user_id`
-- [ ] Garantir idempotência (verificar existência antes de inserir)
-- [ ] Implementar cron `supabase-keepalive` (a cada 3 dias)
-- [ ] Configurar `vercel.json` com os schedules dos crons
-- [ ] Testar geração manual via chamada direta ao endpoint
+- [x] Implementar cron `fetch-exchange-rate` (dia 1, 05:30)
+- [x] Implementar cron `generate-monthly` (dia 1, 06:00) — respeita `scope` e `user_id`
+- [x] Garantir idempotência (verificar existência antes de inserir)
+- [x] Implementar cron `supabase-keepalive` (a cada 3 dias)
+- [x] Configurar `vercel.json` com os schedules dos crons
+- [x] Testar geração manual via chamada direta ao endpoint
 
-**Critério de conclusão:** ao acionar manualmente o cron, transações do mês são geradas corretamente e sem duplicatas.
+**Critério de conclusão:** ao acionar manualmente o cron, transações do mês são geradas corretamente e sem duplicatas. ✅ **Concluído em 2026-02-26**
 
 ---
 
@@ -133,16 +133,16 @@
 
 **Objetivo:** usuário consegue definir e acompanhar o orçamento por categoria.
 
-- [ ] Listagem do orçamento do mês com barra de progresso (`<ProgressBar />`)
-- [ ] Orçamento pessoal e familiar separados (toggle)
-- [ ] Detectar ausência de orçamento no mês e exibir modal de criação
-- [ ] Opção "Clonar do mês anterior"
-- [ ] Adicionar / editar / remover categoria do orçamento
-- [ ] Cálculo: gasto realizado vs. comprometido vs. planejado
-- [ ] Destaque visual para categorias acima do limite
-- [ ] Navegação entre meses
+- [x] Listagem do orçamento do mês com barra de progresso (`<ProgressBar />`)
+- [x] Orçamento pessoal e familiar separados (toggle)
+- [x] Detectar ausência de orçamento no mês e exibir modal de criação
+- [x] Opção "Clonar do mês anterior"
+- [x] Adicionar / editar / remover categoria do orçamento
+- [x] Cálculo: gasto realizado vs. comprometido vs. planejado
+- [x] Destaque visual para categorias acima do limite
+- [x] Navegação entre meses
 
-**Critério de conclusão:** orçamento pessoal e familiar criados e acompanhados com barras de progresso corretas.
+**Critério de conclusão:** orçamento pessoal e familiar criados e acompanhados com barras de progresso corretas. ✅ **Concluído em 2026-02-26**
 
 ---
 
@@ -150,14 +150,14 @@
 
 **Objetivo:** tela dedicada à gestão financeira conjunta do casal.
 
-- [ ] Tela `/family` com toggle Pessoal | Familiar na navegação principal
-- [ ] Configuração de contribuição mensal (cada usuário define o seu valor no Caixa Familiar)
-- [ ] Exibição do Caixa Familiar: contribuição de cada um + total disponível + saldo livre
-- [ ] Visão de despesas familiares do mês (scope = 'family')
-- [ ] Visualização de itens pessoais compartilhados pelo parceiro (is_shared = true, somente leitura)
-- [ ] Indicação clara de quem é dono de cada item pessoal compartilhado
+- [x] Tela `/familia` com navegação por mês
+- [x] Registro de aportes reais ao Caixa Familiar (cria despesa pessoal vinculada via `transaction_id`)
+- [x] Exibição do Caixa Familiar: total aportado por membro no mês + contagem de aportes
+- [x] Totais: total aportado, gastos familiares, saldo livre
+- [x] Visão de transações familiares do mês (scope = 'family')
+- [x] Migration 020: renomeia `effective_from→date`, adiciona FK `transaction_id`, remove unique constraint
 
-**Critério de conclusão:** cada usuário vê sua visão pessoal e a visão familiar, com o Caixa Familiar calculado corretamente.
+**Critério de conclusão:** Caixa Familiar reflete movimentos financeiros reais; saldo calculado dinamicamente. ✅ **Concluído em 2026-02-26**
 
 ---
 
@@ -165,18 +165,25 @@
 
 **Objetivo:** tela principal consolidada com visão financeira completa do mês.
 
-- [ ] Cards de resumo: Receitas, Despesas, Saldo realizado, A receber, A pagar
-- [ ] Toggle Pessoal | Familiar nos cards de resumo
-- [ ] Gráfico de evolução dos últimos 6 meses (`<AreaChart />`)
-- [ ] Gráfico de distribuição por categoria (`<DonutChart />`)
-- [ ] Seção de orçamento por categoria com `<ProgressBar />`
-- [ ] Cards de faturas por cartão com status e botão de pagamento
-- [ ] Modal de registro de pagamento de fatura
-- [ ] Tabela de próximos lançamentos (próximos 7–10 `pending`)
-- [ ] Navegação entre meses no dashboard
-- [ ] Loading states e tratamento de erros em todos os componentes
+- [x] Cards de resumo: Receitas, Despesas, Saldo realizado, A receber, A pagar
+- [x] Toggle Pessoal | Familiar nos cards de resumo
+- [x] Gráfico de evolução dos últimos 6 meses (`<AreaChart />`)
+- [x] Gráfico de distribuição por categoria (`<DonutChart />`)
+- [x] Seção de orçamento por categoria com `<ProgressBar />`
+- [x] Cards de faturas por cartão com status e botão de pagamento
+- [x] Modal de registro de pagamento de fatura
+- [x] Tabela de próximos lançamentos (próximos 7–10 `pending`)
+- [x] Navegação entre meses no dashboard
+- [x] Loading states e tratamento de erros em todos os componentes
 
-**Critério de conclusão:** dashboard exibe todos os dados corretamente para o mês corrente e meses anteriores.
+**Melhorias pós-fase (Sessão 012):**
+- [x] Redesign `CartaoCard` — layout tipo cartão de crédito real (`aspect-[8/5]`, cor dinâmica, chip EMV, número mascarado)
+- [x] `FaturaDetalheModal` — modal de detalhe da fatura com navegação de mês, lista de transações e botão "Pagar Fatura"
+- [x] `PagarFaturaModal` — componente compartilhado com UX total/parcial + DatePicker + observações (usado por Dashboard, Cartões e Transações)
+- [x] `POST /api/faturas` — ao pagar fatura faz bulk-update `status = 'paid'` em todas as transactions do cartão no mês
+- [x] `FaturaGrupoCard` em `/transacoes` — agrupa transações de cartão por fatura no topo da lista; expansível; badge Pendente/Pago; botão "Pagar Fatura"
+
+**Critério de conclusão:** dashboard exibe todos os dados corretamente para o mês corrente e meses anteriores. ✅ **Concluído em 2026-02-26**
 
 ---
 
