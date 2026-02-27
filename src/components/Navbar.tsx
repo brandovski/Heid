@@ -13,12 +13,13 @@ import {
   ChevronDown,
   Layers,
   RefreshCw,
+  Target,
 } from "lucide-react";
 
 const mobileNavItems = [
   { href: "/dashboard", label: "Início", icon: LayoutDashboard },
   { href: "/transacoes", label: "Transações", icon: ArrowLeftRight },
-  { href: "/cartoes", label: "Cartões", icon: CreditCard },
+  { href: "/projetos", label: "Projetos", icon: Target },
   { href: "/orcamento", label: "Orçamento", icon: PieChart },
   { href: "/familia", label: "Família", icon: Users },
 ];
@@ -144,6 +145,18 @@ export default function Navbar() {
               >
                 <Users size={16} />
                 Família
+              </Link>
+
+              <Link
+                href="/projetos"
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive("/projetos")
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <Target size={16} />
+                Projetos
               </Link>
             </div>
 

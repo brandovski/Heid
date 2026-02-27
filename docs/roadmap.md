@@ -191,22 +191,24 @@
 
 **Objetivo:** módulo de planejamento de compras/projetos com orçamento e rastreamento de pagamentos.
 
-- [ ] Listar projetos (pessoais e familiares) com status e progresso de orçamento
-- [ ] Criar projeto (nome, descrição, budget total, data alvo, escopo)
-- [ ] Editar projeto / marcar como concluído ou cancelado
-- [ ] Criar grupos dentro de um projeto
-- [ ] Criar itens dentro de um grupo com tipo de pagamento:
-  - `cash`: origem (Parceiro 1 / Parceiro 2 / Caixa Familiar) + método (débito/pix/dinheiro/transferência)
+- [x] Listar projetos (pessoais e familiares) com status e progresso de orçamento
+- [x] Criar projeto (nome, descrição, budget total, data alvo, escopo)
+- [x] Editar projeto / marcar como concluído ou cancelado
+- [x] Criar grupos dentro de um projeto
+- [x] Criar itens dentro de um grupo com tipo de pagamento:
+  - `cash`: origem (Pessoal / Caixa Familiar) + método (débito/pix/dinheiro/transferência)
   - `card_installment`: cartão + nº de parcelas
   - `deposit_remainder`: valor do sinal + data do restante
-- [ ] Confirmar item (status → `confirmed`) com definição do valor real
-- [ ] Gerar transação(ões) ao confirmar pagamento (status → `paid`)
-- [ ] Painel de resumo do projeto:
+- [x] Confirmar item (status → `confirmed`) com definição do valor real
+- [x] Gerar transação(ões) ao confirmar pagamento (status → `paid`)
+- [x] Painel de resumo do projeto:
   - Total orçado vs. total real
   - Quanto foi pago vs. pendente
   - Estimativa de sobra/estouro do budget
+- [x] Sugestão de conclusão quando todos os itens estão pagos
+- [x] Projetos na navbar (desktop e mobile — substitui Cartões no mobile)
 
-**Critério de conclusão:** projeto completo funciona do planejamento ao pagamento, com transações geradas corretamente.
+**Critério de conclusão:** projeto completo funciona do planejamento ao pagamento, com transações geradas corretamente. ✅ **Concluído em 2026-02-27**
 
 ---
 

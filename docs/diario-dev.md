@@ -9,11 +9,12 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Pré-Fase 9 — Projetos
-**Última sessão:** Sessão 016 — 2026-02-27
-**Próxima ação:** Iniciar Fase 9 — Projetos (rodar migration 015 e depois 017 Parte 5 no Supabase antes de iniciar)
+**Fase:** Fase 10 — Investimentos (próxima)
+**Última sessão:** Sessão 017 — 2026-02-27
+**Próxima ação:** Iniciar Fase 10 — Investimentos (rodar migration 018 no Supabase antes de iniciar)
 
 ### O que está feito
+- [x] Fase 9 — Projetos completo (Sessão 017): módulo completo de projetos com grupos, itens, fluxo considering→confirmed→paid, geração de transações (cash/card_installment/deposit_remainder), navbar atualizada
 - [x] Fase 8 — Dashboard completo + melhorias pós-fase: redesign de CartaoCard, FaturaDetalheModal, PagarFaturaModal compartilhado, FaturaGrupoCard em /transacoes
 - [x] Reestruturação de escopo (Sessão 013): /transacoes com abas Meu/Parceiro, /dashboard com toggle pessoal/parceiro (nomes reais), /orcamento sempre pessoal, /perfil com avatar/iniciais/logout, parcelamento inline no TransacaoModal, toggle de compartilhamento persistente
 - [x] Correções pós-escopo (Sessão 014): migration 022 — coluna `is_shared` em transactions + backfill + cláusula RLS; data fix no cartão "Itaú Click"; migration 021 — policy `profiles_select_family_members`
@@ -51,10 +52,10 @@
 - [x] Rodar migration 013 no Supabase (aplicada em sessão anterior)
 - [x] Rodar migration 014 no Supabase (aplicada em sessão anterior)
 - [x] Rodar migration 016 no Supabase (aplicada em sessão anterior)
-- [ ] Migration 015 (projects) — aguardar Fase 9
+- [x] Migration 015 (projects) — aplicada em sessão 017
 - [x] Rodar migration 017 Parte 1 (ENUM: investment_deposit + investment_withdrawal) no Supabase
 - [x] Rodar migration 017 Partes 2–4 (investments, investment_transactions, investment_snapshots) no Supabase
-- [ ] Rodar migration 017 Parte 5 (ALTER TABLE project_items) — diferida para após migration 015 (Fase 9)
+- [x] Rodar migration 017 Parte 5 (ALTER TABLE project_items) — aplicada em sessão 017
 - [ ] Migration 018 (investment_id em transactions) — diferida para início da Fase 10
 - [x] Commit e push de todas as alterações desta sessão
 - [x] Fase 2 — CRUD base concluída
@@ -85,6 +86,47 @@
 ---
 
 ## Log de Sessões
+
+---
+
+### Sessão 017 — 2026-02-27
+
+**Objetivo:** Implementar Fase 9 — Projetos
+
+**O que foi feito:**
+
+*Migrations:*
+- Migration 015 aplicada via Management API: tabelas `projects`, `project_groups`, `project_items` com RLS
+- Migration 017 Parte 5 aplicada: `project_items` com colunas `investment_id`, `expected_payment_date`, constraint expandida para `payment_origin='investment'`
+
+*API Routes (7 arquivos):*
+- `POST /api/projetos` — criar projeto
+- `PATCH /api/projetos/[id]` — editar/mudar status do projeto
+- `POST /api/projetos/[id]/grupos` — criar grupo
+- `PATCH + DELETE /api/projetos/grupos/[id]` — editar/excluir grupo (cascade items)
+- `POST /api/projetos/itens` — criar item (status: considering)
+- `PATCH + DELETE /api/projetos/itens/[id]` — editar/confirmar item (soft-cancel)
+- `POST /api/projetos/itens/[id]/pagar` — pagar item, gera transações por tipo: cash/card_installment/deposit_remainder
+
+*Pages e Componentes (11 arquivos):*
+- `/projetos/page.tsx` — Server Component, busca projetos + itens para calcular stats
+- `_components/types.ts` — tipos ProjectWithStats, helpers computeProjectStats, formatCurrency, labels/cores
+- `_components/ProjetoList.tsx` — Client, filtros por status (Ativos/Concluídos/Cancelados/Todos), card de totais
+- `_components/ProjetoCard.tsx` — Client, card com ProgressBar, menu de ações
+- `_components/ProjetoModal.tsx` — Client, criar/editar projeto com DatePicker
+- `/projetos/[id]/page.tsx` — Server Component, query paralela de dados
+- `[id]/_components/ProjetoDetalhe.tsx` — Client, header + summary cards + lista grupos + banner conclusão
+- `[id]/_components/GrupoSection.tsx` — Client, seção expansível de grupo com itens
+- `[id]/_components/ItemCard.tsx` — Client, card de item com ações por status
+- `[id]/_components/ItemModal.tsx` — Client, criar/editar/confirmar item com campos condicionais por tipo de pagamento
+- `[id]/_components/GrupoModal.tsx` — Client, criar/editar grupo
+
+*Navbar:*
+- Desktop: adicionado "Projetos" (ícone Target) após "Família"
+- Mobile: substituído "Cartões" por "Projetos" (ícone Target)
+- Mobile final: Dashboard · Transações · **Projetos** · Orçamento · Família
+
+*Build:* Next.js build sem erros de TypeScript ✅
 
 ---
 

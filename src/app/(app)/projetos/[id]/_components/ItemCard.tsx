@@ -1,0 +1,149 @@
+"use client";
+
+import { useState } from "react";
+import { Check, MoreHorizontal } from "lucide-react";
+import type { ProjectItemWithRelations, ProjectItem, ProjectGroup } from "../../_components/types";
+import {
+  formatCurrency,
+  ITEM_STATUS_LABELS,
+  ITEM_STATUS_COLORS,
+  PAYMENT_TYPE_LABELS,
+} from "../../_components/types";
+
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface CreditCard {
+  id: string;
+  name: string;
+  brand: string;
+}
+
+interface Props {
+  item: ProjectItemWithRelations;
+  groups: ProjectGroup[];
+  categories: Category[];
+  creditCards: CreditCard[];
+  projectId: string;
+  onEdit: (item: ProjectItemWithRelations) => void;
+  onConfirm: (item: ProjectItemWithRelations) => void;
+  onPay: (item: ProjectItemWithRelations) => void;
+  onCancel: (id: string) => void;
+}
+
+export default function ItemCard({
+  item,
+  onEdit,
+  onConfirm,
+  onPay,
+  onCancel,
+}: Props) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [paying, setPaying] = useState(false);
+
+  const isPaid = item.status === "paid";
+  const isCancelled = item.status === "cancelled";
+
+  async function handlePay() {
+    setPaying(true);
+    await onPay(item);
+    setPaying(false);
+  }
+
+  return (
+    <div className={`flex items-start gap-3 py-3 px-4 rounded-xl ${isPaid ? "bg-green-50" : isCancelled ? "bg-gray-50" : "bg-white border border-gray-100"}`}>
+      {/* Status icon */}
+      <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+        isPaid ? "bg-green-500" : isCancelled ? "bg-gray-200" : "bg-gray-100"
+      }`}>
+        {isPaid && <Check size={12} className="text-white" />}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        {/* Row 1: name + status badge */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`text-sm font-medium ${isCancelled ? "line-through text-gray-400" : "text-gray-900"}`}>
+            {item.name}
+          </span>
+          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${ITEM_STATUS_COLORS[item.status]}`}>
+            {ITEM_STATUS_LABELS[item.status]}
+          </span>
+          {item.payment_type && (
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">
+              {PAYMENT_TYPE_LABELS[item.payment_type]}
+            </span>
+          )}
+        </div>
+
+        {/* Row 2: amounts */}
+        <div className="flex items-center gap-3 mt-0.5">
+          {item.budget_amount != null && (
+            <span className="text-xs text-gray-400">
+              Orçado: {formatCurrency(item.budget_amount)}
+            </span>
+          )}
+          {item.actual_amount != null && (
+            <span className={`text-xs font-medium ${isPaid ? "text-green-700" : "text-blue-700"}`}>
+              Real: {formatCurrency(item.actual_amount)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Actions */}
+      {!isCancelled && !isPaid && (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+
+          {menuOpen && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+              <div className="absolute right-0 top-8 z-20 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1">
+                <button
+                  onClick={() => { setMenuOpen(false); onEdit(item); }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  Editar
+                </button>
+
+                {item.status === "considering" && (
+                  <button
+                    onClick={() => { setMenuOpen(false); onConfirm(item); }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-blue-700 hover:bg-gray-50"
+                  >
+                    Confirmar
+                  </button>
+                )}
+
+                {item.status === "confirmed" && (
+                  <button
+                    onClick={() => { setMenuOpen(false); handlePay(); }}
+                    disabled={paying}
+                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {paying ? "Pagando..." : "Pagar"}
+                  </button>
+                )}
+
+                <button
+                  onClick={() => { setMenuOpen(false); onCancel(item.id); }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
