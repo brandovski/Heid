@@ -10,9 +10,10 @@ interface Props {
   grupo: FaturaGrupo;
   mes: string;
   onPaid: () => void;
+  readOnly?: boolean;
 }
 
-export default function FaturaGrupoCard({ grupo, mes, onPaid }: Props) {
+export default function FaturaGrupoCard({ grupo, mes, onPaid, readOnly = false }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [showPayModal, setShowPayModal] = useState(false);
 
@@ -101,15 +102,17 @@ export default function FaturaGrupoCard({ grupo, mes, onPaid }: Props) {
                   <span className="text-xs text-gray-500">
                     {grupo.transactions.length} transaç{grupo.transactions.length === 1 ? "ão" : "ões"}
                   </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowPayModal(true);
-                    }}
-                    className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-                  >
-                    Pagar Fatura
-                  </button>
+                  {!readOnly && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowPayModal(true);
+                      }}
+                      className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                    >
+                      Pagar Fatura
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -117,15 +120,17 @@ export default function FaturaGrupoCard({ grupo, mes, onPaid }: Props) {
         )}
       </div>
 
-      <PagarFaturaModal
-        isOpen={showPayModal}
-        onClose={() => setShowPayModal(false)}
-        onSaved={onPaid}
-        cartaoNome={grupo.cartaoNome}
-        totalAmount={grupo.total}
-        creditCardId={grupo.cartaoId}
-        referenceMonth={mes}
-      />
+      {!readOnly && (
+        <PagarFaturaModal
+          isOpen={showPayModal}
+          onClose={() => setShowPayModal(false)}
+          onSaved={onPaid}
+          cartaoNome={grupo.cartaoNome}
+          totalAmount={grupo.total}
+          creditCardId={grupo.cartaoId}
+          referenceMonth={mes}
+        />
+      )}
     </>
   );
 }

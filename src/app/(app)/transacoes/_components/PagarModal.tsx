@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
-import DatePicker from "@/components/ui/DatePicker";
 import type { TransactionWithRelations } from "./types";
 import { formatCurrency } from "./types";
 
@@ -88,10 +87,11 @@ export default function PagarModal({ transacao, onClose, onSaved }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Data de pagamento
           </label>
-          <DatePicker
+          <input
+            type="date"
             value={paidDate}
-            onChange={setPaidDate}
-            placeholder="Selecione a data"
+            onChange={(e) => setPaidDate(e.target.value)}
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           />
           <p className="text-xs text-gray-400 mt-1">
             Padrão: hoje. Altere se o pagamento ocorreu em outra data.

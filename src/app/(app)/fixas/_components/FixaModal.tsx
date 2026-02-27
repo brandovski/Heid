@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import ScopeSelector from "@/components/ui/ScopeSelector";
-import DatePicker from "@/components/ui/DatePicker";
 import type {
   FixedIncome,
   FixedExpense,
@@ -261,10 +260,11 @@ export default function FixaModal({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Início
           </label>
-          <DatePicker
+          <input
+            type="date"
             value={startDate}
-            onChange={setStartDate}
-            placeholder="Selecione a data de início"
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
+import Link from "next/link";
+import { Plus, ChevronLeft, ChevronRight, Share2, Settings } from "lucide-react";
 import type { Category, CreditCard, TransactionStatus } from "@/types/database";
 import type { TransactionWithRelations, FaturaGrupo, InvoicePaymentSimple } from "./types";
 import {
@@ -25,6 +26,7 @@ interface Props {
   invoicePayments: InvoicePaymentSimple[];
   mes: string;
   currentUserId: string;
+  userName: string;
   partnerName: string;
   shareWithPartner: boolean;
 }
@@ -39,6 +41,7 @@ export default function TransacaoList({
   invoicePayments,
   mes,
   currentUserId,
+  userName,
   partnerName,
   shareWithPartner,
 }: Props) {
@@ -131,6 +134,35 @@ export default function TransacaoList({
 
   const faturaGrupos = [...grupoMap.values()].filter((g) => g.total > 0);
 
+  // ── Grupos de fatura do parceiro (somente leitura) ──
+  const partnerCardTxs = transacoes.filter(
+    (t) => t.user_id !== currentUserId && t.credit_card_id && t.is_shared && t.status !== "cancelled"
+  );
+  const partnerGrupoMap = new Map<string, FaturaGrupo>();
+  for (const t of partnerCardTxs) {
+    const cardId = t.credit_card_id!;
+    if (!partnerGrupoMap.has(cardId)) {
+      partnerGrupoMap.set(cardId, {
+        cartaoId: cardId,
+        cartaoNome: t.credit_card?.name ?? "Cartão",
+        cartaoBrand: t.credit_card?.brand ?? "",
+        cartaoColor: t.credit_card?.color ?? null,
+        transactions: [],
+        total: 0,
+        isPaid: false,
+        payment: null,
+      });
+    }
+    const g = partnerGrupoMap.get(cardId)!;
+    g.transactions.push(t);
+    g.total += t.amount;
+  }
+  for (const pmt of invoicePayments) {
+    const g = partnerGrupoMap.get(pmt.credit_card_id);
+    if (g) { g.isPaid = true; g.payment = pmt; }
+  }
+  const partnerFaturaGrupos = [...partnerGrupoMap.values()].filter((g) => g.total > 0);
+
   // ── Filtering ──────────────────────────────────────────────────────────────
   const scopedTxs = flatTxs.filter((t) => {
     if (scopeFilter === "personal") return t.user_id === currentUserId;
@@ -210,6 +242,17 @@ export default function TransacaoList({
         </button>
       </div>
 
+      {/* Link para transações fixas */}
+      <div className="flex justify-end mb-4">
+        <Link
+          href="/fixas"
+          className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
+        >
+          <Settings size={12} />
+          Gerenciar Transações Fixas
+        </Link>
+      </div>
+
       {/* Navegação de mês */}
       <div className="flex items-center justify-center gap-4 mb-6">
         <button
@@ -276,7 +319,7 @@ export default function TransacaoList({
         <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-full sm:w-fit">
           {(
             [
-              { value: "personal" as ScopeFilter, label: "Meu" },
+              { value: "personal" as ScopeFilter, label: userName },
               { value: "partner" as ScopeFilter, label: partnerName },
             ]
           ).map(({ value, label }) => (
@@ -377,8 +420,27 @@ export default function TransacaoList({
         </div>
       )}
 
+      {/* ── Grupos de fatura do parceiro (somente leitura) ── */}
+      {scopeFilter === "partner" && partnerFaturaGrupos.length > 0 && (
+        <div className="space-y-2 mb-4">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide px-0.5">
+            Faturas de cartão
+          </p>
+          {partnerFaturaGrupos.map((grupo) => (
+            <FaturaGrupoCard
+              key={grupo.cartaoId}
+              grupo={grupo}
+              mes={mes}
+              onPaid={handleSaved}
+              readOnly
+            />
+          ))}
+        </div>
+      )}
+
       {/* ── Lista de transações ── */}
-      {filtered.length === 0 && (scopeFilter !== "personal" || faturaGrupos.length === 0) ? (
+      {filtered.length === 0 &&
+        (scopeFilter === "personal" ? faturaGrupos.length === 0 : partnerFaturaGrupos.length === 0) ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-sm">Nenhuma transação encontrada.</p>
           {scopeFilter === "personal" && transacoes.length === 0 && (

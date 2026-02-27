@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import TransacaoList from "./_components/TransacaoList";
-import type { TransactionWithRelations, InvoicePaymentSimple } from "./_components/types";
+import type { TransactionWithRelations } from "./_components/types";
 
 function getMonthRange(mes: string) {
   const [year, month] = mes.split("-").map(Number);
@@ -28,32 +28,12 @@ export default async function TransacoesPage({
 
   const { firstDay, lastDay } = getMonthRange(mes);
 
-  // Buscar profile do usuário (para family_id e share_with_partner)
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("family_id, share_with_partner")
-    .eq("id", user.id)
-    .single();
-
-  // Buscar perfis da família para nome do parceiro
-  let partnerName = "Parceiro";
-  if (profile?.family_id) {
-    const { data: partnerProfile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("family_id", profile.family_id)
-      .neq("id", user.id)
-      .single();
-    partnerName = partnerProfile?.full_name ?? "Parceiro";
-  }
-
-  const [transacoesRes, categoriasRes, cartoesRes, invoicePaymentsRes] = await Promise.all([
+  const [transacoesRes, categoriasRes, cartoesRes] = await Promise.all([
     supabase
       .from("transactions")
       .select(
-        "*, category:categories(id, name, icon, color), credit_card:credit_cards(id, name, brand, color)"
+        "*, category:categories(id, name, icon, color), credit_card:credit_cards(id, name, brand)"
       )
-      .eq("scope", "personal")
       .gte("date", firstDay)
       .lte("date", lastDay)
       .order("date", { ascending: false })
@@ -65,13 +45,9 @@ export default async function TransacoesPage({
       .order("name"),
     supabase
       .from("credit_cards")
-      .select("id, name, brand, color")
+      .select("id, name, brand")
       .eq("is_active", true)
       .order("name"),
-    supabase
-      .from("invoice_payments")
-      .select("id, credit_card_id, amount_paid, paid_at")
-      .eq("reference_month", mes),
   ]);
 
   return (
@@ -80,11 +56,8 @@ export default async function TransacoesPage({
         transacoes={(transacoesRes.data ?? []) as unknown as TransactionWithRelations[]}
         categorias={categoriasRes.data ?? []}
         cartoes={cartoesRes.data ?? []}
-        invoicePayments={(invoicePaymentsRes.data ?? []) as InvoicePaymentSimple[]}
         mes={mes}
         currentUserId={user.id}
-        partnerName={partnerName}
-        shareWithPartner={profile?.share_with_partner ?? false}
       />
     </div>
   );

@@ -339,9 +339,9 @@ CREATE TABLE invoice_payments (
 
 ---
 
-### `family_contributions` *(migration 014, atualizado em 020)*
+### `family_contributions` *(migration 014)*
 
-Cada linha representa um aporte real ao Caixa Familiar — o valor sai da conta pessoal do usuário e entra no caixa coletivo. Cada aporte é vinculado à transação pessoal correspondente.
+Cada usuário configura o valor que contribui mensalmente para o Caixa Familiar.
 
 ```sql
 CREATE TABLE family_contributions (
@@ -349,17 +349,14 @@ CREATE TABLE family_contributions (
   family_id      UUID NOT NULL,
   user_id        UUID NOT NULL REFERENCES auth.users(id),
   amount         NUMERIC(12,2) NOT NULL CHECK (amount > 0),
-  date           DATE NOT NULL,              -- renomeado de effective_from (migration 020)
-  transaction_id UUID REFERENCES transactions(id) ON DELETE SET NULL,  -- migration 020
+  effective_from DATE NOT NULL,
   notes          TEXT,
-  created_at     TIMESTAMPTZ DEFAULT now()
-  -- UNIQUE (family_id, user_id, effective_from) removido em migration 020
+  created_at     TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (family_id, user_id, effective_from)
 );
-
-CREATE INDEX idx_family_contributions_family_date ON family_contributions(family_id, date);
 ```
 
-> O saldo do Caixa Familiar é calculado dinamicamente: `SUM(aportes do mês) - SUM(transações com scope='family' no mês)`.
+> O saldo do Caixa Familiar é calculado dinamicamente: `SUM(contribuições do mês) - SUM(transações com scope='family' no mês)`.
 
 ---
 
@@ -682,10 +679,8 @@ CREATE INDEX idx_inv_snapshots_family ON investment_snapshots(family_id, date DE
 016_update_rls_for_scope.sql          ← Substitui family_access por scoped_select/scoped_modify
 017_create_investments.sql            ← Módulo de Investimentos (PARTE 1 isolada: ENUM; PARTES 2–5: tabelas)
 018_add_investment_to_transactions.sql ← Vincula transactions a investments (diferida — Fase 10)
-019_fix_budget_unique_constraint.sql   ← Corrige constraint única de orçamentos mensais
-020_update_family_contributions.sql    ← Renomeia effective_from→date, adiciona transaction_id FK, remove unique constraint
 ```
 
 ---
 
-*Atualizado em: 2026-02-26*
+*Atualizado em: 2026-02-25*

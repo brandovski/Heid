@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
-  const publicRoutes = ["/login", "/api/cron"];
+  const publicRoutes = ["/login"];
   const isPublicRoute = publicRoutes.some((route) =>
     pathname.startsWith(route)
   );

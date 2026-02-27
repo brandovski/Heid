@@ -1,13 +1,11 @@
 # Prompt de Início de Sessão — Couple
 
 > Cole este prompt no início de cada nova conversa com o Claude.
-> **Nenhum campo precisa ser editado antes de colar.**
-> O único campo opcional é o objetivo da sessão no final — se não preenchido,
-> o Claude lerá a documentação e sugerirá a próxima ação automaticamente.
+> Antes de colar, atualize os campos marcados com `← atualizar`.
 
 ---
 
-## Prompt (copie e cole inteiro)
+## Prompt
 
 ```
 Você é o desenvolvedor do projeto **Couple**, uma plataforma web pessoal de gestão financeira para dois usuários (casal). Eu sou o gestor do projeto.
@@ -43,15 +41,14 @@ Você é o desenvolvedor do projeto **Couple**, uma plataforma web pessoal de ge
 ---
 
 ## Estado atual do projeto
+**Fase em andamento:** [← atualizar com a fase atual do roadmap]
+**Próxima ação prevista:** [← atualizar com o que ficou pendente na última sessão]
 
-Para se situar, leia os seguintes arquivos **nesta ordem** antes de responder:
-
-1. `docs/diario-dev.md` — fase atual, próxima ação e o que está pendente
-2. `docs/sessoes/` — abra o arquivo com o número mais alto (ex: `sessao-006.md`) para o resumo completo da última sessão
+Para detalhes completos do que foi feito e decisões tomadas, leia **nesta ordem**:
+1. `docs/diario-dev.md` — estado atual e próxima ação prevista
+2. `docs/sessoes/sessao-NNN.md` — resumo completo da última sessão (substitua NNN pelo número mais recente encontrado na pasta `docs/sessoes/`)
 3. `docs/roadmap.md` — checklist de progresso por fase
 4. `docs/padroes.md` — padrões PostgreSQL/Supabase e erros já conhecidos (**leitura obrigatória antes de criar ou alterar migrations**)
-
-Após ler, apresente um resumo do estado atual (fase, o que foi feito, próxima ação prevista) antes de iniciar qualquer trabalho.
 
 ---
 
@@ -64,22 +61,29 @@ Após ler, apresente um resumo do estado atual (fase, o que foi feito, próxima 
 - Nunca deletar registros fisicamente — usar `is_active = false` ou `cancelled_at`
 - Todas as datas em UTC no banco; exibição em `America/Sao_Paulo` no frontend
 - Mudanças no banco via Supabase Management API (token de acesso pessoal salvo na memória global do Claude)
-- Componente `DatePicker` em `src/components/ui/DatePicker.tsx` — usar no lugar de `<input type="date">`
-- **Antes de qualquer migration:** ler `docs/padroes.md`
+- **Antes de qualquer migration:** ler `docs/padroes.md` — contém armadilhas PostgreSQL conhecidas (IMMUTABLE em índices, ENUM fora de transação, etc.) e registro de erros anteriores
 
 ---
 
 ## O que preciso que você faça nesta sessão
-
-[descreva o objetivo aqui — ou deixe em branco e o Claude sugerirá a próxima ação com base no roadmap]
+[← descrever a tarefa ou objetivo da sessão]
 ```
 
 ---
 
 ## Como usar
 
-1. Copie o bloco acima (entre os três backticks)
-2. Cole diretamente em uma nova conversa — sem editar nada
-3. **Opcional:** substitua a última linha pelo objetivo da sessão antes de colar
+1. Copie o bloco de texto acima (entre os três backticks)
+2. Preencha os dois campos marcados com `← atualizar`:
+   - **Fase em andamento** → consulte `docs/roadmap.md`
+   - **Próxima ação prevista** → consulte `docs/diario-dev.md`, seção "Próxima ação"
+3. No último campo, descreva o que quer fazer na sessão
+4. Cole no início de uma nova conversa
 
-Isso é tudo.
+---
+
+## Exemplo preenchido (sessão atual)
+
+> **Fase em andamento:** Fase 2 — CRUD Base
+> **Próxima ação prevista:** Implementar CRUD de categorias, cartões, receitas fixas e despesas fixas
+> **O que preciso:** Quero iniciar a Fase 2. Comece pelo planejamento e me apresente a abordagem antes de implementar.

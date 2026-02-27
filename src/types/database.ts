@@ -147,7 +147,6 @@ export interface Transaction {
   // Escopo (migration 013)
   scope: Scope;
   user_id: string | null;
-  is_shared: boolean;
   // Investimento vinculado (migration 018 — diferida para Fase 10)
   investment_id: string | null;
   created_at: string;

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
-import DatePicker from "@/components/ui/DatePicker";
-import type { Category, CreditCard } from "@/types/database";
+import ScopeSelector from "@/components/ui/ScopeSelector";
+import type { Category, CreditCard, Scope } from "@/types/database";
 import type { TransactionWithRelations } from "./types";
 
 interface Props {
@@ -13,8 +13,6 @@ interface Props {
   onClose: () => void;
   onSaved: () => void;
 }
-
-type PaymentMode = "avista" | "parcelado";
 
 export default function TransacaoModal({
   transacao,
@@ -44,17 +42,11 @@ export default function TransacaoModal({
     transacao?.credit_card_id ?? ""
   );
   const [notes, setNotes] = useState(transacao?.notes ?? "");
-
-  // Parcelamento — apenas despesa + cartão + nova transação
-  const [paymentMode, setPaymentMode] = useState<PaymentMode>("avista");
-  const [installmentsCount, setInstallmentsCount] = useState("2");
-  const [firstInstallmentDate, setFirstInstallmentDate] = useState(today);
+  const [scope, setScope] = useState<Scope>(transacao?.scope ?? "family");
+  const [isShared, setIsShared] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const showParcelamento =
-    !isEditing && type === "expense" && paymentMethod === "credit_card";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,77 +59,45 @@ export default function TransacaoModal({
       setError("Selecione um cartão de crédito");
       return;
     }
-    if (showParcelamento && paymentMode === "parcelado") {
-      const n = parseInt(installmentsCount, 10);
-      if (!n || n < 2) {
-        setError("Número de parcelas deve ser pelo menos 2");
-        return;
-      }
-    }
 
     setLoading(true);
     setError("");
 
-    try {
-      if (!isEditing && showParcelamento && paymentMode === "parcelado") {
-        // Criar parcelamento
-        const res = await fetch("/api/parcelamentos", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            description: description.trim(),
-            total_amount: parseFloat(amount),
-            installments_count: parseInt(installmentsCount, 10),
-            first_installment_date: firstInstallmentDate,
-            credit_card_id: creditCardId,
-            category_id: categoryId || null,
-            notes: notes || null,
-            scope: "personal",
-          }),
-        });
-        if (!res.ok) {
-          const { error: msg } = await res.json();
-          throw new Error(msg ?? "Erro ao criar parcelamento");
-        }
-      } else {
-        // Criar / editar transação avulsa
-        const url = isEditing ? `/api/transacoes/${transacao.id}` : "/api/transacoes";
-        const method = isEditing ? "PATCH" : "POST";
+    const url = isEditing
+      ? `/api/transacoes/${transacao.id}`
+      : "/api/transacoes";
+    const method = isEditing ? "PATCH" : "POST";
 
-        const payload: Record<string, unknown> = {
-          description: description.trim(),
-          amount: parseFloat(amount),
-          date,
-          category_id: categoryId || null,
-          credit_card_id:
-            type === "expense" && paymentMethod === "credit_card"
-              ? creditCardId
-              : null,
-          notes: notes || null,
-          scope: "personal",
-        };
+    const payload: Record<string, unknown> = {
+      description: description.trim(),
+      amount: parseFloat(amount),
+      date,
+      category_id: categoryId || null,
+      credit_card_id:
+        type === "expense" && paymentMethod === "credit_card"
+          ? creditCardId
+          : null,
+      notes: notes || null,
+      scope,
+    };
 
-        if (!isEditing) {
-          payload.type = type;
-        }
-
-        const res = await fetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) {
-          const { error: msg } = await res.json();
-          throw new Error(msg ?? "Erro ao salvar");
-        }
-      }
-
-      onSaved();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar");
-    } finally {
-      setLoading(false);
+    if (!isEditing) {
+      payload.type = type;
     }
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    setLoading(false);
+    if (!res.ok) {
+      const { error: msg } = await res.json();
+      setError(msg ?? "Erro ao salvar");
+      return;
+    }
+    onSaved();
   }
 
   const title = isEditing
@@ -169,11 +129,7 @@ export default function TransacaoModal({
               disabled={loading}
               className="flex-1 py-2.5 px-4 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              {loading
-                ? "Salvando..."
-                : !isEditing && showParcelamento && paymentMode === "parcelado"
-                ? "Parcelar"
-                : "Salvar"}
+              {loading ? "Salvando..." : "Salvar"}
             </button>
           </div>
         </div>
@@ -199,7 +155,6 @@ export default function TransacaoModal({
                     if (value === "income") {
                       setPaymentMethod("account");
                       setCreditCardId("");
-                      setPaymentMode("avista");
                     }
                   }}
                   className={`py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
@@ -235,8 +190,7 @@ export default function TransacaoModal({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {showParcelamento && paymentMode === "parcelado" ? "Total (R$)" : "Valor (R$)"}{" "}
-              <span className="text-red-500">*</span>
+              Valor (R$) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -250,13 +204,13 @@ export default function TransacaoModal({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {showParcelamento && paymentMode === "parcelado" ? "Data 1ª parcela" : "Data"}{" "}
-              <span className="text-red-500">*</span>
+              Data <span className="text-red-500">*</span>
             </label>
-            <DatePicker
-              value={showParcelamento && paymentMode === "parcelado" ? firstInstallmentDate : date}
-              onChange={showParcelamento && paymentMode === "parcelado" ? setFirstInstallmentDate : setDate}
-              placeholder="Selecione a data"
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -296,10 +250,7 @@ export default function TransacaoModal({
                     type="button"
                     onClick={() => {
                       setPaymentMethod(value);
-                      if (value === "account") {
-                        setCreditCardId("");
-                        setPaymentMode("avista");
-                      }
+                      if (value === "account") setCreditCardId("");
                     }}
                     className={`py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
                       paymentMethod === value
@@ -332,56 +283,6 @@ export default function TransacaoModal({
                 </select>
               </div>
             )}
-
-            {/* Parcelamento — apenas nova despesa em cartão */}
-            {showParcelamento && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Parcelamento
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { value: "avista" as PaymentMode, label: "À vista" },
-                    { value: "parcelado" as PaymentMode, label: "Parcelado" },
-                  ].map(({ value, label }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setPaymentMode(value)}
-                      className={`py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
-                        paymentMode === value
-                          ? "bg-purple-50 border-purple-500 text-purple-700"
-                          : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-
-                {paymentMode === "parcelado" && (
-                  <div className="mt-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nº de parcelas <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      min="2"
-                      max="72"
-                      step="1"
-                      value={installmentsCount}
-                      onChange={(e) => setInstallmentsCount(e.target.value)}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    {amount && parseInt(installmentsCount, 10) >= 2 && (
-                      <p className="text-xs text-gray-400 mt-1">
-                        ≈ R$ {(parseFloat(amount) / parseInt(installmentsCount, 10)).toFixed(2).replace(".", ",")} / parcela
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
           </>
         )}
 
@@ -397,6 +298,13 @@ export default function TransacaoModal({
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
         </div>
+
+        <ScopeSelector
+          scope={scope}
+          isShared={isShared}
+          onScopeChange={setScope}
+          onIsSharedChange={setIsShared}
+        />
       </form>
     </Modal>
   );

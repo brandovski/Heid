@@ -6,7 +6,6 @@ import { Plus } from "lucide-react";
 import type { CreditCard } from "@/types/database";
 import CartaoCard from "./CartaoCard";
 import CartaoModal from "./CartaoModal";
-import FaturaDetalheModal from "./FaturaDetalheModal";
 
 interface Props {
   initialData: CreditCard[];
@@ -15,7 +14,6 @@ interface Props {
 export default function CartaoList({ initialData }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<CreditCard | null>(null);
-  const [viewingFatura, setViewingFatura] = useState<CreditCard | null>(null);
   const router = useRouter();
 
   function handleEdit(cartao: CreditCard) {
@@ -31,10 +29,6 @@ export default function CartaoList({ initialData }: Props) {
   function handleSaved() {
     handleClose();
     router.refresh();
-  }
-
-  function handleViewFatura(cartao: CreditCard) {
-    setViewingFatura(cartao);
   }
 
   const active = initialData.filter((c) => c.is_active);
@@ -65,7 +59,6 @@ export default function CartaoList({ initialData }: Props) {
             cartao={cartao}
             onEdit={handleEdit}
             onSaved={handleSaved}
-            onViewFatura={handleViewFatura}
           />
         ))}
       </div>
@@ -80,7 +73,6 @@ export default function CartaoList({ initialData }: Props) {
                 cartao={cartao}
                 onEdit={handleEdit}
                 onSaved={handleSaved}
-                onViewFatura={handleViewFatura}
               />
             ))}
           </div>
@@ -92,14 +84,6 @@ export default function CartaoList({ initialData }: Props) {
           cartao={editing}
           onClose={handleClose}
           onSaved={handleSaved}
-        />
-      )}
-
-      {viewingFatura && (
-        <FaturaDetalheModal
-          isOpen
-          onClose={() => setViewingFatura(null)}
-          cartao={viewingFatura}
         />
       )}
     </div>

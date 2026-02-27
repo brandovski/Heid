@@ -140,70 +140,7 @@ Ao chegar na fase correspondente, lembrar de verificar dependências antes de ap
 
 ---
 
-## 2. Biblioteca de UI e Componentes
-
-### 2.0 Dependências de UI — decisões consolidadas
-
-| Biblioteca | Status | Motivo |
-|---|---|---|
-| `@tremor/react` | ❌ **Removida** | Visual opinionado, difícil de customizar, bundle pesado |
-| `recharts` | ✅ **Usada diretamente** | Recharts já era transitivo via Tremor; usar direto dá controle total sem custo de bundle |
-| Tailwind CSS | ✅ | Padrão de estilização de toda a UI |
-
-**Regra permanente:** não adicionar bibliotecas de componentes de UI de terceiros (Tremor, shadcn, Chakra, MUI, etc.). Toda UI é construída com Tailwind + componentes próprios em `src/components/ui/`. Exceção: se o componente for incrivelmente complexo de reimplementar (ex: date picker), avaliar caso a caso.
-
----
-
-### 2.0.1 Componentes de UI próprios disponíveis
-
-| Componente | Arquivo | Uso |
-|---|---|---|
-| `Modal` | `src/components/ui/Modal.tsx` | Dialogs / bottom sheets |
-| `ProgressBar` | `src/components/ui/ProgressBar.tsx` | Barras de progresso (orçamento, etc.) |
-| `DatePicker` | `src/components/ui/DatePicker.tsx` | Seleção de datas (popover desktop, bottom sheet mobile) |
-| `ScopeSelector` | `src/components/ui/ScopeSelector.tsx` | Toggle Familiar/Pessoal |
-| `PagarFaturaModal` | `src/components/ui/PagarFaturaModal.tsx` | Pagamento de fatura de cartão — UX total/parcial + DatePicker; usado por Dashboard, Cartões e Transações |
-
----
-
-### 2.0.2 Padrão de gráficos — Recharts com componentes customizados
-
-Gráficos são implementados como componentes `"use client"` individuais na pasta `_components/` de cada page. Cada componente encapsula: `ResponsiveContainer`, gradientes SVG, tooltip customizado (card branco com sombra) e paleta de cores do projeto.
-
-**Paleta de cores para gráficos:**
-
-```typescript
-// Séries temporais (receitas/despesas)
-receitas: "#2563eb" // blue-600
-despesas: "#f43f5e" // rose-500
-
-// Distribuição por categoria (donut/pie — até 10 fatias)
-const DONUT_COLORS = [
-  "#2563eb", "#7c3aed", "#db2777", "#ea580c", "#16a34a",
-  "#0891b2", "#d97706", "#9333ea", "#dc2626", "#0d9488",
-];
-```
-
-**Tooltip padrão:** card branco (`bg-white border border-gray-100 shadow-xl rounded-xl px-4 py-3 text-xs`).
-
-**Referência de implementação:** `src/app/(app)/dashboard/_components/GraficoEvolucao.tsx` e `GraficoCategoria.tsx`.
-
----
-
-### 2.0.3 ProgressBar
-
-```tsx
-import ProgressBar from "@/components/ui/ProgressBar";
-
-<ProgressBar value={75} color="blue" />   // azul (padrão)
-<ProgressBar value={110} color="red" />   // vermelho (acima do limite)
-```
-
-`value` é clampado entre 0 e 100 automaticamente. `color` aceita `"blue"` | `"red"`.
-
----
-
-## 3. Padrões de UI / Mobile
+## 2. Padrões de UI / Mobile
 
 ### 2.1 Modal — estrutura padrão
 
@@ -274,9 +211,9 @@ Tabs/segmented controls devem ser `w-full sm:w-fit` no mobile, com botões `flex
 
 ---
 
-## 4. Padrões de TypeScript / Tipos
+## 3. Padrões de TypeScript / Tipos
 
-### 4.1 Campos de entidade sempre tipados como `string | null` para UUIDs opcionais
+### 2.1 Campos de entidade sempre tipados como `string | null` para UUIDs opcionais
 
 ```typescript
 // CORRETO
@@ -286,7 +223,7 @@ investment_id: string | null;
 investment_id?: string;  // undefined != null no banco
 ```
 
-### 4.2 Datas do banco são sempre `string` no TypeScript
+### 2.2 Datas do banco são sempre `string` no TypeScript
 
 O Supabase retorna datas (DATE, TIMESTAMPTZ) como strings. Nunca usar `Date` nas interfaces.
 
@@ -295,7 +232,7 @@ date: string;         // DATE — 'YYYY-MM-DD'
 created_at: string;   // TIMESTAMPTZ — ISO 8601
 ```
 
-### 4.3 Comentar a migration de origem em campos novos
+### 2.3 Comentar a migration de origem em campos novos
 
 ```typescript
 // Investimento vinculado (migration 017)
@@ -304,54 +241,9 @@ investment_id: string | null;
 
 ---
 
-## 5. Registro de Erros e Correções
+## 3. Registro de Erros e Correções
 
 > Log cronológico de erros encontrados em execução. Nunca apagar entradas — apenas adicionar.
-
----
-
-### [2026-02-26] upsert({ ignoreDuplicates: true }) não funciona com índices parciais
-
-**Contexto:** Cron `generate-monthly` — tentativa de usar `upsert({ ignoreDuplicates: true })` para idempotência.
-
-**Erro:**
-```
-duplicate key value violates unique constraint "idx_transactions_fixed_expense_month"
-```
-
-**Causa:** O Supabase JS gera `ON CONFLICT (id) DO NOTHING` (verifica apenas o PK). Como cada insert usa uma nova UUID, o PK nunca conflita. O índice parcial fica sem cobertura e lança constraint violation normalmente.
-
-**Correção:** pré-filtro antes do insert — buscar quais `fixed_income_id`/`fixed_expense_id`/`subscription_id` já têm transação `auto_generated = true` no mês corrente, filtrar as entidades que já existem, e usar `.insert()` apenas para as novas.
-
-**Regra permanente:** não usar `upsert({ ignoreDuplicates: true })` para idempotência com índices parciais. Sempre pré-filtrar.
-
----
-
-### [2026-02-26] Middleware bloqueando rotas de cron
-
-**Contexto:** Endpoints `/api/cron/*` retornavam redirect para `/login` ao chamar via curl.
-
-**Causa:** O middleware de autenticação intercepta todas as rotas e redireciona requisições sem sessão. Crons não têm sessão — usam `CRON_SECRET`.
-
-**Correção:** adicionar `"/api/cron"` ao array `publicRoutes` no `src/middleware.ts`.
-
-**Regra permanente:** toda rota de API que usa autenticação própria (cron secret, webhook secret, etc.) deve ser adicionada a `publicRoutes` no middleware.
-
----
-
-### [2026-02-25] Dev server com assets 404 após rm -rf .next
-
-**Contexto:** Após limpar o cache e rodar `npm run dev -- --port 3001`, o browser ainda recebia 404 para `layout.css`, `app-pages-internals.js` e `main-app.js`.
-
-**Causa:** Havia um processo Node anterior travado em background ocupando a porta 3001. O novo `npm run dev` falhava silenciosamente com `EADDRINUSE`, e o browser continuava apontando para o processo antigo (com `.next` já deletado).
-
-**Resolução:** Fechar completamente o terminal (não só o processo), abrir um novo e rodar:
-```bash
-rm -rf .next && npm run dev -- --port 3001
-```
-Aguardar a mensagem `Ready in Xms` antes de acessar o app.
-
-**Regra permanente:** se `rm -rf .next` não resolver assets 404, fechar o terminal inteiro antes de tentar novamente.
 
 ---
 

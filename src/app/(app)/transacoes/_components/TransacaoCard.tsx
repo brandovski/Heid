@@ -11,8 +11,8 @@ import {
 
 interface Props {
   transacao: TransactionWithRelations;
-  onEdit?: (t: TransactionWithRelations) => void;
-  onPagar?: (t: TransactionWithRelations) => void;
+  onEdit: (t: TransactionWithRelations) => void;
+  onPagar: (t: TransactionWithRelations) => void;
   onSaved: () => void;
 }
 
@@ -115,8 +115,8 @@ export default function TransacaoCard({
 
           {/* Ações */}
           <div className="flex items-center gap-0.5">
-            {/* Editar — apenas manuais não cancelados (quando callback disponível) */}
-            {onEdit && isManual && t.status !== "cancelled" && (
+            {/* Editar — apenas manuais não cancelados */}
+            {isManual && t.status !== "cancelled" && (
               <button
                 onClick={() => onEdit(t)}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
@@ -126,8 +126,8 @@ export default function TransacaoCard({
               </button>
             )}
 
-            {/* Pagar — apenas pendentes (quando callback disponível) */}
-            {onPagar && t.status === "pending" && (
+            {/* Pagar — apenas pendentes */}
+            {t.status === "pending" && (
               <button
                 onClick={() => onPagar(t)}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors"
@@ -137,8 +137,8 @@ export default function TransacaoCard({
               </button>
             )}
 
-            {/* Cancelar — apenas não cancelados (quando callback disponível) */}
-            {onEdit && t.status !== "cancelled" && (
+            {/* Cancelar — apenas não cancelados */}
+            {t.status !== "cancelled" && (
               <button
                 onClick={handleCancel}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
@@ -148,8 +148,8 @@ export default function TransacaoCard({
               </button>
             )}
 
-            {/* Excluir — apenas manuais cancelados (quando callback disponível) */}
-            {onEdit && isManual && t.status === "cancelled" && (
+            {/* Excluir — apenas manuais cancelados */}
+            {isManual && t.status === "cancelled" && (
               <button
                 onClick={handleDelete}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
