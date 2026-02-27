@@ -1,0 +1,90 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const {
+    name,
+    original_currency,
+    amount_original,
+    amount_brl,
+    billing_day,
+    credit_card_id,
+    category_id,
+    notes,
+    scope,
+    is_shared,
+  } = await req.json();
+
+  const updates: Record<string, unknown> = {};
+
+  if (name !== undefined) updates.name = name.trim();
+  if (billing_day !== undefined) updates.billing_day = Number(billing_day);
+  if (credit_card_id !== undefined) updates.credit_card_id = credit_card_id;
+  if (category_id !== undefined) updates.category_id = category_id || null;
+  if (notes !== undefined) updates.notes = notes || null;
+  if (scope !== undefined) {
+    updates.scope = scope;
+    updates.user_id = scope === "personal" ? user.id : null;
+    updates.is_shared = scope === "personal" ? (is_shared ?? false) : false;
+  }
+  if (original_currency !== undefined) updates.original_currency = original_currency;
+  if (amount_original !== undefined) updates.amount_original = parseFloat(amount_original);
+  if (amount_brl !== undefined) updates.amount_brl = parseFloat(amount_brl);
+  else if (original_currency === "BRL" && amount_original !== undefined) {
+    updates.amount_brl = parseFloat(amount_original);
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return NextResponse.json({ error: "Nenhum campo para atualizar" }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from("subscriptions")
+    .update(updates)
+    .eq("id", params.id)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
+
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data: sub } = await supabase
+    .from("subscriptions")
+    .select("id, is_active")
+    .eq("id", params.id)
+    .single();
+
+  if (!sub) {
+    return NextResponse.json({ error: "Assinatura não encontrada" }, { status: 404 });
+  }
+
+  const { data, error } = await supabase
+    .from("subscriptions")
+    .update({ is_active: false, cancelled_at: new Date().toISOString() })
+    .eq("id", params.id)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
