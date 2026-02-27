@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
-import ScopeSelector from "@/components/ui/ScopeSelector";
-import type { CreditCard, Scope } from "@/types/database";
+import type { CreditCard } from "@/types/database";
 
 const CARD_BRANDS = [
   "Visa",
@@ -38,8 +37,6 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
   const [creditLimit, setCreditLimit] = useState(cartao?.credit_limit?.toString() ?? "");
   const [lastFour, setLastFour] = useState(cartao?.last_four_digits ?? "");
   const [color, setColor] = useState(cartao?.color ?? "");
-  const [scope, setScope] = useState<Scope>(cartao?.scope ?? "family");
-  const [isShared, setIsShared] = useState(cartao?.is_shared ?? false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -61,8 +58,8 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
       credit_limit: creditLimit ? parseFloat(creditLimit) : null,
       last_four_digits: lastFour || null,
       color: color || null,
-      scope,
-      is_shared: scope === "personal" ? isShared : false,
+      scope: "personal",
+      is_shared: false,
     };
 
     const url = cartao ? `/api/cartoes/${cartao.id}` : "/api/cartoes";
@@ -228,12 +225,6 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
           </div>
         </div>
 
-        <ScopeSelector
-          scope={scope}
-          isShared={isShared}
-          onScopeChange={setScope}
-          onIsSharedChange={setIsShared}
-        />
       </form>
     </Modal>
   );
