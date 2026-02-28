@@ -218,37 +218,37 @@
 
 ### Schema (migrations)
 - [x] Migration 017: tabelas `investments`, `investment_transactions`, `investment_snapshots`; alterações em `project_items` (migration 017 — criada em 2026-02-25)
-- [ ] Migration 018: adicionar `investment_id` em `transactions`; atualizar `scoped_select` (diferida — rodar no início desta fase)
+- [x] Migration 018: adicionar `investment_id` em `transactions`; atualizar `scoped_select` — aplicada em Sessão 018
 
 ### CRUD de Investimentos
-- [ ] Listar investimentos (pessoais e familiares) com saldo atual e rentabilidade
-- [ ] Criar investimento (tipo, escopo, meta, aporte mensal, elegibilidade para projetos)
-- [ ] Editar investimento
-- [ ] Arquivar investimento (`is_active = false`)
+- [x] Listar investimentos (pessoais e familiares) com saldo atual e rentabilidade
+- [x] Criar investimento (tipo, escopo, meta, aporte mensal, elegibilidade para projetos)
+- [x] Editar investimento
+- [x] Arquivar investimento (`is_active = false`)
 
 ### Aportes e Resgates
-- [ ] Registrar aporte manual (`investment_transaction` tipo `deposit`)
-- [ ] Registrar resgate manual (`investment_transaction` tipo `withdrawal`)
-- [ ] Visualizar histórico de aportes/resgates com totais
+- [x] Registrar aporte manual (`investment_transaction` tipo `deposit`)
+- [x] Registrar resgate manual (`investment_transaction` tipo `withdrawal`)
+- [x] Visualizar histórico de aportes/resgates com totais
 
 ### Snapshots de Saldo
-- [ ] Registrar saldo de mercado atual (cria novo snapshot)
-- [ ] Exibir histórico de snapshots com gráfico de evolução
+- [x] Registrar saldo de mercado atual (cria novo snapshot)
+- [x] Exibir histórico de snapshots com gráfico de evolução
 
 ### Cálculos e Projeções
-- [ ] Exibir: total aportado, rentabilidade R$, rentabilidade %
-- [ ] Projeção conservadora (sem retorno)
-- [ ] Projeção com retorno (baseada no último retorno mensal)
+- [x] Exibir: total aportado, rentabilidade R$, rentabilidade %
+- [x] Projeção conservadora (sem retorno)
+- [x] Projeção com retorno (baseada no último retorno mensal)
 
 ### Integração com Projetos
-- [ ] Exibir investimentos elegíveis como opção de pagamento em itens de projeto
-- [ ] Exibir total comprometido com projetos confirmados na tela do investimento
+- [x] Exibir investimentos elegíveis como opção de pagamento em itens de projeto
+- [x] Exibir total comprometido com projetos confirmados na tela do investimento
 
 ### Automação (extensão do cron `generate-monthly`)
-- [ ] Gerar aporte automático mensal para investimentos com `monthly_contribution_amount`
-- [ ] Garantir idempotência via índice único `idx_inv_tx_auto_month`
+- [x] Gerar aporte automático mensal para investimentos com `monthly_contribution_amount`
+- [x] Garantir idempotência via índice único `idx_inv_tx_auto_month`
 
-**Critério de conclusão:** usuário consegue acompanhar todos os investimentos com saldo atualizado, projeção de crescimento e integração com projetos.
+**Critério de conclusão:** usuário consegue acompanhar todos os investimentos com saldo atualizado, projeção de crescimento e integração com projetos. ✅ **Concluído em 2026-02-27**
 
 ---
 
@@ -256,14 +256,22 @@
 
 **Objetivo:** visualização temporal de todos os compromissos financeiros futuros — transações, aportes, vencimentos de projetos.
 
-- [ ] Tela de calendário / linha do tempo mensal
-- [ ] Exibir lançamentos pendentes (`status = pending`) ordenados por data
-- [ ] Exibir aportes mensais de investimentos previstos
-- [ ] Exibir `expected_payment_date` de itens de projeto confirmados
-- [ ] Indicação visual de saldo projetado dia a dia
-- [ ] Filtro por escopo (Pessoal / Familiar / Tudo)
+- [x] Tela de calendário / linha do tempo mensal
+- [x] Exibir lançamentos pendentes (`status = pending`) ordenados por data
+- [x] Exibir aportes mensais de investimentos previstos
+- [x] Exibir `expected_payment_date` de itens de projeto confirmados
+- [x] Indicação visual de saldo projetado dia a dia
+- [x] Filtro por escopo (Pessoal / Familiar / Tudo)
 
-**Critério de conclusão:** usuário consegue ver todos os compromissos financeiros do mês em uma única tela com saldo projetado.
+**Melhorias pós-fase (Sessões 021–024):**
+- [x] FluxoWidget no Dashboard (4 próximas movimentações + link /fluxo)
+- [x] FluxoProjecao em Investimentos substituída por ProjecaoView (timeline + calendário unificados)
+- [x] ProjecaoView: eventos `deposit_remainder` divididos em entrada + restante (Sessão 023)
+- [x] `/fluxo` expandido para 9 queries (fixed_incomes, fixed_expenses, credit_cards, partner profile)
+- [x] FluxoView v2: agrupamento de fatura por cartão, projeção de fixas não-geradas, escopo parceiro com nomes reais
+- [x] Navbar mobile redesenhada: header fixo com título + perfil dropdown multi-nível; FAB para quick-add transação; bottom nav glassmorphism (Sessão 024)
+
+**Critério de conclusão:** usuário consegue ver todos os compromissos financeiros do mês em uma única tela com saldo projetado. ✅ **Concluído em 2026-02-28**
 
 ---
 
@@ -279,4 +287,4 @@
 
 ---
 
-*Atualizado em: 2026-02-27*
+*Atualizado em: 2026-02-28*
