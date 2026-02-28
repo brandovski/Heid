@@ -129,7 +129,7 @@ export default function OrcamentoList({
             {
               label: "Disponível",
               value: totalAvailable,
-              color: totalAvailable < 0 ? "text-red-600" : "text-blue-600",
+              color: totalAvailable < 0 ? "text-red-600" : "text-brand-600",
             },
           ].map(({ label, value, color }) => (
             <div
@@ -160,14 +160,14 @@ export default function OrcamentoList({
             <button
               onClick={handleClone}
               disabled={cloning}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition-colors disabled:opacity-50"
             >
               <Copy size={15} />
               {cloning ? "Clonando..." : "Clonar do mês anterior"}
             </button>
             <button
               onClick={openCreate}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors"
             >
               <Plus size={15} />
               Criar do zero
@@ -187,7 +187,7 @@ export default function OrcamentoList({
           <button
             onClick={openCreate}
             disabled={budgetedCategoryIds.size >= categories.length}
-            className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-gray-500 border-2 border-dashed border-gray-200 rounded-xl hover:border-blue-300 hover:text-blue-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-gray-500 border-2 border-dashed border-gray-200 rounded-xl hover:border-brand-300 hover:text-brand-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus size={16} />
             Adicionar categoria

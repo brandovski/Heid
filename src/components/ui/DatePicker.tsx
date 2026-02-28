@@ -48,8 +48,8 @@ const DAY_PICKER_CLASSES = {
   row: "flex mt-1",
   cell: "w-9 text-center p-0",
   day: "w-9 h-9 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none",
-  day_selected: "bg-blue-600 text-white hover:bg-blue-700 font-medium",
-  day_today: "font-bold text-blue-600",
+  day_selected: "bg-brand-600 text-white hover:bg-brand-700 font-medium",
+  day_today: "font-bold text-brand-600",
   day_outside: "text-gray-300",
   day_disabled: "text-gray-200 cursor-not-allowed",
   day_hidden: "invisible",
@@ -151,9 +151,9 @@ export default function DatePicker({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`w-full flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm text-left transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+        className={`w-full flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm text-left transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 ${
           open
-            ? "border-blue-500 bg-white"
+            ? "border-brand-500 bg-white"
             : "border-gray-300 bg-white hover:border-gray-400"
         } ${value ? "text-gray-900" : "text-gray-400"}`}
       >

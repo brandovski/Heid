@@ -54,7 +54,7 @@ export default function OrcamentoCard({ budget, onEdit }: Props) {
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => onEdit(budget)}
-            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
           >
             <Pencil size={15} />
           </button>

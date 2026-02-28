@@ -12,7 +12,7 @@ interface Props {
 }
 
 const STATUS_BADGE = {
-  active: { label: "Em andamento", className: "bg-blue-50 text-blue-700" },
+  active: { label: "Em andamento", className: "bg-brand-50 text-brand-700" },
   done: { label: "Quitado", className: "bg-green-50 text-green-700" },
   cancelled: { label: "Cancelado", className: "bg-gray-100 text-gray-500" },
 };
@@ -22,7 +22,7 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
   const status = groupStatus(summary);
   const badge = STATUS_BADGE[status];
   const scopeColor =
-    group.scope === "personal" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700";
+    group.scope === "personal" ? "bg-purple-50 text-purple-700" : "bg-brand-50 text-brand-700";
 
   async function handleCancelRemaining() {
     if (!confirm(`Cancelar as ${summary.pending} parcela(s) pendente(s) de "${group.description}"?`))
@@ -71,7 +71,7 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
           <div className="w-full bg-gray-100 rounded-full h-1.5">
             <div
               className={`h-1.5 rounded-full transition-all ${
-                status === "done" ? "bg-green-500" : "bg-blue-500"
+                status === "done" ? "bg-green-500" : "bg-brand-500"
               }`}
               style={{ width: `${(summary.paid / summary.total) * 100}%` }}
             />

@@ -120,7 +120,7 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
             <button
               type="button"
               onClick={() => setShowPayModal(true)}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors"
             >
               Pagar Fatura
             </button>

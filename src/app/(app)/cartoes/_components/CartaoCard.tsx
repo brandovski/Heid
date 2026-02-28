@@ -107,7 +107,7 @@ export default function CartaoCard({ cartao, onEdit, onSaved, onViewFatura }: Pr
             <>
               <button
                 onClick={() => onViewFatura(cartao)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors"
                 title="Ver Fatura"
               >
                 <Receipt size={13} />

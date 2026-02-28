@@ -1,4 +1,4 @@
-# Couple — Arquitetura e Decisões Técnicas
+# Heid — Arquitetura e Decisões Técnicas
 
 ---
 
@@ -83,7 +83,7 @@
 
 **Decisão:** Recharts diretamente, sem Tremor.
 
-**Motivo:** Tremor foi avaliado e removido por ter visual opinionado e difícil de customizar para o design específico do Couple. Recharts já era uma dependência transitiva do Tremor e oferece controle total sobre aparência. Toda UI de componentes é construída com Tailwind CSS + componentes próprios em `src/components/ui/`.
+**Motivo:** Tremor foi avaliado e removido por ter visual opinionado e difícil de customizar para o design específico do Heid. Recharts já era uma dependência transitiva do Tremor e oferece controle total sobre aparência. Toda UI de componentes é construída com Tailwind CSS + componentes próprios em `src/components/ui/`.
 
 ---
 

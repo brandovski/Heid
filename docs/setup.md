@@ -1,4 +1,4 @@
-# Couple — Guia de Configuração do Ambiente
+# Heid — Guia de Configuração do Ambiente
 
 ---
 

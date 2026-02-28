@@ -65,7 +65,7 @@ export default function GrupoSection({
         <button
           type="button"
           onClick={() => onAddItem(group.id)}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+          className="p-1.5 rounded-lg text-gray-400 hover:text-brand-600 hover:bg-brand-50 transition-colors"
           title="Adicionar item"
         >
           <Plus size={15} />
@@ -107,7 +107,7 @@ export default function GrupoSection({
         <div>
           {group.items.length === 0 ? (
             <div className="px-4 py-4 text-center text-sm text-gray-400">
-              Nenhum item. <button type="button" onClick={() => onAddItem(group.id)} className="text-blue-600 hover:underline">Adicionar</button>
+              Nenhum item. <button type="button" onClick={() => onAddItem(group.id)} className="text-brand-600 hover:underline">Adicionar</button>
             </div>
           ) : (
             <div className="divide-y divide-gray-50">

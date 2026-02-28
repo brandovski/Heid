@@ -31,7 +31,7 @@ export default function FixaCard({ item, tab, categorias, onEdit, onSaved }: Pro
   const scopeColor =
     item.scope === "personal"
       ? "bg-purple-50 text-purple-700"
-      : "bg-blue-50 text-blue-700";
+      : "bg-brand-50 text-brand-700";
   const amountColor = tab === "receitas" ? "text-green-600" : "text-red-600";
 
   return (

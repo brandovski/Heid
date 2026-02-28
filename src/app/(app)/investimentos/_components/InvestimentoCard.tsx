@@ -35,10 +35,10 @@ export default function InvestimentoCard({ investment, transactions, snapshots, 
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <Link href={`/investimentos/${investment.id}`} className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+            <Link href={`/investimentos/${investment.id}`} className="text-sm font-semibold text-gray-900 hover:text-brand-600 transition-colors">
               {investment.name}
             </Link>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 font-medium">
               {INVESTMENT_TYPE_LABELS[investment.type]}
             </span>
             <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">

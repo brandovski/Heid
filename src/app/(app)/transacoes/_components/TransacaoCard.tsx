@@ -54,7 +54,7 @@ export default function TransacaoCard({
   const scopeColor =
     t.scope === "personal"
       ? "bg-purple-50 text-purple-700"
-      : "bg-blue-50 text-blue-700";
+      : "bg-brand-50 text-brand-700";
   const scopeLabel = t.scope === "personal" ? "Pessoal" : "Familiar";
 
   return (

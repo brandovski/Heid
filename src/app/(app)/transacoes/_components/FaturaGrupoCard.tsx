@@ -108,7 +108,7 @@ export default function FaturaGrupoCard({ grupo, mes, onPaid, readOnly = false }
                         e.stopPropagation();
                         setShowPayModal(true);
                       }}
-                      className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                      className="px-3 py-1.5 text-xs font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors"
                     >
                       Pagar Fatura
                     </button>

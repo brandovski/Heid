@@ -88,7 +88,7 @@ export default function Navbar() {
 
   const pageTitle =
     Object.entries(PAGE_TITLES).find(([path]) => pathname.startsWith(path))?.[1] ??
-    "Couple";
+    "Heid";
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -136,13 +136,13 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-1">
-              <span className="text-lg font-bold text-gray-900 mr-6">Couple</span>
+              <span className="text-lg font-serif font-bold text-brand-700 mr-6">Heid</span>
 
               <Link
                 href="/dashboard"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/dashboard")
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-brand-50 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -154,7 +154,7 @@ export default function Navbar() {
                 href="/transacoes"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/transacoes")
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-brand-50 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -168,7 +168,7 @@ export default function Navbar() {
                   onClick={() => setCartoesOpen((v) => !v)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isCartoesActive
-                      ? "bg-blue-50 text-blue-700"
+                      ? "bg-brand-50 text-brand-700"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }`}
                 >
@@ -189,7 +189,7 @@ export default function Navbar() {
                         onClick={() => setCartoesOpen(false)}
                         className={`flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
                           isActive(href)
-                            ? "text-blue-700 bg-blue-50"
+                            ? "text-brand-700 bg-brand-50"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
@@ -205,7 +205,7 @@ export default function Navbar() {
                 href="/orcamento"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/orcamento")
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-brand-50 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -217,7 +217,7 @@ export default function Navbar() {
                 href="/familia"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/familia")
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-brand-50 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -229,7 +229,7 @@ export default function Navbar() {
                 href="/projetos"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/projetos")
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-brand-50 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -241,7 +241,7 @@ export default function Navbar() {
                 href="/investimentos"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/investimentos")
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-brand-50 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -254,7 +254,7 @@ export default function Navbar() {
               href="/perfil"
               className={`p-2 rounded-lg transition-colors ${
                 isActive("/perfil")
-                  ? "bg-blue-50 text-blue-700"
+                  ? "bg-brand-50 text-brand-700"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
               }`}
               aria-label="Perfil"
@@ -281,7 +281,7 @@ export default function Navbar() {
               }}
               className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                 profileMenuOpen
-                  ? "bg-blue-600 text-white shadow-sm"
+                  ? "bg-brand-600 text-white shadow-sm"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
               aria-label="Abrir menu"
@@ -345,7 +345,7 @@ export default function Navbar() {
                       <button
                         type="button"
                         onClick={() => setMenuView("main")}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50/50 transition-colors border-b border-gray-100"
+                        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-brand-600 hover:bg-brand-50/50 transition-colors border-b border-gray-100"
                       >
                         <ChevronLeft size={14} />
                         Cartões
@@ -391,7 +391,7 @@ export default function Navbar() {
       <button
         type="button"
         onClick={handleOpenQuickAdd}
-        className="sm:hidden fixed bottom-11 left-1/2 -translate-x-1/2 z-50 w-14 h-14 rounded-full bg-blue-600 ring-4 ring-white shadow-lg shadow-blue-600/40 flex items-center justify-center text-white active:scale-95 transition-transform"
+        className="sm:hidden fixed bottom-11 left-1/2 -translate-x-1/2 z-50 w-14 h-14 rounded-full bg-brand-600 ring-4 ring-white shadow-lg shadow-brand-600/40 flex items-center justify-center text-white active:scale-95 transition-transform"
         aria-label="Nova transação"
       >
         <Plus size={22} strokeWidth={2.5} />
@@ -413,7 +413,7 @@ export default function Navbar() {
                 href={href}
                 className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-xl transition-all ${
                   active
-                    ? "bg-white/80 text-blue-600"
+                    ? "bg-white/80 text-brand-600"
                     : "text-gray-400 hover:text-gray-700"
                 }`}
               >
@@ -430,7 +430,7 @@ export default function Navbar() {
         (quickAddLoading || !quickAddData ? (
           <div className="fixed inset-0 z-[60] bg-black/40 flex items-end sm:items-center justify-center sm:p-4">
             <div className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl p-12 flex items-center justify-center">
-              <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
             </div>
           </div>
         ) : (

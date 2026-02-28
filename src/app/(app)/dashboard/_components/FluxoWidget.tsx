@@ -110,7 +110,7 @@ export default function FluxoWidget({ transactions, creditCards, currentMonth, e
         <h2 className="text-sm font-semibold text-gray-700">Próximas movimentações</h2>
         <Link
           href={`/fluxo?escopo=${fluxoEscopo}`}
-          className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+          className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1"
         >
           Ver tudo <ExternalLink size={12} />
         </Link>
@@ -128,13 +128,13 @@ export default function FluxoWidget({ transactions, creditCards, currentMonth, e
               return (
                 <div key={item.id} className="flex items-center justify-between py-2.5 gap-3">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center shrink-0">
                       <CreditCard size={12} />
                     </span>
                     <div className="min-w-0">
                       <p className="text-sm text-gray-800 truncate">Fatura {item.cardName}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] bg-blue-50 text-blue-600 rounded px-1.5 py-0.5 font-medium">
+                        <span className="text-[10px] bg-brand-50 text-brand-600 rounded px-1.5 py-0.5 font-medium">
                           fatura
                         </span>
                         <span className="text-xs text-gray-400">{formatDate(item.date)}</span>

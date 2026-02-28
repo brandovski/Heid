@@ -1,4 +1,4 @@
-# Couple — Roadmap de Desenvolvimento
+# Heid — Roadmap de Desenvolvimento
 
 > Legenda de status: `[ ]` Não iniciado · `[~]` Em progresso · `[x]` Concluído · `[-]` Bloqueado
 

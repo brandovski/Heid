@@ -226,7 +226,7 @@ export default function FamiliaView({
           </h2>
           <button
             onClick={() => setIsContribuicaoOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors"
           >
             <Plus size={13} />
             Registrar aporte
@@ -271,7 +271,7 @@ export default function FamiliaView({
             {
               label: "Total aportado",
               value: totalContribuicoes,
-              color: "text-blue-600",
+              color: "text-brand-600",
             },
             {
               label: "Gastos familiares",

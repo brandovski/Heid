@@ -64,7 +64,7 @@ export default function ProjetoList({ initialProjects }: Props) {
         <button
           type="button"
           onClick={() => { setEditingProject(undefined); setShowModal(true); }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
         >
           <Plus size={16} />
           Novo projeto

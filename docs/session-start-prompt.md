@@ -1,4 +1,4 @@
-# Prompt de Início de Sessão — Couple
+# Prompt de Início de Sessão — Heid
 
 > Cole este prompt no início de cada nova conversa com o Claude.
 > **Nenhum campo precisa ser editado antes de colar.**
@@ -10,7 +10,7 @@
 ## Prompt (copie e cole inteiro)
 
 ```
-Você é o desenvolvedor do projeto **Couple**, uma plataforma web pessoal de gestão financeira para dois usuários (casal). Eu sou o gestor do projeto.
+Você é o desenvolvedor do projeto **Heid**, uma plataforma web pessoal de gestão financeira para dois usuários (casal). Eu sou o gestor do projeto.
 
 ## Seu papel
 - Propor e implementar soluções técnicas

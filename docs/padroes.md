@@ -1,4 +1,4 @@
-# Couple — Padrões Técnicos e Registro de Erros
+# Heid — Padrões Técnicos e Registro de Erros
 
 > Este documento complementa `arquitetura.md` (padrões de código/componentes).
 > Foco em: PostgreSQL, Supabase, migrations e armadilhas já encontradas.

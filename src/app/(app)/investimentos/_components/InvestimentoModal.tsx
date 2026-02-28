@@ -104,7 +104,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
           <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
             Cancelar
           </button>
-          <button type="button" onClick={handleSave} disabled={saving} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-60 transition-colors">
+          <button type="button" onClick={handleSave} disabled={saving} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-60 transition-colors">
             {saving ? "Salvando..." : isEdit ? "Salvar" : "Criar"}
           </button>
         </div>
@@ -120,7 +120,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Tesouro Selic, CDB Nubank..."
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -129,7 +129,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
           <select
             value={type}
             onChange={(e) => setType(e.target.value as InvestmentType)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             {TYPE_OPTIONS.map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
@@ -147,7 +147,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
                 onClick={() => setScope(s)}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
                   scope === s
-                    ? "bg-blue-50 border-blue-500 text-blue-700"
+                    ? "bg-brand-50 border-brand-500 text-brand-700"
                     : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -164,7 +164,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -177,7 +177,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
             min="0"
             step="0.01"
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -192,7 +192,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
                 min="0"
                 step="0.01"
                 placeholder="Valor (R$)"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div className="w-28">
@@ -203,7 +203,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
                 min="1"
                 max="28"
                 placeholder="Dia (1–28)"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
@@ -216,7 +216,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
             type="checkbox"
             checked={eligibleForProjects}
             onChange={(e) => setEligibleForProjects(e.target.checked)}
-            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
           />
           <label htmlFor="eligible" className="text-sm text-gray-700">
             Elegível para uso em Projetos

@@ -61,7 +61,7 @@ export default function InvestimentoList({ investments: initial, transactions, s
         <button
           type="button"
           onClick={() => { setModalInvestment(undefined); setModalOpen(true); }}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-brand-600 border border-brand-200 rounded-lg hover:bg-brand-50 transition-colors"
         >
           <Plus size={14} />
           Novo
@@ -78,7 +78,7 @@ export default function InvestimentoList({ investments: initial, transactions, s
             <button
               type="button"
               onClick={() => { setModalInvestment(undefined); setModalOpen(true); }}
-              className="mt-2 text-sm text-blue-600 hover:underline"
+              className="mt-2 text-sm text-brand-600 hover:underline"
             >
               Criar primeiro investimento
             </button>

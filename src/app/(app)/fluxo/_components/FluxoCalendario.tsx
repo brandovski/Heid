@@ -74,7 +74,7 @@ function getDayDots(items: FluxoItem[]): JSX.Element[] {
 
   if (entradas.length > 0) dots.push(<span key="entrada" className="w-1.5 h-1.5 rounded-full bg-emerald-500" />);
   if (saidas.length > 0) dots.push(<span key="saida" className="w-1.5 h-1.5 rounded-full bg-rose-500" />);
-  if (projetados.length > 0) dots.push(<span key="proj" className="w-1.5 h-1.5 rounded-full bg-blue-400" />);
+  if (projetados.length > 0) dots.push(<span key="proj" className="w-1.5 h-1.5 rounded-full bg-brand-400" />);
 
   return dots.slice(0, 3);
 }
@@ -133,9 +133,9 @@ export default function FluxoCalendario({ items, saldoPorDia, mes }: Props) {
                 disabled={!cell.isCurrentMonth}
                 className={`
                   relative flex flex-col items-center justify-start pt-1.5 pb-2 min-h-[52px] border-b border-r border-gray-50 transition-colors
-                  ${!cell.isCurrentMonth ? "bg-gray-50/50 cursor-default" : "hover:bg-blue-50/50 cursor-pointer"}
-                  ${isToday ? "bg-blue-50 border-blue-200" : ""}
-                  ${isSelected ? "bg-blue-100 ring-1 ring-inset ring-blue-300" : ""}
+                  ${!cell.isCurrentMonth ? "bg-gray-50/50 cursor-default" : "hover:bg-brand-50/50 cursor-pointer"}
+                  ${isToday ? "bg-brand-50 border-brand-200" : ""}
+                  ${isSelected ? "bg-brand-100 ring-1 ring-inset ring-brand-300" : ""}
                 `}
               >
                 <span
@@ -143,9 +143,9 @@ export default function FluxoCalendario({ items, saldoPorDia, mes }: Props) {
                     !cell.isCurrentMonth
                       ? "text-gray-300"
                       : isToday
-                      ? "text-blue-700 font-bold"
+                      ? "text-brand-700 font-bold"
                       : isSelected
-                      ? "text-blue-700"
+                      ? "text-brand-700"
                       : "text-gray-700"
                   }`}
                 >
@@ -170,7 +170,7 @@ export default function FluxoCalendario({ items, saldoPorDia, mes }: Props) {
       <div className="flex items-center gap-3 text-xs text-gray-400 mb-4 px-1">
         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Entrada</span>
         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500" /> Saída</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400" /> Previsto</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-brand-400" /> Previsto</span>
       </div>
 
       {/* Painel de detalhes do dia selecionado */}
@@ -205,9 +205,9 @@ export default function FluxoCalendario({ items, saldoPorDia, mes }: Props) {
                 else if (isProjected) badgeText = `${badgeText} · previsto`;
 
                 return (
-                  <div key={item.id} className={`flex items-center gap-3 px-4 py-3 ${isProjected ? "bg-blue-50/50" : ""}`}>
+                  <div key={item.id} className={`flex items-center gap-3 px-4 py-3 ${isProjected ? "bg-brand-50/50" : ""}`}>
                     {isFatura ? (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-100 text-blue-600">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-brand-100 text-brand-600">
                         <CreditCard size={16} />
                       </div>
                     ) : (

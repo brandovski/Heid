@@ -206,7 +206,7 @@ export default function TransacaoList({
         <h1 className="text-xl font-bold text-gray-900">Transações</h1>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
         >
           <Plus size={16} />
           <span className="hidden sm:inline">Nova Transação</span>
@@ -230,8 +230,8 @@ export default function TransacaoList({
           aria-checked={isShared}
           onClick={handleShareToggle}
           disabled={sharingLoading}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 ${
-            isShared ? "bg-blue-600" : "bg-gray-200"
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 ${
+            isShared ? "bg-brand-600" : "bg-gray-200"
           }`}
         >
           <span
@@ -292,19 +292,19 @@ export default function TransacaoList({
           </div>
           <div
             className={`rounded-xl p-3 text-center ${
-              saldo >= 0 ? "bg-blue-50" : "bg-orange-50"
+              saldo >= 0 ? "bg-brand-50" : "bg-orange-50"
             }`}
           >
             <p
               className={`text-xs font-medium mb-0.5 ${
-                saldo >= 0 ? "text-blue-600" : "text-orange-600"
+                saldo >= 0 ? "text-brand-600" : "text-orange-600"
               }`}
             >
               Saldo
             </p>
             <p
               className={`text-sm font-bold ${
-                saldo >= 0 ? "text-blue-700" : "text-orange-700"
+                saldo >= 0 ? "text-brand-700" : "text-orange-700"
               }`}
             >
               {formatCurrency(saldo)}

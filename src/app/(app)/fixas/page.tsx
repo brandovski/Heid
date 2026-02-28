@@ -28,7 +28,7 @@ export default async function FixasPage() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <Repeat className="text-blue-600" size={24} />
+        <Repeat className="text-brand-600" size={24} />
         <h1 className="text-2xl font-bold text-gray-900">
           Receitas e Despesas Fixas
         </h1>

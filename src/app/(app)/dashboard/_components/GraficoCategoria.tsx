@@ -5,7 +5,7 @@ import { CategoryAmount, formatCurrency } from "./types";
 
 // Paleta moderna e harmônica
 const COLORS = [
-  "#2563eb", // blue-600
+  "#2563eb", // brand-600
   "#7c3aed", // violet-600
   "#db2777", // pink-600
   "#ea580c", // orange-600

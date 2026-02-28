@@ -99,7 +99,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               type="submit"
               form="cartao-form"
               disabled={loading}
-              className="flex-1 py-2.5 px-4 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="flex-1 py-2.5 px-4 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition-colors"
             >
               {loading ? "Salvando..." : "Salvar"}
             </button>
@@ -117,7 +117,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Nubank"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -128,7 +128,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
           <select
             value={brand}
             onChange={(e) => setBrand(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             {CARD_BRANDS.map((b) => (
               <option key={b} value={b}>{b}</option>
@@ -148,7 +148,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={closingDay}
               onChange={(e) => setClosingDay(e.target.value)}
               placeholder="Dia"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
           <div>
@@ -162,7 +162,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={dueDay}
               onChange={(e) => setDueDay(e.target.value)}
               placeholder="Dia"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
         </div>
@@ -179,7 +179,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={creditLimit}
               onChange={(e) => setCreditLimit(e.target.value)}
               placeholder="Ex: 5000"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
           <div>
@@ -192,7 +192,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={lastFour}
               onChange={(e) => setLastFour(e.target.value.replace(/\D/g, ""))}
               placeholder="1234"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
         </div>
@@ -206,7 +206,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               type="button"
               onClick={() => setColor("")}
               className={`w-8 h-8 rounded-full border-2 transition-all ${
-                !color ? "border-blue-500 scale-110" : "border-gray-200"
+                !color ? "border-brand-500 scale-110" : "border-gray-200"
               } bg-gray-100`}
               title="Sem cor"
             />
@@ -216,7 +216,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
                 type="button"
                 onClick={() => setColor(c)}
                 className={`w-8 h-8 rounded-full border-2 transition-all ${
-                  color === c ? "border-blue-500 scale-110" : "border-transparent"
+                  color === c ? "border-brand-500 scale-110" : "border-transparent"
                 }`}
                 style={{ backgroundColor: c }}
                 title={c}

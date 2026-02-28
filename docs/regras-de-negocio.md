@@ -1,4 +1,4 @@
-# Couple
+# Heid
 ## Plataforma Pessoal de Gestão Financeira
 ### Documento de Regras de Negócio — v1.0
 
@@ -6,7 +6,7 @@
 
 ## 1. Visão Geral do Projeto
 
-O **Couple** é uma aplicação web pessoal desenvolvida para dois usuários (casal), com o objetivo de substituir o gerenciamento financeiro feito no Notion. A plataforma oferece controle de orçamento por categoria, gestão de cartões de crédito (compras únicas, parcelamentos e assinaturas), acompanhamento de movimentações mensais com lançamentos futuros, e um dashboard visual consolidado.
+O **Heid** é uma aplicação web pessoal desenvolvida para dois usuários (casal), com o objetivo de substituir o gerenciamento financeiro feito no Notion. A plataforma oferece controle de orçamento por categoria, gestão de cartões de crédito (compras únicas, parcelamentos e assinaturas), acompanhamento de movimentações mensais com lançamentos futuros, e um dashboard visual consolidado.
 
 ### 1.1 Objetivos Principais
 
@@ -762,4 +762,4 @@ Os novos valores do enum `transaction_type` são:
 
 ---
 
-*Couple — Documento de Regras de Negócio v1.2 — Confidencial, uso interno do casal*
+*Heid — Documento de Regras de Negócio v1.2 — Confidencial, uso interno do casal*

@@ -48,7 +48,7 @@ export const STATUS_LABELS: Record<Project["status"], string> = {
 };
 
 export const STATUS_COLORS: Record<Project["status"], string> = {
-  active: "bg-blue-100 text-blue-700",
+  active: "bg-brand-100 text-brand-700",
   completed: "bg-green-100 text-green-700",
   cancelled: "bg-gray-100 text-gray-500",
 };
@@ -62,7 +62,7 @@ export const ITEM_STATUS_LABELS: Record<ProjectItem["status"], string> = {
 
 export const ITEM_STATUS_COLORS: Record<ProjectItem["status"], string> = {
   considering: "bg-amber-100 text-amber-700",
-  confirmed: "bg-blue-100 text-blue-700",
+  confirmed: "bg-brand-100 text-brand-700",
   paid: "bg-green-100 text-green-700",
   cancelled: "bg-gray-100 text-gray-400",
 };

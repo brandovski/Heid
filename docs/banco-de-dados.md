@@ -1,4 +1,4 @@
-# Couple — Schema do Banco de Dados
+# Heid — Schema do Banco de Dados
 
 > Todas as tabelas usam `UUID` como PK gerado pelo Postgres (`gen_random_uuid()`).
 > Todas as datas são armazenadas em UTC.

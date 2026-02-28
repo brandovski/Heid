@@ -1,4 +1,4 @@
-# Couple — Diário de Desenvolvimento
+# Heid — Diário de Desenvolvimento
 
 > Este documento é o registro vivo do projeto. Atualizado ao fim de cada sessão.
 > Serve como ponto de partida para retomar o contexto sem depender da memória da sessão anterior.
@@ -9,11 +9,12 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Sessão 024 — Redesign Navegação Mobile
-**Última sessão:** Sessão 024 — 2026-02-28
+**Fase:** Sessão 025 — Rebrand Couple → Heid
+**Última sessão:** Sessão 025 — 2026-02-28
 **Próxima ação:** Iniciar Fase 12 ou novas melhorias
 
 ### O que está feito
+- [x] Sessão 025 — Rebrand Couple → Heid: nova identidade visual completa — fontes Kaisei Tokumin (serif, títulos) + Poppins (sans, body) via next/font; paleta brand-* (#1D2D28 como brand-600, deep forest green) substituindo blue-* em 90+ arquivos src/; `tailwind.config.ts` com colors.brand e fontFamily (sans/serif); `globals.css` com `@layer base { h1, h2, h3 { @apply font-serif; } }`; Navbar: "Heid" com `font-serif text-brand-700`; login page: acento brand + h1 Kaisei Tokumin; package.json: name "heid"; documentação e MEMORY.md atualizados. Zero erros TypeScript.
 - [x] Sessão 024 — Redesign completo da navegação mobile: Desktop: Dashboard renomeado para Home (ícone Home), link Fluxo removido (acessado apenas via Dashboard); Mobile: novo header fixo (`h-14`, `bg-white/80 backdrop-blur-xl`) com título da página derivado do pathname via `PAGE_TITLES` map e botão de perfil com dropdown multi-nível (`MenuView: "main" | "cartoes"`) — Meu Perfil, Cartões → submenu (Gerenciar Cartões, Parcelas, Assinatura + botão voltar), Orçamento, Família; Mobile bottom nav glassmorphism com 4 links (Home, Transações, Projetos, Invest.) + slot central `flex-1` para FAB; FAB fixo `bottom-11` (44px) `left-1/2` com `ring-4 ring-white bg-blue-600`, 40px dentro da nav e 16px acima dela para projeção visual; quick-add modal com lazy fetch de `/api/categorias` (GET) e `/api/cartoes` (GET) + `TransacaoModal` + `router.refresh()` após criar; layout.tsx: `mt-14 sm:mt-0` para compensar header fixo mobile; `GET /api/categorias` e `GET /api/cartoes` adicionados. Zero erros TypeScript.
 - [x] Sessão 023 — Fluxo two-step para `deposit_remainder` em Projetos + Projeção Dividida em Investimentos: ItemModal (modo confirm) com 4 campos pré-preenchidos para deposit_remainder (valor total, entrada, data entrada, data restante) e cálculo do restante em tempo real; fallback `budget_amount` no `actualAmount` para todos os tipos; PATCH confirm aceita `deposit_amount` e `remainder_date` opcionalmente; ItemCard exibe "Pagar Entrada" / "Pagar Restante" conforme `deposit_transaction_id` + info visual Entrada/Restante; ProjetoDetalhe.handlePayItem lê body da resposta (`step: "deposit"` → seta `deposit_transaction_id`; `step: "remainder"` → status→paid); pagar/route.ts dois passos: Passo 1 cria transação do sinal, deixa item em "confirmed", retorna `{step:"deposit"}`; Passo 2 cria transação do restante, status→"paid", retorna `{step:"remainder"}`; investimentos/[id]/page.tsx amplia query project_items com payment_type/deposit_amount/remainder_date/deposit_transaction_id; ProjectItemRef em InvestimentoDetalhe e ProjecaoView atualizado com novos campos; ProjecaoView cria dois eventos separados por item deposit_remainder (entrada na expected_payment_date, restante na remainder_date), skipa itens paid, envia para "sem data" apenas se sem nenhuma data futura. Zero erros TypeScript.
 - [x] Sessão 022 — `expected_payment_date` em Projetos + ProjecaoView em Investimentos: ItemModal (modo confirm) agora exibe DatePicker opcional "Data prevista de pagamento" e envia `expected_payment_date` ao PATCH; API `/api/projetos/itens/[id]` atualizada para salvar a data na confirmação; FluxoProjecao removido e substituído por ProjecaoView (orquestrador) + ProjecaoTimeline + ProjecaoCalendario — seção unificada com navegação por mês, saldo acumulado por dia, aportes reais futuros, aportes mensais projetados (sem auto_generated), project_items com data, e seção inferior para itens sem data prevista; InvestimentoDetalhe usa ProjecaoView sempre (sem condicional). Zero erros TypeScript.

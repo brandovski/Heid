@@ -190,7 +190,7 @@ export default function ItemModal({
           <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
             Cancelar
           </button>
-          <button type="button" onClick={handleSave} disabled={saving} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-60 transition-colors">
+          <button type="button" onClick={handleSave} disabled={saving} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-60 transition-colors">
             {saving ? "Salvando..." : isConfirm ? "Confirmar" : isEdit ? "Salvar" : "Criar"}
           </button>
         </div>
@@ -216,7 +216,7 @@ export default function ItemModal({
                 min="0"
                 step="0.01"
                 placeholder="0,00"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
 
@@ -231,7 +231,7 @@ export default function ItemModal({
                     min="0"
                     step="0.01"
                     placeholder="0,00"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div>
@@ -281,7 +281,7 @@ export default function ItemModal({
                 <select
                   value={groupId}
                   onChange={(e) => setGroupId(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
                   {groups.map((g) => (
                     <option key={g.id} value={g.id}>{g.name}</option>
@@ -297,7 +297,7 @@ export default function ItemModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ex: Buffet, Passagem aérea..."
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
 
@@ -308,7 +308,7 @@ export default function ItemModal({
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 placeholder="Opcional"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
 
@@ -321,7 +321,7 @@ export default function ItemModal({
                 min="0"
                 step="0.01"
                 placeholder="0,00"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
 
@@ -332,7 +332,7 @@ export default function ItemModal({
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
                   <option value="">Sem categoria</option>
                   {categories.map((c) => (
@@ -353,7 +353,7 @@ export default function ItemModal({
                     onClick={() => setPaymentType(paymentType === value ? "" : value)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                       paymentType === value
-                        ? "bg-blue-600 text-white border-blue-600"
+                        ? "bg-brand-600 text-white border-brand-600"
                         : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
                     }`}
                   >
@@ -376,7 +376,7 @@ export default function ItemModal({
                         onClick={() => setPaymentOrigin(o)}
                         className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
                           paymentOrigin === o
-                            ? "bg-blue-600 text-white border-blue-600"
+                            ? "bg-brand-600 text-white border-brand-600"
                             : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
                         }`}
                       >
@@ -389,7 +389,7 @@ export default function ItemModal({
                         onClick={() => setPaymentOrigin("investment")}
                         className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
                           paymentOrigin === "investment"
-                            ? "bg-blue-600 text-white border-blue-600"
+                            ? "bg-brand-600 text-white border-brand-600"
                             : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
                         }`}
                       >
@@ -405,7 +405,7 @@ export default function ItemModal({
                     <select
                       value={investmentId}
                       onChange={(e) => setInvestmentId(e.target.value)}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                     >
                       <option value="">Selecione...</option>
                       {eligibleInvestments.map((inv) => (
@@ -430,7 +430,7 @@ export default function ItemModal({
                       onClick={() => setPaymentMethod(paymentMethod === value ? "" : value)}
                       className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                         paymentMethod === value
-                          ? "bg-blue-600 text-white border-blue-600"
+                          ? "bg-brand-600 text-white border-brand-600"
                           : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
                       }`}
                     >
@@ -448,7 +448,7 @@ export default function ItemModal({
                   <select
                     value={creditCardId}
                     onChange={(e) => setCreditCardId(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="">Selecione...</option>
                     {creditCards.map((c) => (
@@ -464,7 +464,7 @@ export default function ItemModal({
                     onChange={(e) => setInstallmentsCount(e.target.value)}
                     min="2"
                     max="48"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
@@ -481,7 +481,7 @@ export default function ItemModal({
                     min="0"
                     step="0.01"
                     placeholder="0,00"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div>
@@ -503,7 +503,7 @@ export default function ItemModal({
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
                 placeholder="Opcional"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </>

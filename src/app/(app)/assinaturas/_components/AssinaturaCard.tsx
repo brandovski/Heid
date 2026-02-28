@@ -13,7 +13,7 @@ interface Props {
 export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props) {
   const isUsd = a.original_currency === "USD";
   const scopeColor =
-    a.scope === "personal" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700";
+    a.scope === "personal" ? "bg-purple-50 text-purple-700" : "bg-brand-50 text-brand-700";
 
   async function handleCancel() {
     if (!confirm(`Cancelar a assinatura "${a.name}"?`)) return;

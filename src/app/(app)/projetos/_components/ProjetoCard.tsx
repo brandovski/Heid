@@ -25,8 +25,8 @@ export default function ProjetoCard({ project, onEdit, onStatusChange }: Props) 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-shadow">
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 p-2 bg-blue-50 rounded-lg shrink-0">
-          <Target size={16} className="text-blue-600" />
+        <div className="mt-0.5 p-2 bg-brand-50 rounded-lg shrink-0">
+          <Target size={16} className="text-brand-600" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -34,7 +34,7 @@ export default function ProjetoCard({ project, onEdit, onStatusChange }: Props) 
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href={`/projetos/${project.id}`}
-              className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors truncate"
+              className="text-sm font-semibold text-gray-900 hover:text-brand-600 transition-colors truncate"
             >
               {project.name}
             </Link>
@@ -102,7 +102,7 @@ export default function ProjetoCard({ project, onEdit, onStatusChange }: Props) 
                 {project.status !== "active" && (
                   <button
                     onClick={() => { setMenuOpen(false); onStatusChange(project.id, "active"); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-blue-600 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2.5 text-sm text-brand-600 hover:bg-gray-50"
                   >
                     Reativar
                   </button>

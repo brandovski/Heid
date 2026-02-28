@@ -54,7 +54,7 @@ export default function AssinaturaList({ assinaturas, categorias, cartoes }: Pro
         <h1 className="text-xl font-bold text-gray-900">Assinaturas</h1>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
         >
           <Plus size={16} />
           <span className="hidden sm:inline">Nova Assinatura</span>

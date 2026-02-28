@@ -32,7 +32,7 @@ export default function ScopeSelector({
               }}
               className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
                 scope === s
-                  ? "bg-blue-50 border-blue-500 text-blue-700"
+                  ? "bg-brand-50 border-brand-500 text-brand-700"
                   : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
@@ -47,7 +47,7 @@ export default function ScopeSelector({
             type="checkbox"
             checked={isShared}
             onChange={(e) => onIsSharedChange(e.target.checked)}
-            className="rounded border-gray-300 text-blue-600"
+            className="rounded border-gray-300 text-brand-600"
           />
           <span className="text-sm text-gray-600">
             Compartilhar com parceiro (somente leitura)

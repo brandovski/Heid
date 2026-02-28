@@ -59,7 +59,7 @@ export default function TransacaoModal({
           <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
             Cancelar
           </button>
-          <button type="button" onClick={handleSave} disabled={saving} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-60 transition-colors">
+          <button type="button" onClick={handleSave} disabled={saving} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-60 transition-colors">
             {saving ? "Salvando..." : "Registrar"}
           </button>
         </div>
@@ -80,7 +80,7 @@ export default function TransacaoModal({
                 onClick={() => setType(t)}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
                   type === t
-                    ? "bg-blue-600 text-white border-blue-600"
+                    ? "bg-brand-600 text-white border-brand-600"
                     : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
                 }`}
               >
@@ -99,7 +99,7 @@ export default function TransacaoModal({
             min="0"
             step="0.01"
             placeholder="0,00"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -115,7 +115,7 @@ export default function TransacaoModal({
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
       </div>

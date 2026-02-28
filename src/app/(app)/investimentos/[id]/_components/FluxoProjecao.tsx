@@ -88,12 +88,12 @@ export default function FluxoProjecao({ saldoAtual, monthlyContribution, project
               return (
                 <tr
                   key={row.mes}
-                  className={isCurrentMonth ? "bg-blue-50" : "hover:bg-gray-50/50"}
+                  className={isCurrentMonth ? "bg-brand-50" : "hover:bg-gray-50/50"}
                 >
                   <td className="px-4 py-2.5 text-gray-700 font-medium whitespace-nowrap">
                     {row.label}
                     {isCurrentMonth && (
-                      <span className="ml-1.5 text-[10px] font-medium text-blue-600 bg-blue-100 rounded px-1 py-0.5">
+                      <span className="ml-1.5 text-[10px] font-medium text-brand-600 bg-brand-100 rounded px-1 py-0.5">
                         atual
                       </span>
                     )}

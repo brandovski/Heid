@@ -199,7 +199,7 @@ export default function ProjecaoView({
             <button
               onClick={() => setLayout("timeline")}
               className={`p-1.5 rounded-md transition-colors ${
-                layout === "timeline" ? "bg-white shadow-sm text-blue-600" : "text-gray-500 hover:text-gray-700"
+                layout === "timeline" ? "bg-white shadow-sm text-brand-600" : "text-gray-500 hover:text-gray-700"
               }`}
               aria-label="Lista"
             >
@@ -208,7 +208,7 @@ export default function ProjecaoView({
             <button
               onClick={() => setLayout("calendario")}
               className={`p-1.5 rounded-md transition-colors ${
-                layout === "calendario" ? "bg-white shadow-sm text-blue-600" : "text-gray-500 hover:text-gray-700"
+                layout === "calendario" ? "bg-white shadow-sm text-brand-600" : "text-gray-500 hover:text-gray-700"
               }`}
               aria-label="Calendário"
             >
@@ -273,7 +273,7 @@ export default function ProjecaoView({
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                     item.status === "paid"
                       ? "bg-green-50 text-green-700"
-                      : "bg-blue-50 text-blue-700"
+                      : "bg-brand-50 text-brand-700"
                   }`}>
                     {item.status === "paid" ? "Pago" : "Confirmado"}
                   </span>

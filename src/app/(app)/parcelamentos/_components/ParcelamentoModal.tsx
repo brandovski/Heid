@@ -98,7 +98,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
               type="submit"
               form={formId}
               disabled={loading}
-              className="flex-1 py-2.5 px-4 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="flex-1 py-2.5 px-4 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition-colors"
             >
               {loading ? "Cadastrando..." : `Criar ${count}x parcelas`}
             </button>
@@ -116,7 +116,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Ex: iPhone 16, TV Samsung..."
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -132,7 +132,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
               value={totalAmount}
               onChange={(e) => setTotalAmount(e.target.value)}
               placeholder="0,00"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
           <div>
@@ -145,7 +145,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
               max="48"
               value={installmentsCount}
               onChange={(e) => setInstallmentsCount(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
         </div>
@@ -174,7 +174,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
           <select
             value={creditCardId}
             onChange={(e) => setCreditCardId(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="">Selecione um cartão</option>
             {cartoes.map((c) => (
@@ -190,7 +190,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="">Sem categoria</option>
             {categorias.map((c) => (
@@ -209,7 +209,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
           />
         </div>
 

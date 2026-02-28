@@ -13,7 +13,7 @@ export default async function CategoriasPage() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <Tag className="text-blue-600" size={24} />
+        <Tag className="text-brand-600" size={24} />
         <h1 className="text-2xl font-bold text-gray-900">Categorias</h1>
       </div>
       <CategoriaList initialData={categorias ?? []} />

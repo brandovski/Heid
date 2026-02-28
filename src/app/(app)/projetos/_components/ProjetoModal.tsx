@@ -68,7 +68,7 @@ export default function ProjetoModal({ onClose, onSaved, project }: Props) {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-60 transition-colors"
+            className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-60 transition-colors"
           >
             {saving ? "Salvando..." : editing ? "Salvar" : "Criar"}
           </button>
@@ -87,7 +87,7 @@ export default function ProjetoModal({ onClose, onSaved, project }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Casamento, Viagem Europa..."
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -98,7 +98,7 @@ export default function ProjetoModal({ onClose, onSaved, project }: Props) {
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -111,7 +111,7 @@ export default function ProjetoModal({ onClose, onSaved, project }: Props) {
             min="0"
             step="0.01"
             placeholder="0,00"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -130,7 +130,7 @@ export default function ProjetoModal({ onClose, onSaved, project }: Props) {
                 onClick={() => setScope(s)}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
                   scope === s
-                    ? "bg-blue-600 text-white border-blue-600"
+                    ? "bg-brand-600 text-white border-brand-600"
                     : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
                 }`}
               >

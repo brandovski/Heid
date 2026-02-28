@@ -34,10 +34,10 @@ function getBadgeText(kind: ProjecaoItemKind): string {
 
 function getBadgeStyle(kind: ProjecaoItemKind): string {
   switch (kind) {
-    case "aporte_projetado": return "text-blue-600 bg-blue-50";
+    case "aporte_projetado": return "text-brand-600 bg-brand-50";
     case "aporte_real": return "text-green-600 bg-green-50";
     case "retirada": return "text-red-600 bg-red-50";
-    case "projeto": return "text-blue-600 bg-blue-50";
+    case "projeto": return "text-brand-600 bg-brand-50";
   }
 }
 
@@ -50,7 +50,7 @@ function getIconStyle(kind: ProjecaoItemKind): string {
     case "aporte_projetado": return "bg-green-100 text-green-600";
     case "aporte_real": return "bg-green-100 text-green-600";
     case "retirada": return "bg-red-100 text-red-600";
-    case "projeto": return "bg-blue-100 text-blue-600";
+    case "projeto": return "bg-brand-100 text-brand-600";
   }
 }
 
@@ -67,7 +67,7 @@ interface Props {
 function ItemRow({ item }: { item: ProjecaoItem }) {
   const isEntrada = item.amount > 0;
   return (
-    <div className={`flex items-center gap-3 px-4 py-3 ${isProjected(item.kind) ? "bg-blue-50/50" : ""}`}>
+    <div className={`flex items-center gap-3 px-4 py-3 ${isProjected(item.kind) ? "bg-brand-50/50" : ""}`}>
       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${getIconStyle(item.kind)}`}>
         {getIcon(item.kind)}
       </div>
@@ -124,8 +124,8 @@ export default function ProjecaoTimeline({ items, saldoPorDia, saldoInicioMes }:
 
   return (
     <div>
-      <div className="mb-4 p-3 bg-blue-50 rounded-xl border border-blue-100">
-        <p className="text-xs text-blue-600 font-medium">Saldo início do mês</p>
+      <div className="mb-4 p-3 bg-brand-50 rounded-xl border border-brand-100">
+        <p className="text-xs text-brand-600 font-medium">Saldo início do mês</p>
         <p className={`text-lg font-bold mt-0.5 ${saldoInicioMes >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
           {formatCurrency(saldoInicioMes)}
         </p>

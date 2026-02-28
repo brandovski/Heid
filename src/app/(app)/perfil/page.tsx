@@ -34,7 +34,7 @@ export default async function PerfilPage() {
     <div className="max-w-md mx-auto px-4 py-8">
       {/* Avatar + info */}
       <div className="flex flex-col items-center gap-3 mb-8">
-        <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white text-xl font-bold select-none">
+        <div className="w-16 h-16 rounded-full bg-brand-600 flex items-center justify-center text-white text-xl font-bold select-none">
           {initials}
         </div>
         {name && (

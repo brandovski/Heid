@@ -52,7 +52,7 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
-                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                     focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
           placeholder="seu@email.com"
         />
       </div>
@@ -72,7 +72,7 @@ export function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
-                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                     focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
           placeholder="••••••••"
         />
       </div>
@@ -86,9 +86,9 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-2.5 px-4 bg-blue-600 text-white text-sm font-medium
-                   rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2
-                   focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-60
+        className="w-full py-2.5 px-4 bg-brand-600 text-white text-sm font-medium
+                   rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2
+                   focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-60
                    disabled:cursor-not-allowed transition-colors"
       >
         {loading ? "Entrando..." : "Entrar"}

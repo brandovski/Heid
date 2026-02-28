@@ -100,7 +100,7 @@ export default function InvestimentoDetalhe({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-xl font-bold text-gray-900">{investment.name}</h1>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 font-medium">
                 {INVESTMENT_TYPE_LABELS[investment.type]}
               </span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">
@@ -197,7 +197,7 @@ export default function InvestimentoDetalhe({
           <button
             type="button"
             onClick={() => setModal({ type: "snapshot" })}
-            className="px-3 py-1.5 text-sm font-medium text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+            className="px-3 py-1.5 text-sm font-medium text-brand-700 border border-brand-300 rounded-lg hover:bg-brand-50 transition-colors"
           >
             Atualizar Saldo
           </button>

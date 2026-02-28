@@ -26,12 +26,12 @@ function ItemRow({ item }: { item: FluxoItem }) {
   return (
     <div
       className={`flex items-center gap-3 px-4 py-3 ${
-        isProjected ? "bg-blue-50/50" : ""
+        isProjected ? "bg-brand-50/50" : ""
       }`}
     >
       {/* Ícone */}
       {isFatura ? (
-        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 bg-blue-100 text-blue-600">
+        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 bg-brand-100 text-brand-600">
           <CreditCard size={16} />
         </div>
       ) : (
@@ -127,8 +127,8 @@ export default function FluxoTimeline({ items, saldoPorDia, saldoBase, mes }: Pr
   return (
     <div>
       {/* Saldo base do mês */}
-      <div className="mb-4 p-3 bg-blue-50 rounded-xl border border-blue-100">
-        <p className="text-xs text-blue-600 font-medium">Saldo do mês (transações pagas)</p>
+      <div className="mb-4 p-3 bg-brand-50 rounded-xl border border-brand-100">
+        <p className="text-xs text-brand-600 font-medium">Saldo do mês (transações pagas)</p>
         <p className={`text-lg font-bold mt-0.5 ${saldoBase >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
           {formatCurrency(saldoBase)}
         </p>

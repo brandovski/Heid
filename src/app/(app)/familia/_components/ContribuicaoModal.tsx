@@ -76,7 +76,7 @@ export default function ContribuicaoModal({ isOpen, onClose }: Props) {
               type="submit"
               form="contribuicao-form"
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors"
             >
               {loading ? "Registrando..." : "Registrar"}
             </button>
@@ -85,7 +85,7 @@ export default function ContribuicaoModal({ isOpen, onClose }: Props) {
       }
     >
       <form id="contribuicao-form" onSubmit={handleSubmit} className="space-y-4">
-        <p className="text-xs text-gray-500 bg-blue-50 text-blue-700 rounded-lg px-3 py-2">
+        <p className="text-xs text-gray-500 bg-brand-50 text-brand-700 rounded-lg px-3 py-2">
           O valor será registrado como despesa pessoal e creditado no Caixa Familiar.
         </p>
 
@@ -102,7 +102,7 @@ export default function ContribuicaoModal({ isOpen, onClose }: Props) {
             step="0.01"
             placeholder="0,00"
             autoFocus
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -115,7 +115,7 @@ export default function ContribuicaoModal({ isOpen, onClose }: Props) {
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -129,7 +129,7 @@ export default function ContribuicaoModal({ isOpen, onClose }: Props) {
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Observações..."
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
           />
         </div>
       </form>

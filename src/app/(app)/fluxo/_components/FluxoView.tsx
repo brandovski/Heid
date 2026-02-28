@@ -298,7 +298,7 @@ export default function FluxoView({
             <button
               onClick={() => setLayout("timeline")}
               className={`p-1.5 rounded-md transition-colors ${
-                layout === "timeline" ? "bg-white shadow-sm text-blue-600" : "text-gray-500 hover:text-gray-700"
+                layout === "timeline" ? "bg-white shadow-sm text-brand-600" : "text-gray-500 hover:text-gray-700"
               }`}
               aria-label="Lista"
             >
@@ -307,7 +307,7 @@ export default function FluxoView({
             <button
               onClick={() => setLayout("calendario")}
               className={`p-1.5 rounded-md transition-colors ${
-                layout === "calendario" ? "bg-white shadow-sm text-blue-600" : "text-gray-500 hover:text-gray-700"
+                layout === "calendario" ? "bg-white shadow-sm text-brand-600" : "text-gray-500 hover:text-gray-700"
               }`}
               aria-label="Calendário"
             >
@@ -324,7 +324,7 @@ export default function FluxoView({
               onClick={() => navigateEscopo(tab.value)}
               className={`flex-1 py-1.5 px-2 rounded-md text-sm font-medium transition-colors ${
                 escopo === tab.value
-                  ? "bg-white shadow-sm text-blue-600"
+                  ? "bg-white shadow-sm text-brand-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >

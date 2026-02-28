@@ -85,7 +85,7 @@ export default function DashboardView({
     {
       label: "Saldo",
       value: summary.balance,
-      color: summary.balance >= 0 ? "text-blue-600" : "text-red-600",
+      color: summary.balance >= 0 ? "text-brand-600" : "text-red-600",
     },
     { label: "A receber", value: summary.pendingIncome, color: "text-amber-600" },
     { label: "A pagar", value: summary.pendingExpense, color: "text-orange-600" },
@@ -108,7 +108,7 @@ export default function DashboardView({
             onClick={() => escopo !== "personal" && toggleEscopo()}
             className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
               escopo === "personal"
-                ? "bg-blue-600 text-white"
+                ? "bg-brand-600 text-white"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -118,7 +118,7 @@ export default function DashboardView({
             onClick={() => escopo !== "parceiro" && toggleEscopo()}
             className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
               escopo === "parceiro"
-                ? "bg-blue-600 text-white"
+                ? "bg-brand-600 text-white"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -171,7 +171,7 @@ export default function DashboardView({
         <div className="lg:col-span-3 bg-white rounded-xl border border-gray-100 p-5">
           <div className="flex items-center gap-4 mb-5">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+              <span className="w-2.5 h-2.5 rounded-full bg-brand-600" />
               <span className="text-xs text-gray-500">Receitas</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -206,7 +206,7 @@ export default function DashboardView({
           <h2 className="text-sm font-semibold text-gray-700">Orçamento</h2>
           <Link
             href={`/orcamento?mes=${currentMonth}`}
-            className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1"
           >
             Ver tudo <ExternalLink size={12} />
           </Link>
@@ -218,7 +218,7 @@ export default function DashboardView({
             </p>
             <Link
               href={`/orcamento?mes=${currentMonth}`}
-              className="text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="text-sm font-medium text-brand-600 hover:text-brand-700"
             >
               Configurar orçamento →
             </Link>
@@ -254,7 +254,7 @@ export default function DashboardView({
                 +{budgetsWithStats.length - 5} categorias —{" "}
                 <Link
                   href={`/orcamento?mes=${currentMonth}`}
-                  className="text-blue-600 hover:text-blue-700"
+                  className="text-brand-600 hover:text-brand-700"
                 >
                   ver tudo
                 </Link>
@@ -306,7 +306,7 @@ export default function DashboardView({
                 ) : (
                   <button
                     onClick={() => setSelectedInvoice({ card, monthTotal })}
-                    className="w-full text-xs font-medium text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-lg py-2 px-3 transition-colors"
+                    className="w-full text-xs font-medium text-brand-600 border border-brand-200 bg-brand-50 hover:bg-brand-100 rounded-lg py-2 px-3 transition-colors"
                   >
                     Registrar pagamento
                   </button>
@@ -325,7 +325,7 @@ export default function DashboardView({
           </h2>
           <Link
             href={`/transacoes?mes=${currentMonth}`}
-            className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1"
           >
             Ver tudo <ExternalLink size={12} />
           </Link>

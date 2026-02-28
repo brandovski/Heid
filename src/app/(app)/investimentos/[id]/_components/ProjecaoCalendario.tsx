@@ -63,7 +63,7 @@ function getDayDots(items: ProjecaoItem[]): React.ReactElement[] {
 
   if (aportesReais) dots.push(<span key="aporte-real" className="w-1.5 h-1.5 rounded-full bg-emerald-500" />);
   if (retiradas) dots.push(<span key="retirada" className="w-1.5 h-1.5 rounded-full bg-rose-500" />);
-  if (projetados) dots.push(<span key="proj" className="w-1.5 h-1.5 rounded-full bg-blue-400" />);
+  if (projetados) dots.push(<span key="proj" className="w-1.5 h-1.5 rounded-full bg-brand-400" />);
 
   return dots.slice(0, 3);
 }
@@ -79,10 +79,10 @@ function getBadgeText(kind: ProjecaoItem["kind"]): string {
 
 function getBadgeStyle(kind: ProjecaoItem["kind"]): string {
   switch (kind) {
-    case "aporte_projetado": return "text-blue-600 bg-blue-50";
+    case "aporte_projetado": return "text-brand-600 bg-brand-50";
     case "aporte_real": return "text-green-600 bg-green-50";
     case "retirada": return "text-red-600 bg-red-50";
-    case "projeto": return "text-blue-600 bg-blue-50";
+    case "projeto": return "text-brand-600 bg-brand-50";
   }
 }
 
@@ -95,7 +95,7 @@ function getIconStyle(kind: ProjecaoItem["kind"]): string {
     case "aporte_projetado": return "bg-green-100 text-green-600";
     case "aporte_real": return "bg-green-100 text-green-600";
     case "retirada": return "bg-red-100 text-red-600";
-    case "projeto": return "bg-blue-100 text-blue-600";
+    case "projeto": return "bg-brand-100 text-brand-600";
   }
 }
 
@@ -144,15 +144,15 @@ export default function ProjecaoCalendario({ items, saldoPorDia, mes }: Props) {
                 disabled={!cell.isCurrentMonth}
                 className={`
                   relative flex flex-col items-center justify-start pt-1.5 pb-2 min-h-[52px] border-b border-r border-gray-50 transition-colors
-                  ${!cell.isCurrentMonth ? "bg-gray-50/50 cursor-default" : "hover:bg-blue-50/50 cursor-pointer"}
-                  ${isToday ? "bg-blue-50 border-blue-200" : ""}
-                  ${isSelected ? "bg-blue-100 ring-1 ring-inset ring-blue-300" : ""}
+                  ${!cell.isCurrentMonth ? "bg-gray-50/50 cursor-default" : "hover:bg-brand-50/50 cursor-pointer"}
+                  ${isToday ? "bg-brand-50 border-brand-200" : ""}
+                  ${isSelected ? "bg-brand-100 ring-1 ring-inset ring-brand-300" : ""}
                 `}
               >
                 <span className={`text-xs font-medium ${
                   !cell.isCurrentMonth ? "text-gray-300" :
-                  isToday ? "text-blue-700 font-bold" :
-                  isSelected ? "text-blue-700" : "text-gray-700"
+                  isToday ? "text-brand-700 font-bold" :
+                  isSelected ? "text-brand-700" : "text-gray-700"
                 }`}>
                   {cell.day}
                 </span>
@@ -174,7 +174,7 @@ export default function ProjecaoCalendario({ items, saldoPorDia, mes }: Props) {
       <div className="flex items-center gap-3 text-xs text-gray-400 mb-4 px-1">
         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Aporte</span>
         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500" /> Saída</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400" /> Previsto</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-brand-400" /> Previsto</span>
       </div>
 
       {/* Painel de detalhes do dia selecionado */}
@@ -199,7 +199,7 @@ export default function ProjecaoCalendario({ items, saldoPorDia, mes }: Props) {
                 const isEntrada = item.amount > 0;
                 const isProjected = item.kind === "aporte_projetado" || item.kind === "projeto";
                 return (
-                  <div key={item.id} className={`flex items-center gap-3 px-4 py-3 ${isProjected ? "bg-blue-50/50" : ""}`}>
+                  <div key={item.id} className={`flex items-center gap-3 px-4 py-3 ${isProjected ? "bg-brand-50/50" : ""}`}>
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${getIconStyle(item.kind)}`}>
                       {getIcon(item.kind)}
                     </div>

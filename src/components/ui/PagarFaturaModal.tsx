@@ -90,7 +90,7 @@ export default function PagarFaturaModal({
               type="submit"
               form="pagar-fatura-form"
               disabled={loading || !canSubmit}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-50 rounded-lg transition-colors"
             >
               {loading ? "Salvando..." : "Confirmar Pagamento"}
             </button>
@@ -104,14 +104,14 @@ export default function PagarFaturaModal({
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">Valor do pagamento</label>
 
-          <label className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+          <label className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
             <input
               type="radio"
               name="pay-type"
               value="total"
               checked={payType === "total"}
               onChange={() => setPayType("total")}
-              className="accent-blue-600"
+              className="accent-brand-600"
             />
             <div className="flex items-center justify-between flex-1">
               <span className="text-sm font-medium text-gray-800">Valor total</span>
@@ -121,14 +121,14 @@ export default function PagarFaturaModal({
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+          <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
             <input
               type="radio"
               name="pay-type"
               value="partial"
               checked={payType === "partial"}
               onChange={() => setPayType("partial")}
-              className="accent-blue-600 mt-0.5"
+              className="accent-brand-600 mt-0.5"
             />
             <div className="flex-1 space-y-2">
               <span className="text-sm font-medium text-gray-800">Valor parcial</span>
@@ -141,7 +141,7 @@ export default function PagarFaturaModal({
                   onChange={(e) => setPartialStr(e.target.value)}
                   placeholder="0,00"
                   autoFocus
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               )}
             </div>
@@ -170,7 +170,7 @@ export default function PagarFaturaModal({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Ex: débito automático"
-            className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
       </form>

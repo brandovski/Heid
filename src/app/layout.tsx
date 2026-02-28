@@ -1,11 +1,23 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Kaisei_Tokumin, Poppins } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const kaiseiTokumin = Kaisei_Tokumin({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-kaisei",
+  display: "swap",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Couple",
+  title: "Heid",
   description: "Gestão financeira do casal",
 };
 
@@ -16,7 +28,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>{children}</body>
+      <body className={`${kaiseiTokumin.variable} ${poppins.variable} font-sans`}>
+        {children}
+      </body>
     </html>
   );
 }
