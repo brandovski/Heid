@@ -45,9 +45,9 @@ export default function GrupoSection({
   const subtotal = activeItems.reduce((s, i) => s + (i.budget_amount ?? 0), 0);
 
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden">
+    <div className="border border-gray-200 rounded-xl">
       {/* Group header */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-gray-50">
+      <div className={`flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-t-xl${!expanded ? " rounded-b-xl" : ""}`}>
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
