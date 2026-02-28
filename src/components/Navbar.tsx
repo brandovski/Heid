@@ -387,11 +387,11 @@ export default function Navbar() {
       </header>
 
       {/* ─── Mobile FAB ─── */}
-      {/* bottom-[5.5rem] = nav bottom-5 (1.25rem) + nav h-16 (4rem) + 4px gap = 5.5rem above viewport bottom */}
+      {/* bottom-11 (44px): FAB de 56px vai de 44–100px; nav de 20–84px → 40px dentro da nav, 16px acima */}
       <button
         type="button"
         onClick={handleOpenQuickAdd}
-        className="sm:hidden fixed bottom-[5.5rem] left-1/2 -translate-x-1/2 z-50 w-14 h-14 rounded-full bg-blue-600 shadow-lg shadow-blue-600/40 flex items-center justify-center text-white active:scale-95 transition-transform"
+        className="sm:hidden fixed bottom-11 left-1/2 -translate-x-1/2 z-50 w-14 h-14 rounded-full bg-blue-600 ring-4 ring-white shadow-lg shadow-blue-600/40 flex items-center justify-center text-white active:scale-95 transition-transform"
         aria-label="Nova transação"
       >
         <Plus size={22} strokeWidth={2.5} />
