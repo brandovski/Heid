@@ -42,6 +42,15 @@ export default function InvestimentoList({ investments: initial, transactions, s
 
   return (
     <div className="space-y-4">
+      {/* Mobile full-width button */}
+      <button
+        type="button"
+        onClick={() => { setModalInvestment(undefined); setModalOpen(true); }}
+        className="sm:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors"
+      >
+        <Plus size={14} /> Novo Investimento
+      </button>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
@@ -61,10 +70,10 @@ export default function InvestimentoList({ investments: initial, transactions, s
         <button
           type="button"
           onClick={() => { setModalInvestment(undefined); setModalOpen(true); }}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-brand-600 border border-brand-200 rounded-lg hover:bg-brand-50 transition-colors"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm text-brand-600 border border-brand-200 rounded-lg hover:bg-brand-100 transition-colors"
         >
           <Plus size={14} />
-          Novo
+          Novo Investimento
         </button>
       </div>
 

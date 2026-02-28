@@ -21,7 +21,7 @@ export default async function InvestimentosPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32 sm:pb-8">
-      <div className="mb-6">
+      <div className="hidden sm:block mb-6">
         <h1 className="text-xl font-bold text-gray-900">Investimentos</h1>
         <p className="text-sm text-gray-500 mt-1">Acompanhe seus aportes e evolução patrimonial.</p>
       </div>

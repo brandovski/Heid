@@ -49,16 +49,23 @@ export default function AssinaturaList({ assinaturas, categorias, cartoes }: Pro
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Mobile full-width button */}
+      <button
+        onClick={() => setShowModal(true)}
+        className="sm:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl text-sm font-semibold mb-4 hover:bg-brand-700 transition-colors"
+      >
+        <Plus size={16} /> Nova Assinatura
+      </button>
+
+      {/* Header desktop */}
+      <div className="hidden sm:flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-900">Assinaturas</h1>
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
         >
           <Plus size={16} />
-          <span className="hidden sm:inline">Nova Assinatura</span>
-          <span className="sm:hidden">Nova</span>
+          Nova Assinatura
         </button>
       </div>
 

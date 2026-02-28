@@ -136,13 +136,13 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-1">
-              <span className="text-lg font-serif font-bold text-brand-700 mr-6">Heid</span>
+              <span className="text-lg font-bold text-brand-700 mr-6">Heid</span>
 
               <Link
                 href="/dashboard"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/dashboard")
-                    ? "bg-brand-50 text-brand-700"
+                    ? "bg-brand-100 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -154,7 +154,7 @@ export default function Navbar() {
                 href="/transacoes"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/transacoes")
-                    ? "bg-brand-50 text-brand-700"
+                    ? "bg-brand-100 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -168,7 +168,7 @@ export default function Navbar() {
                   onClick={() => setCartoesOpen((v) => !v)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isCartoesActive
-                      ? "bg-brand-50 text-brand-700"
+                      ? "bg-brand-100 text-brand-700"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }`}
                 >
@@ -189,7 +189,7 @@ export default function Navbar() {
                         onClick={() => setCartoesOpen(false)}
                         className={`flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
                           isActive(href)
-                            ? "text-brand-700 bg-brand-50"
+                            ? "text-brand-700 bg-brand-100"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
@@ -205,7 +205,7 @@ export default function Navbar() {
                 href="/orcamento"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/orcamento")
-                    ? "bg-brand-50 text-brand-700"
+                    ? "bg-brand-100 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -217,7 +217,7 @@ export default function Navbar() {
                 href="/familia"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/familia")
-                    ? "bg-brand-50 text-brand-700"
+                    ? "bg-brand-100 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -229,7 +229,7 @@ export default function Navbar() {
                 href="/projetos"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/projetos")
-                    ? "bg-brand-50 text-brand-700"
+                    ? "bg-brand-100 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -241,7 +241,7 @@ export default function Navbar() {
                 href="/investimentos"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/investimentos")
-                    ? "bg-brand-50 text-brand-700"
+                    ? "bg-brand-100 text-brand-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -254,7 +254,7 @@ export default function Navbar() {
               href="/perfil"
               className={`p-2 rounded-lg transition-colors ${
                 isActive("/perfil")
-                  ? "bg-brand-50 text-brand-700"
+                  ? "bg-brand-100 text-brand-700"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
               }`}
               aria-label="Perfil"
@@ -268,7 +268,7 @@ export default function Navbar() {
       {/* ─── Mobile header ─── */}
       <header className="sm:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 shadow-sm shadow-black/5">
         <div className="flex items-center justify-between h-full px-4">
-          <span className="text-base font-semibold text-gray-900 tracking-tight">
+          <span className="text-[1.5rem] font-bold text-gray-900 font-serif">
             {pageTitle}
           </span>
 
@@ -345,7 +345,7 @@ export default function Navbar() {
                       <button
                         type="button"
                         onClick={() => setMenuView("main")}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-brand-600 hover:bg-brand-50/50 transition-colors border-b border-gray-100"
+                        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-brand-600 hover:bg-brand-100/50 transition-colors border-b border-gray-100"
                       >
                         <ChevronLeft size={14} />
                         Cartões

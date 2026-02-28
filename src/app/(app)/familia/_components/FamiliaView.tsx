@@ -197,7 +197,7 @@ export default function FamiliaView({
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       {/* Header */}
-      <h1 className="text-xl font-bold text-gray-900">Família</h1>
+      <h1 className="text-xl font-bold text-gray-900 hidden sm:block">Família</h1>
 
       {/* Month navigation */}
       <div className="flex items-center justify-between">

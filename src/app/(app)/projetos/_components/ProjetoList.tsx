@@ -50,8 +50,17 @@ export default function ProjetoList({ initialProjects }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Mobile full-width button */}
+      <button
+        type="button"
+        onClick={() => { setEditingProject(undefined); setShowModal(true); }}
+        className="sm:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors"
+      >
+        <Plus size={16} /> Novo Projeto
+      </button>
+
+      {/* Header desktop */}
+      <div className="hidden sm:flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Projetos</h1>
           {activeProjects.length > 0 && (
@@ -67,7 +76,7 @@ export default function ProjetoList({ initialProjects }: Props) {
           className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
         >
           <Plus size={16} />
-          Novo projeto
+          Novo Projeto
         </button>
       </div>
 

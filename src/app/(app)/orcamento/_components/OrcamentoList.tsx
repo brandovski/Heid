@@ -97,7 +97,7 @@ export default function OrcamentoList({
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-bold text-gray-900">Orçamento Pessoal</h1>
+        <h1 className="text-xl font-bold text-gray-900 hidden sm:block">Orçamento Pessoal</h1>
       </div>
 
       {/* Navegação de mês */}
