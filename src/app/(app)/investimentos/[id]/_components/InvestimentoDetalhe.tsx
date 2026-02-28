@@ -26,6 +26,10 @@ interface ProjectItemRef {
   budget_amount?: number | null;
   expected_payment_date?: string | null;
   status: string;
+  payment_type?: string | null;
+  deposit_amount?: number | null;
+  remainder_date?: string | null;
+  deposit_transaction_id?: string | null;
 }
 
 interface Props {

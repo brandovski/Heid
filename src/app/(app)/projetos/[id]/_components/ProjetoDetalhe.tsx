@@ -107,11 +107,17 @@ export default function ProjetoDetalhe({
   async function handlePayItem(item: ProjectItemWithRelations) {
     const res = await fetch(`/api/projetos/itens/${item.id}/pagar`, { method: "POST" });
     if (res.ok) {
-      // Update item status to paid
+      const data = await res.json();
       setGroups((prev) =>
         prev.map((g) => ({
           ...g,
-          items: g.items.map((i) => i.id === item.id ? { ...i, status: "paid" as const } : i),
+          items: g.items.map((i) => {
+            if (i.id !== item.id) return i;
+            if (data.step === "deposit") {
+              return { ...i, deposit_transaction_id: data.deposit_transaction_id };
+            }
+            return { ...i, status: "paid" as const };
+          }),
         }))
       );
     }

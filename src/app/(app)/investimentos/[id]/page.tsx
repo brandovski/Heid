@@ -33,7 +33,7 @@ export default async function InvestimentoDetalhePage({
       .order("created_at", { ascending: false }),
     supabase
       .from("project_items")
-      .select("id, name, actual_amount, budget_amount, expected_payment_date, status")
+      .select("id, name, actual_amount, budget_amount, expected_payment_date, status, payment_type, deposit_amount, remainder_date, deposit_transaction_id")
       .eq("investment_id", params.id)
       .in("status", ["confirmed", "paid"]),
   ]);

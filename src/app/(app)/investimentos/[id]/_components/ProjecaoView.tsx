@@ -15,6 +15,10 @@ interface ProjectItemRef {
   budget_amount?: number | null;
   expected_payment_date?: string | null;
   status: string;
+  payment_type?: string | null;
+  deposit_amount?: number | null;
+  remainder_date?: string | null;
+  deposit_transaction_id?: string | null;
 }
 
 interface Props {
@@ -108,19 +112,62 @@ export default function ProjecaoView({
     }
   }
 
-  // 3. Project items com expected_payment_date >= today
-  const projetoEvents: ProjecaoItem[] = projectItems
-    .filter((item) => item.expected_payment_date && item.expected_payment_date >= todayStr)
-    .map((item) => ({
-      id: `proj-${item.id}`,
-      date: item.expected_payment_date!,
-      description: item.name,
-      amount: -(item.actual_amount ?? 0),
-      kind: "projeto" as const,
-    }));
+  // 3. Project items — split por tipo de pagamento
+  const projetoEvents: ProjecaoItem[] = [];
+  const itemsWithoutDate: ProjectItemRef[] = [];
 
-  // Items sem expected_payment_date (seção separada)
-  const itemsWithoutDate = projectItems.filter((item) => !item.expected_payment_date);
+  for (const item of projectItems) {
+    if (item.status === "paid") continue; // já pago totalmente: não projeta
+
+    if (item.payment_type === "deposit_remainder") {
+      const depositPaid = !!item.deposit_transaction_id;
+      const depositVal = item.deposit_amount ?? 0;
+      const totalVal = item.actual_amount ?? 0;
+
+      // Entrada: mostrar apenas se ainda não paga e tem data futura
+      if (!depositPaid && item.expected_payment_date && item.expected_payment_date >= todayStr) {
+        projetoEvents.push({
+          id: `proj-deposit-${item.id}`,
+          date: item.expected_payment_date,
+          description: `${item.name} — Entrada`,
+          amount: -depositVal,
+          kind: "projeto",
+        });
+      }
+
+      // Restante: mostrar se remainder_date >= hoje
+      if (item.remainder_date && item.remainder_date >= todayStr) {
+        projetoEvents.push({
+          id: `proj-remainder-${item.id}`,
+          date: item.remainder_date,
+          description: `${item.name} — Restante`,
+          amount: -(totalVal - depositVal),
+          kind: "projeto",
+        });
+      }
+
+      // Sem nenhuma data futura: vai para seção "sem data"
+      const hasAnyFutureDate =
+        (!depositPaid && item.expected_payment_date && item.expected_payment_date >= todayStr) ||
+        (item.remainder_date && item.remainder_date >= todayStr);
+      if (!hasAnyFutureDate) {
+        itemsWithoutDate.push(item);
+      }
+    } else {
+      // Comportamento atual: evento único na expected_payment_date
+      if (item.expected_payment_date && item.expected_payment_date >= todayStr) {
+        projetoEvents.push({
+          id: `proj-${item.id}`,
+          date: item.expected_payment_date,
+          description: item.name,
+          amount: -(item.actual_amount ?? 0),
+          kind: "projeto",
+        });
+      } else {
+        itemsWithoutDate.push(item);
+      }
+    }
+  }
 
   // Todos os eventos ordenados por data
   const allEvents = [...realEvents, ...projetadosEvents, ...projetoEvents]

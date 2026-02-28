@@ -45,6 +45,8 @@ export default function ItemCard({
 
   const isPaid = item.status === "paid";
   const isCancelled = item.status === "cancelled";
+  const isDepositRemainder = item.payment_type === "deposit_remainder";
+  const depositPaid = !!item.deposit_transaction_id;
 
   async function handlePay() {
     setPaying(true);
@@ -90,6 +92,19 @@ export default function ItemCard({
             </span>
           )}
         </div>
+
+        {/* Row 3: deposit/remainder breakdown for confirmed deposit_remainder items */}
+        {isDepositRemainder && item.status === "confirmed" && item.deposit_amount != null && item.actual_amount != null && (
+          <div className="flex items-center gap-3 mt-0.5">
+            <span className={`text-xs ${depositPaid ? "text-green-600" : "text-gray-500"}`}>
+              Entrada: {formatCurrency(item.deposit_amount)}{depositPaid ? " ✓" : ""}
+            </span>
+            <span className="text-xs text-gray-400">|</span>
+            <span className="text-xs text-gray-500">
+              Restante: {formatCurrency(item.actual_amount - item.deposit_amount)}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Actions */}
@@ -123,13 +138,33 @@ export default function ItemCard({
                   </button>
                 )}
 
-                {item.status === "confirmed" && (
+                {item.status === "confirmed" && !isDepositRemainder && (
                   <button
                     onClick={() => { setMenuOpen(false); handlePay(); }}
                     disabled={paying}
                     className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50 disabled:opacity-60"
                   >
                     {paying ? "Pagando..." : "Pagar"}
+                  </button>
+                )}
+
+                {item.status === "confirmed" && isDepositRemainder && !depositPaid && (
+                  <button
+                    onClick={() => { setMenuOpen(false); handlePay(); }}
+                    disabled={paying}
+                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {paying ? "Pagando..." : "Pagar Entrada"}
+                  </button>
+                )}
+
+                {item.status === "confirmed" && isDepositRemainder && depositPaid && (
+                  <button
+                    onClick={() => { setMenuOpen(false); handlePay(); }}
+                    disabled={paying}
+                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {paying ? "Pagando..." : "Pagar Restante"}
                   </button>
                 )}
 

@@ -68,7 +68,10 @@ export default function ItemModal({
   const [name, setName] = useState(item?.name ?? "");
   const [description, setDescription] = useState(item?.description ?? "");
   const [budgetAmount, setBudgetAmount] = useState(item?.budget_amount != null ? String(item.budget_amount) : "");
-  const [actualAmount, setActualAmount] = useState(item?.actual_amount != null ? String(item.actual_amount) : "");
+  const [actualAmount, setActualAmount] = useState(
+    item?.actual_amount != null ? String(item.actual_amount) :
+    item?.budget_amount != null ? String(item.budget_amount) : ""
+  );
   const [paymentType, setPaymentType] = useState<PaymentType | "">(item?.payment_type ?? "");
   const [paymentOrigin, setPaymentOrigin] = useState<PaymentOrigin>(
     (item?.payment_origin as PaymentOrigin | null) ?? "personal"
@@ -82,12 +85,18 @@ export default function ItemModal({
   const [categoryId, setCategoryId] = useState(item?.category_id ?? "");
   const [notes, setNotes] = useState(item?.notes ?? "");
   const [expectedPaymentDate, setExpectedPaymentDate] = useState(item?.expected_payment_date ?? "");
+  const [confirmDepositAmount, setConfirmDepositAmount] = useState(
+    item?.deposit_amount != null ? String(item.deposit_amount) : ""
+  );
+  const [confirmRemainderDate, setConfirmRemainderDate] = useState(item?.remainder_date ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const depositAmountNum = parseFloat(depositAmount) || 0;
   const actualAmountNum = parseFloat(actualAmount) || 0;
   const remainderPreview = actualAmountNum - depositAmountNum;
+  const confirmDepositAmountNum = parseFloat(confirmDepositAmount) || 0;
+  const confirmRemainderPreview = actualAmountNum - confirmDepositAmountNum;
 
   async function handleSave() {
     if (isConfirm) {
@@ -96,10 +105,19 @@ export default function ItemModal({
         return;
       }
       setSaving(true);
+      const confirmPayload: Record<string, unknown> = {
+        confirmar: true,
+        actual_amount: parseFloat(actualAmount),
+        expected_payment_date: expectedPaymentDate || null,
+      };
+      if (item?.payment_type === "deposit_remainder") {
+        confirmPayload.deposit_amount = parseFloat(confirmDepositAmount) || null;
+        confirmPayload.remainder_date = confirmRemainderDate || null;
+      }
       const res = await fetch(`/api/projetos/itens/${item!.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ confirmar: true, actual_amount: parseFloat(actualAmount), expected_payment_date: expectedPaymentDate || null }),
+        body: JSON.stringify(confirmPayload),
       });
       if (!res.ok) {
         const d = await res.json();
@@ -181,14 +199,16 @@ export default function ItemModal({
       <div className="space-y-4">
         {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
 
-        {/* Confirm mode: only ask for actual_amount */}
+        {/* Confirm mode */}
         {isConfirm ? (
           <>
             <p className="text-sm text-gray-600">
               Confirme o valor real do item <strong>{item?.name}</strong> para finalizar.
             </p>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Valor Real (R$) *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {item?.payment_type === "deposit_remainder" ? "Valor Total Real (R$) *" : "Valor Real (R$) *"}
+              </label>
               <input
                 type="number"
                 value={actualAmount}
@@ -199,19 +219,58 @@ export default function ItemModal({
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Data prevista de pagamento
-              </label>
-              <DatePicker
-                value={expectedPaymentDate}
-                onChange={setExpectedPaymentDate}
-                placeholder="Selecione a data"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Usada na projeção de saldo do investimento.
-              </p>
-            </div>
+
+            {item?.payment_type === "deposit_remainder" ? (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Valor da Entrada (R$) *</label>
+                  <input
+                    type="number"
+                    value={confirmDepositAmount}
+                    onChange={(e) => setConfirmDepositAmount(e.target.value)}
+                    min="0"
+                    step="0.01"
+                    placeholder="0,00"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Data de pagamento da entrada</label>
+                  <DatePicker
+                    value={expectedPaymentDate}
+                    onChange={setExpectedPaymentDate}
+                    placeholder="Selecione a data"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Data de pagamento do restante</label>
+                  <DatePicker
+                    value={confirmRemainderDate}
+                    onChange={setConfirmRemainderDate}
+                    placeholder="Selecione a data"
+                  />
+                </div>
+                {confirmDepositAmountNum > 0 && actualAmountNum > 0 && (
+                  <p className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
+                    Restante: <strong>{formatCurrency(confirmRemainderPreview)}</strong>
+                  </p>
+                )}
+              </>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data prevista de pagamento
+                </label>
+                <DatePicker
+                  value={expectedPaymentDate}
+                  onChange={setExpectedPaymentDate}
+                  placeholder="Selecione a data"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Usada na projeção de saldo do investimento.
+                </p>
+              </div>
+            )}
           </>
         ) : (
           <>

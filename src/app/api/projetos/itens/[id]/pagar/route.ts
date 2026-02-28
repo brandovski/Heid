@@ -166,57 +166,60 @@ export async function POST(
 
     const remainderAmount = item.actual_amount - item.deposit_amount;
 
-    // Insert deposit transaction (paid now)
-    const { data: depositTx, error: depositError } = await supabase
-      .from("transactions")
-      .insert({
-        ...baseTransaction,
-        description: `${item.name} — Sinal`,
-        amount: item.deposit_amount,
-        date: today,
-        status: "paid",
-        paid_at: new Date().toISOString(),
-        notes: item.notes,
-      })
-      .select()
-      .single();
+    if (!item.deposit_transaction_id) {
+      // PASSO 1: Pagar entrada — status permanece "confirmed"
+      const { data: depositTx, error: depositError } = await supabase
+        .from("transactions")
+        .insert({
+          ...baseTransaction,
+          description: `${item.name} — Sinal`,
+          amount: item.deposit_amount,
+          date: today,
+          status: "paid",
+          paid_at: new Date().toISOString(),
+          notes: item.notes,
+        })
+        .select()
+        .single();
 
-    if (depositError) return NextResponse.json({ error: depositError.message }, { status: 500 });
+      if (depositError) return NextResponse.json({ error: depositError.message }, { status: 500 });
 
-    // Insert remainder transaction (pending)
-    const { data: remainderTx, error: remainderError } = await supabase
-      .from("transactions")
-      .insert({
-        ...baseTransaction,
-        description: `${item.name} — Restante`,
-        amount: remainderAmount,
-        date: item.remainder_date,
-        status: "pending",
-        notes: item.notes,
-      })
-      .select()
-      .single();
+      const { error: updateError } = await supabase
+        .from("project_items")
+        .update({ deposit_transaction_id: depositTx.id })
+        .eq("id", params.id);
 
-    if (remainderError) {
-      await supabase.from("transactions").delete().eq("id", depositTx.id);
-      return NextResponse.json({ error: remainderError.message }, { status: 500 });
+      if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+
+      return NextResponse.json({ step: "deposit", deposit_transaction_id: depositTx.id });
+
+    } else {
+      // PASSO 2: Pagar restante — status → "paid"
+      const { data: remainderTx, error: remainderError } = await supabase
+        .from("transactions")
+        .insert({
+          ...baseTransaction,
+          description: `${item.name} — Restante`,
+          amount: remainderAmount,
+          date: today,
+          status: "paid",
+          paid_at: new Date().toISOString(),
+          notes: item.notes,
+        })
+        .select()
+        .single();
+
+      if (remainderError) return NextResponse.json({ error: remainderError.message }, { status: 500 });
+
+      const { error: updateError } = await supabase
+        .from("project_items")
+        .update({ status: "paid", remainder_transaction_id: remainderTx.id })
+        .eq("id", params.id);
+
+      if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+
+      return NextResponse.json({ step: "remainder" });
     }
-
-    const { error: updateError } = await supabase
-      .from("project_items")
-      .update({
-        status: "paid",
-        deposit_transaction_id: depositTx.id,
-        remainder_transaction_id: remainderTx.id,
-      })
-      .eq("id", params.id);
-
-    if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
-
-    return NextResponse.json({
-      deposit_transaction_id: depositTx.id,
-      remainder_transaction_id: remainderTx.id,
-    });
   } else if (item.payment_origin === "investment") {
     if (!item.investment_id) {
       return NextResponse.json({ error: "Investimento não vinculado ao item" }, { status: 400 });
