@@ -9,11 +9,12 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Fase 11 — Fluxo Futuro v2 (revisão concluída)
-**Última sessão:** Sessão 021 — 2026-02-27
-**Próxima ação:** Iniciar Fase 12
+**Fase:** Sessão 022 — melhorias em Projetos + Investimentos
+**Última sessão:** Sessão 022 — 2026-02-27
+**Próxima ação:** Continuar Fase 12 ou próximas melhorias
 
 ### O que está feito
+- [x] Sessão 022 — `expected_payment_date` em Projetos + ProjecaoView em Investimentos: ItemModal (modo confirm) agora exibe DatePicker opcional "Data prevista de pagamento" e envia `expected_payment_date` ao PATCH; API `/api/projetos/itens/[id]` atualizada para salvar a data na confirmação; FluxoProjecao removido e substituído por ProjecaoView (orquestrador) + ProjecaoTimeline + ProjecaoCalendario — seção unificada com navegação por mês, saldo acumulado por dia, aportes reais futuros, aportes mensais projetados (sem auto_generated), project_items com data, e seção inferior para itens sem data prevista; InvestimentoDetalhe usa ProjecaoView sempre (sem condicional). Zero erros TypeScript.
 - [x] Fase 11 v2 — Revisão Fluxo Futuro (Sessão 021): FluxoWidget no Dashboard (4 próximas movimentações + link /fluxo); FluxoProjecao em Investimentos (tabela 12 meses); `/fluxo` expandido para 9 queries (+ fixed_incomes, fixed_expenses, credit_cards, partner profile); FluxoView v2 com agrupamento de fatura por cartão, projeção de fixas não-geradas (kind="fixed_projected"), escopo parceiro com nomes reais (sem "Familiar"/"Tudo"); FluxoTimeline e FluxoCalendario atualizados para kind="fatura" (ícone CreditCard, badge "fatura", "vence dia DD") e kind="fixed_projected" (badge "fixo · previsto", bg-blue-50/50); Navbar mobile: Fluxo → Orçamento restaurado. Zero erros TypeScript.
 - [x] Fase 11 — Fluxo Futuro completo (Sessão 020): tela `/fluxo` com linha do tempo financeira mensal; Server Component com 5 queries em Promise.all (transações pagas, pendentes, investimentos ativos, investment_transactions auto_generated, project_items confirmados); FluxoView Client Component com tabs de escopo (Pessoal/Familiar/Tudo), navegação de mês, cálculo de saldo projetado acumulado por dia e toggle de layout; FluxoTimeline (lista agrupada por dia com saldo projetado no cabeçalho, ícones, badges, destaque para itens projetados); FluxoCalendario (grid 6×7 com dots coloridos por tipo, painel de detalhe ao clicar no dia); Navbar mobile: Orçamento → Fluxo; Navbar desktop: Fluxo adicionado após Investimentos. Zero erros TypeScript.
 - [x] Fase 10 — Investimentos completo (Sessão 018): migration 018 aplicada (`investment_id` em `transactions`, policy `scoped_select` recriada); CRUD de investimentos (GET/POST/PATCH); aportes/resgates manuais com transaction vinculada; snapshots de saldo (append-only); página lista com tabs Ativos/Arquivados; página detalhe com stats, gráfico Recharts, movimentações; GraficoEvolucao LineChart; cron `generate-monthly` estendido com aportes automáticos (idempotente); integração Projetos: `payment_origin='investment'` no ItemModal, `investment_id` nos itens, fluxo pagar cria withdrawal no investimento sem lançar no extrato; link Investimentos na Navbar desktop com ícone TrendingUp.

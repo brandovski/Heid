@@ -9,7 +9,7 @@ import TransacaoModal from "./TransacaoModal";
 import SnapshotModal from "./SnapshotModal";
 import GraficoEvolucao from "./GraficoEvolucao";
 import type { Investment, InvestmentTransaction, InvestmentSnapshot } from "../../_components/types";
-import FluxoProjecao from "./FluxoProjecao";
+import ProjecaoView from "./ProjecaoView";
 import {
   INVESTMENT_TYPE_LABELS,
   formatCurrency,
@@ -61,8 +61,6 @@ export default function InvestimentoDetalhe({
     saldoAtual != null && investment.goal_amount
       ? (saldoAtual / investment.goal_amount) * 100
       : null;
-  const comprometido = projectItems.reduce((s, i) => s + (i.actual_amount ?? 0), 0);
-
   async function reloadData() {
     const [txRes, snapRes] = await Promise.all([
       fetch(`/api/investimentos/${investment.id}/transacoes`).catch(() => null),
@@ -250,45 +248,14 @@ export default function InvestimentoDetalhe({
         )}
       </div>
 
-      {/* Comprometido com Projetos */}
-      {projectItems.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">
-            Comprometido com Projetos
-            <span className="ml-2 text-xs font-normal text-gray-400">
-              {formatCurrency(comprometido)} total
-            </span>
-          </h2>
-          <div className="divide-y divide-gray-100">
-            {projectItems.map((item) => (
-              <div key={item.id} className="flex items-center justify-between py-2.5">
-                <p className="text-sm text-gray-800">{item.name}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    {item.actual_amount != null ? formatCurrency(item.actual_amount) : "—"}
-                  </span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                    item.status === "paid"
-                      ? "bg-green-50 text-green-700"
-                      : "bg-blue-50 text-blue-700"
-                  }`}>
-                    {item.status === "paid" ? "Pago" : "Confirmado"}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Projeção de Saldo */}
-      {investment.monthly_contribution_amount != null && saldoAtual != null && (
-        <FluxoProjecao
-          saldoAtual={saldoAtual}
-          monthlyContribution={investment.monthly_contribution_amount}
-          projectItems={projectItems}
-        />
-      )}
+      <ProjecaoView
+        saldoAtual={saldoAtual ?? 0}
+        monthlyContributionAmount={investment.monthly_contribution_amount}
+        monthlyContributionDay={investment.monthly_contribution_day}
+        investmentTransactions={transactions}
+        projectItems={projectItems}
+      />
 
       {/* Modals */}
       {modal.type === "edit" && (

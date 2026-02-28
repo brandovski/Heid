@@ -15,13 +15,17 @@ export async function PATCH(
 
   // Special case: confirming item (status → confirmed with actual_amount)
   if (body.confirmar) {
-    const { actual_amount } = body;
+    const { actual_amount, expected_payment_date } = body;
     if (!actual_amount || parseFloat(actual_amount) <= 0) {
       return NextResponse.json({ error: "Valor real é obrigatório para confirmar" }, { status: 400 });
     }
     const { data, error } = await supabase
       .from("project_items")
-      .update({ status: "confirmed", actual_amount: parseFloat(actual_amount) })
+      .update({
+        status: "confirmed",
+        actual_amount: parseFloat(actual_amount),
+        expected_payment_date: expected_payment_date ?? null,
+      })
       .eq("id", params.id)
       .eq("status", "considering")
       .select()

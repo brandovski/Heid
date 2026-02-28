@@ -81,6 +81,7 @@ export default function ItemModal({
   const [remainderDate, setRemainderDate] = useState(item?.remainder_date ?? "");
   const [categoryId, setCategoryId] = useState(item?.category_id ?? "");
   const [notes, setNotes] = useState(item?.notes ?? "");
+  const [expectedPaymentDate, setExpectedPaymentDate] = useState(item?.expected_payment_date ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -98,7 +99,7 @@ export default function ItemModal({
       const res = await fetch(`/api/projetos/itens/${item!.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ confirmar: true, actual_amount: parseFloat(actualAmount) }),
+        body: JSON.stringify({ confirmar: true, actual_amount: parseFloat(actualAmount), expected_payment_date: expectedPaymentDate || null }),
       });
       if (!res.ok) {
         const d = await res.json();
@@ -197,6 +198,19 @@ export default function ItemModal({
                 placeholder="0,00"
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Data prevista de pagamento
+              </label>
+              <DatePicker
+                value={expectedPaymentDate}
+                onChange={setExpectedPaymentDate}
+                placeholder="Selecione a data"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Usada na projeção de saldo do investimento.
+              </p>
             </div>
           </>
         ) : (
