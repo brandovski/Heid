@@ -6,13 +6,11 @@ import ItemCard from "./ItemCard";
 import type { ProjectGroupWithItems, ProjectItemWithRelations, ProjectGroup, ProjectItem } from "../../_components/types";
 import { formatCurrency } from "../../_components/types";
 
-interface Category { id: string; name: string; }
 interface CreditCard { id: string; name: string; brand: string; }
 
 interface Props {
   group: ProjectGroupWithItems;
   groups: ProjectGroup[];
-  categories: Category[];
   creditCards: CreditCard[];
   projectId: string;
   onEditGroup: (g: ProjectGroup) => void;
@@ -22,12 +20,12 @@ interface Props {
   onConfirmItem: (item: ProjectItemWithRelations) => void;
   onPayItem: (item: ProjectItemWithRelations) => Promise<void>;
   onCancelItem: (id: string) => void;
+  onDeleteItem: (id: string) => void;
 }
 
 export default function GrupoSection({
   group,
   groups,
-  categories,
   creditCards,
   projectId,
   onEditGroup,
@@ -37,6 +35,7 @@ export default function GrupoSection({
   onConfirmItem,
   onPayItem,
   onCancelItem,
+  onDeleteItem,
 }: Props) {
   const [expanded, setExpanded] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -116,13 +115,13 @@ export default function GrupoSection({
                   key={item.id}
                   item={item}
                   groups={groups}
-                  categories={categories}
                   creditCards={creditCards}
                   projectId={projectId}
                   onEdit={onEditItem}
                   onConfirm={onConfirmItem}
                   onPay={onPayItem}
                   onCancel={onCancelItem}
+                  onDelete={onDeleteItem}
                 />
               ))}
             </div>

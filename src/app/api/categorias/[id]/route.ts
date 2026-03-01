@@ -11,6 +11,17 @@ export async function PATCH(
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Verificar se é categoria de sistema (imutável)
+  const { data: categoria } = await supabase
+    .from("categories")
+    .select("is_system")
+    .eq("id", params.id)
+    .single();
+
+  if (categoria?.is_system) {
+    return NextResponse.json({ error: "Categorias de sistema não podem ser alteradas" }, { status: 403 });
+  }
+
   const body = await req.json();
   const updates: Record<string, unknown> = {};
 

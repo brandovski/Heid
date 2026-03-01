@@ -20,13 +20,11 @@ import {
 } from "../../_components/types";
 import type { Investment } from "@/app/(app)/investimentos/_components/types";
 
-interface Category { id: string; name: string; }
 interface CreditCard { id: string; name: string; brand: string; color: string | null; }
 
 interface Props {
   project: Project;
   groups: ProjectGroupWithItems[];
-  categories: Category[];
   creditCards: CreditCard[];
   eligibleInvestments: Investment[];
 }
@@ -40,7 +38,6 @@ type ModalState =
 export default function ProjetoDetalhe({
   project: initialProject,
   groups: initialGroups,
-  categories,
   creditCards,
   eligibleInvestments,
 }: Props) {
@@ -131,6 +128,18 @@ export default function ProjetoDetalhe({
         prev.map((g) => ({
           ...g,
           items: g.items.map((i) => i.id === id ? { ...i, status: updated.status } : i),
+        }))
+      );
+    }
+  }
+
+  async function handleDeleteItem(id: string) {
+    const res = await fetch(`/api/projetos/itens/${id}?permanent=true`, { method: "DELETE" });
+    if (res.ok) {
+      setGroups((prev) =>
+        prev.map((g) => ({
+          ...g,
+          items: g.items.filter((i) => i.id !== id),
         }))
       );
     }
@@ -250,7 +259,6 @@ export default function ProjetoDetalhe({
               key={group.id}
               group={group}
               groups={plainGroups}
-              categories={categories}
               creditCards={creditCards}
               projectId={project.id}
               onEditGroup={(g) => setModal({ type: "grupo", group: g })}
@@ -260,6 +268,7 @@ export default function ProjetoDetalhe({
               onConfirmItem={(item) => setModal({ type: "item", item, mode: "confirm" })}
               onPayItem={handlePayItem}
               onCancelItem={handleCancelItem}
+              onDeleteItem={handleDeleteItem}
             />
           ))
         )}
@@ -287,7 +296,6 @@ export default function ProjetoDetalhe({
         <ItemModal
           projectId={project.id}
           groups={plainGroups}
-          categories={categories}
           creditCards={creditCards}
           eligibleInvestments={eligibleInvestments}
           item={modal.item}

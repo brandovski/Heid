@@ -14,15 +14,9 @@ interface CreditCard {
   brand: string;
 }
 
-interface Category {
-  id: string;
-  name: string;
-}
-
 interface Props {
   projectId: string;
   groups: ProjectGroup[];
-  categories: Category[];
   creditCards: CreditCard[];
   eligibleInvestments: Investment[];
   item?: ProjectItemWithRelations;
@@ -52,7 +46,6 @@ const CASH_METHODS: { value: CashMethod; label: string }[] = [
 export default function ItemModal({
   projectId,
   groups,
-  categories,
   creditCards,
   eligibleInvestments,
   item,
@@ -82,7 +75,6 @@ export default function ItemModal({
   const [installmentsCount, setInstallmentsCount] = useState(item?.installments_count ? String(item.installments_count) : "2");
   const [depositAmount, setDepositAmount] = useState(item?.deposit_amount != null ? String(item.deposit_amount) : "");
   const [remainderDate, setRemainderDate] = useState(item?.remainder_date ?? "");
-  const [categoryId, setCategoryId] = useState(item?.category_id ?? "");
   const [notes, setNotes] = useState(item?.notes ?? "");
   const [expectedPaymentDate, setExpectedPaymentDate] = useState(item?.expected_payment_date ?? "");
   const [confirmDepositAmount, setConfirmDepositAmount] = useState(
@@ -155,7 +147,6 @@ export default function ItemModal({
       installments_count: paymentType === "card_installment" ? parseInt(installmentsCount) : null,
       deposit_amount: paymentType === "deposit_remainder" ? parseFloat(depositAmount) || null : null,
       remainder_date: paymentType === "deposit_remainder" ? remainderDate || null : null,
-      category_id: categoryId || null,
       notes: notes || null,
     };
 
@@ -324,23 +315,6 @@ export default function ItemModal({
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
-
-            {/* Category */}
-            {categories.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-                <select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                >
-                  <option value="">Sem categoria</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
 
             {/* Payment type */}
             <div>

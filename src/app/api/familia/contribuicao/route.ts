@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { getSystemCategoryId } from "@/lib/supabase/system-categories";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -29,6 +30,8 @@ export async function POST(request: Request) {
 
   const dateToUse = date ?? new Date().toISOString().split("T")[0];
 
+  const systemCategoryId = await getSystemCategoryId(supabase, profile.family_id, "Caixa Familiar");
+
   // 1. Cria despesa pessoal (dinheiro sai da conta do usuário)
   const { data: tx, error: txError } = await supabase
     .from("transactions")
@@ -39,6 +42,7 @@ export async function POST(request: Request) {
       date: dateToUse,
       type: "expense",
       status: "paid",
+      category_id: systemCategoryId,
       scope: "personal",
       user_id: user.id,
       auto_generated: false,

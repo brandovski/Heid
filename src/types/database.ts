@@ -26,6 +26,7 @@ export interface Category {
   icon: string | null;
   color: string | null;
   is_active: boolean;
+  is_system: boolean;
   created_at: string;
 }
 

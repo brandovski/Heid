@@ -19,7 +19,6 @@ export default async function ProjetoDetalhePage({
     { data: project },
     { data: groups },
     { data: items },
-    { data: categories },
     { data: creditCards },
     { data: eligibleInvestments },
   ] = await Promise.all([
@@ -35,7 +34,6 @@ export default async function ProjetoDetalhePage({
       .select("*, credit_card:credit_cards(id, name, brand, color)")
       .eq("project_id", params.id)
       .order("created_at", { ascending: true }),
-    supabase.from("categories").select("id, name").eq("is_active", true).order("name"),
     supabase.from("credit_cards").select("id, name, brand, color").eq("is_active", true).order("name"),
     supabase
       .from("investments")
@@ -59,7 +57,6 @@ export default async function ProjetoDetalhePage({
       <ProjetoDetalhe
         project={project as Project}
         groups={groupsWithItems}
-        categories={categories ?? []}
         creditCards={creditCards ?? []}
         eligibleInvestments={(eligibleInvestments ?? []) as Investment[]}
       />

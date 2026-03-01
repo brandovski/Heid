@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { getSystemCategoryId } from "@/lib/supabase/system-categories";
 
 // Retorna YYYY-MM-DD com clamping para o último dia do mês.
 // month é 1-indexed (1–12).
@@ -243,6 +244,8 @@ export async function GET(req: NextRequest) {
       for (const inv of toProcess) {
         const txDate = dateStr(year, month, inv.monthly_contribution_day ?? 1);
 
+        const investimentoCategoryId = await getSystemCategoryId(supabase, inv.family_id, "Investimento");
+
         // Insert financial transaction
         const { data: tx, error: txErr } = await supabase
           .from("transactions")
@@ -254,6 +257,7 @@ export async function GET(req: NextRequest) {
             type: "investment_deposit" as const,
             status: "paid" as const,
             paid_at: new Date().toISOString(),
+            category_id: investimentoCategoryId,
             scope: inv.scope,
             user_id: inv.user_id,
             is_shared: false,

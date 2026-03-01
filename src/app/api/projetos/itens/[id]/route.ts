@@ -52,7 +52,6 @@ export async function PATCH(
     installments_count,
     deposit_amount,
     remainder_date,
-    category_id,
     notes,
     investment_id,
   } = body;
@@ -69,7 +68,6 @@ export async function PATCH(
   if (installments_count !== undefined) updates.installments_count = installments_count ?? null;
   if (deposit_amount !== undefined) updates.deposit_amount = deposit_amount != null ? parseFloat(deposit_amount) : null;
   if (remainder_date !== undefined) updates.remainder_date = remainder_date ?? null;
-  if (category_id !== undefined) updates.category_id = category_id ?? null;
   if (notes !== undefined) updates.notes = notes?.trim() ?? null;
   if (investment_id !== undefined) updates.investment_id = investment_id ?? null;
 
@@ -90,7 +88,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const supabase = await createClient();
@@ -98,6 +96,34 @@ export async function DELETE(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const isPermanent = new URL(req.url).searchParams.get("permanent") === "true";
+
+  if (isPermanent) {
+    // Hard delete — só permite para itens já cancelados
+    const { data: item } = await supabase
+      .from("project_items")
+      .select("status")
+      .eq("id", params.id)
+      .single();
+
+    if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    if (item.status !== "cancelled") {
+      return NextResponse.json(
+        { error: "Apenas itens cancelados podem ser excluídos permanentemente" },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabase
+      .from("project_items")
+      .delete()
+      .eq("id", params.id);
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ deleted: true });
+  }
 
   // Soft-cancel: status → cancelled
   const { data, error } = await supabase

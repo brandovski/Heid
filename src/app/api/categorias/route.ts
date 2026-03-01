@@ -19,6 +19,7 @@ export async function GET(_req: NextRequest) {
     .select("id, name, icon")
     .eq("family_id", profile.family_id)
     .eq("is_active", true)
+    .eq("is_system", false)
     .order("name");
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

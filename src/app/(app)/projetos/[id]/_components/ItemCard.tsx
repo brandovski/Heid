@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, MoreHorizontal } from "lucide-react";
+import { Check, MoreHorizontal, Trash2 } from "lucide-react";
 import type { ProjectItemWithRelations, ProjectItem, ProjectGroup } from "../../_components/types";
 import {
   formatCurrency,
@@ -9,11 +9,6 @@ import {
   ITEM_STATUS_COLORS,
   PAYMENT_TYPE_LABELS,
 } from "../../_components/types";
-
-interface Category {
-  id: string;
-  name: string;
-}
 
 interface CreditCard {
   id: string;
@@ -24,13 +19,13 @@ interface CreditCard {
 interface Props {
   item: ProjectItemWithRelations;
   groups: ProjectGroup[];
-  categories: Category[];
   creditCards: CreditCard[];
   projectId: string;
   onEdit: (item: ProjectItemWithRelations) => void;
   onConfirm: (item: ProjectItemWithRelations) => void;
   onPay: (item: ProjectItemWithRelations) => void;
   onCancel: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function ItemCard({
@@ -39,6 +34,7 @@ export default function ItemCard({
   onConfirm,
   onPay,
   onCancel,
+  onDelete,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -108,6 +104,17 @@ export default function ItemCard({
       </div>
 
       {/* Actions */}
+      {isCancelled && (
+        <button
+          type="button"
+          onClick={() => onDelete(item.id)}
+          className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+          title="Excluir item permanentemente"
+        >
+          <Trash2 size={14} />
+        </button>
+      )}
+
       {!isCancelled && !isPaid && (
         <div className="relative">
           <button

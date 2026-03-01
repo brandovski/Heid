@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
     installments_count,
     deposit_amount,
     remainder_date,
-    category_id,
     notes,
     investment_id,
   } = await req.json();
@@ -47,7 +46,6 @@ export async function POST(req: NextRequest) {
       installments_count: installments_count ?? null,
       deposit_amount: deposit_amount != null ? parseFloat(deposit_amount) : null,
       remainder_date: remainder_date ?? null,
-      category_id: category_id ?? null,
       notes: notes?.trim() ?? null,
       investment_id: investment_id ?? null,
       status: "considering",

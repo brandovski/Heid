@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getSystemCategoryId } from "@/lib/supabase/system-categories";
 
 export async function POST(
   req: NextRequest,
@@ -47,6 +48,8 @@ export async function POST(
   const txType = type === "deposit" ? "investment_deposit" : "investment_withdrawal";
   const amountNum = parseFloat(amount);
 
+  const systemCategoryId = await getSystemCategoryId(supabase, profile.family_id, "Investimento");
+
   // 1. Create financial transaction
   const { data: tx, error: txError } = await supabase
     .from("transactions")
@@ -58,6 +61,7 @@ export async function POST(
       type: txType,
       status: "paid",
       paid_at: new Date().toISOString(),
+      category_id: systemCategoryId,
       scope: investment.scope,
       user_id: investment.user_id,
       is_shared: false,

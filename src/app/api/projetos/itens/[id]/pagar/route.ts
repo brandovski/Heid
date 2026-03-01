@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getSystemCategoryId } from "@/lib/supabase/system-categories";
 
 function addMonths(dateStr: string, months: number): string {
   const [year, month, day] = dateStr.split("-").map(Number);
@@ -56,10 +57,13 @@ export async function POST(
   const txScope = item.payment_origin === "family" ? "family" : "personal";
   const txUserId = item.payment_origin === "family" ? null : (item.payment_user_id ?? user.id);
 
+  // Usar categoria de sistema "Projeto" para todas as transações de projeto
+  const systemCategoryId = await getSystemCategoryId(supabase, profile.family_id, "Projeto");
+
   const baseTransaction = {
     family_id: profile.family_id,
     type: "expense" as const,
-    category_id: item.category_id,
+    category_id: systemCategoryId,
     scope: txScope,
     user_id: txUserId,
     is_shared: false,
