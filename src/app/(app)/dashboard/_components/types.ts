@@ -1,5 +1,13 @@
 export type EscopoType = "personal" | "parceiro";
 
+// ── Investment utils re-exports ─────────────────────────────────────────────────
+export type {
+  InvestmentContributionRow,
+  InvTransactionRow,
+  AporteCardData,
+} from "@/lib/investment-utils";
+export { computeAporteCards } from "@/lib/investment-utils";
+
 export interface TransactionRow {
   id: string;
   description: string;
@@ -221,4 +229,46 @@ export function shiftMonth(month: string, delta: number): string {
 
 export function last6Months(currentMonth: string): string[] {
   return Array.from({ length: 6 }, (_, i) => shiftMonth(currentMonth, i - 5));
+}
+
+export function lastNMonths(n: number, currentMonth: string): string[] {
+  return Array.from({ length: n }, (_, i) => shiftMonth(currentMonth, i - (n - 1)));
+}
+
+export function lastNDays(n: number): string[] {
+  const ref = new Date();
+  ref.setHours(0, 0, 0, 0);
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date(ref);
+    d.setDate(d.getDate() - (n - 1 - i));
+    return d.toISOString().split("T")[0];
+  });
+}
+
+export function daysInMonth(month: string): string[] {
+  const [y, m] = month.split("-").map(Number);
+  const count = new Date(y, m, 0).getDate();
+  return Array.from({ length: count }, (_, i) =>
+    `${month}-${String(i + 1).padStart(2, "0")}`
+  );
+}
+
+export function computeDailyTotals(
+  transactions: HistoricalTxRow[],
+  days: string[]
+): MonthlyTotal[] {
+  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  return days.map((day) => {
+    const [y, mo, d] = day.split("-").map(Number);
+    const date = new Date(y, mo - 1, d);
+    const label = `${weekDays[date.getDay()]} ${String(d).padStart(2, "0")}`;
+    const txs = transactions.filter((t) => t.date === day && t.status !== "cancelled");
+    const receitas = txs
+      .filter((t) => INCOME_TYPES.includes(t.type))
+      .reduce((s, t) => s + t.amount, 0);
+    const despesas = txs
+      .filter((t) => EXPENSE_TYPES.includes(t.type))
+      .reduce((s, t) => s + t.amount, 0);
+    return { Mês: label, Receitas: receitas, Despesas: despesas };
+  });
 }

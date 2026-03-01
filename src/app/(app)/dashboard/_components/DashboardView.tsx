@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import ProgressBar from "@/components/ui/ProgressBar";
+import ConfirmarAporteModal from "@/components/ui/ConfirmarAporteModal";
 import GraficoEvolucao from "./GraficoEvolucao";
 import GraficoCategoria from "./GraficoCategoria";
 import FaturaModal from "./FaturaModal";
@@ -16,18 +17,26 @@ import {
   BudgetRow,
   CreditCardRow,
   InvoicePaymentRow,
-  UpcomingRow,
+  InvestmentContributionRow,
+  InvTransactionRow,
+  AporteCardData,
+  MonthlyTotal,
   computeSummary,
   computeMonthlyTotals,
+  computeDailyTotals,
   computeCategoryDistribution,
   computeBudgetStats,
   computeInvoiceCards,
+  computeAporteCards,
   formatCurrency,
   formatMonth,
   formatDate,
   shiftMonth,
-  last6Months,
+  lastNMonths,
+  lastNDays,
+  daysInMonth,
 } from "./types";
+import { INVESTMENT_TYPE_LABELS } from "@/app/(app)/investimentos/_components/types";
 
 interface Props {
   currentMonth: string;
@@ -39,7 +48,9 @@ interface Props {
   budgets: BudgetRow[];
   creditCards: CreditCardRow[];
   invoicePayments: InvoicePaymentRow[];
-  upcoming: UpcomingRow[];
+  investments: InvestmentContributionRow[];
+  invTransactions: InvTransactionRow[];
+  currentUserId: string;
 }
 
 export default function DashboardView({
@@ -52,21 +63,36 @@ export default function DashboardView({
   budgets,
   creditCards,
   invoicePayments,
-  upcoming,
+  investments,
+  invTransactions,
+  currentUserId,
 }: Props) {
   const router = useRouter();
   const [selectedInvoice, setSelectedInvoice] = useState<{
     card: CreditCardRow;
     monthTotal: number;
   } | null>(null);
+  const [selectedAporte, setSelectedAporte] = useState<AporteCardData | null>(null);
+
+  type ChartRange = "semana" | "mes" | "3m" | "6m" | "12m";
+  const [chartRange, setChartRange] = useState<ChartRange>("6m");
 
   // ── Cálculos ──────────────────────────────────────────────────────────────────
   const summary = computeSummary(transactions);
-  const months = last6Months(currentMonth);
-  const monthlyTotals = computeMonthlyTotals(historicalTransactions, months);
+
+  let chartData: MonthlyTotal[];
+  switch (chartRange) {
+    case "semana": chartData = computeDailyTotals(historicalTransactions, lastNDays(7)); break;
+    case "mes":    chartData = computeDailyTotals(historicalTransactions, daysInMonth(currentMonth)); break;
+    case "3m":     chartData = computeMonthlyTotals(historicalTransactions, lastNMonths(3, currentMonth)); break;
+    case "12m":    chartData = computeMonthlyTotals(historicalTransactions, lastNMonths(12, currentMonth)); break;
+    default:       chartData = computeMonthlyTotals(historicalTransactions, lastNMonths(6, currentMonth));
+  }
+
   const categoryDistribution = computeCategoryDistribution(transactions);
   const budgetsWithStats = computeBudgetStats(budgets, transactions);
   const invoiceCards = computeInvoiceCards(creditCards, transactions, invoicePayments);
+  const aporteCards = computeAporteCards(investments, invTransactions, currentMonth, currentUserId);
 
   // ── Navegação ─────────────────────────────────────────────────────────────────
   function navigate(delta: number) {
@@ -80,15 +106,11 @@ export default function DashboardView({
 
   // ── Cards de resumo ───────────────────────────────────────────────────────────
   const summaryCards = [
-    { label: "Receitas", value: summary.income, color: "text-green-600" },
-    { label: "Despesas", value: summary.expense, color: "text-red-600" },
-    {
-      label: "Saldo",
-      value: summary.balance,
-      color: summary.balance >= 0 ? "text-brand-600" : "text-red-600",
-    },
-    { label: "A receber", value: summary.pendingIncome, color: "text-amber-600" },
-    { label: "A pagar", value: summary.pendingExpense, color: "text-orange-600" },
+    { label: "Receitas", value: summary.income, color: "text-green-600", wide: false },
+    { label: "Despesas", value: summary.expense, color: "text-red-600", wide: false },
+    { label: "A receber", value: summary.pendingIncome, color: "text-amber-600", wide: false },
+    { label: "A pagar", value: summary.pendingExpense, color: "text-orange-600", wide: false },
+    { label: "Saldo", value: summary.balance, color: summary.balance >= 0 ? "text-brand-600" : "text-red-600", wide: true },
   ];
 
   return (
@@ -148,8 +170,8 @@ export default function DashboardView({
 
       {/* ── Cards de Resumo ── */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        {summaryCards.map(({ label, value, color }) => (
-          <div key={label} className="bg-white rounded-xl border border-gray-100 p-4">
+        {summaryCards.map(({ label, value, color, wide }) => (
+          <div key={label} className={`bg-white rounded-xl border border-gray-100 p-4 ${wide ? "col-span-2 sm:col-span-1" : ""}`}>
             <p className="text-xs text-gray-400 mb-1">{label}</p>
             <p className={`text-sm font-bold ${color}`}>{formatCurrency(value)}</p>
           </div>
@@ -167,7 +189,7 @@ export default function DashboardView({
       {/* ── Charts ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-        {/* Evolução — últimos 6 meses */}
+        {/* Evolução */}
         <div className="lg:col-span-3 bg-white rounded-xl border border-gray-100 p-5">
           <div className="flex items-center gap-4 mb-5">
             <div className="flex items-center gap-1.5">
@@ -178,11 +200,19 @@ export default function DashboardView({
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
               <span className="text-xs text-gray-500">Despesas</span>
             </div>
-            <h2 className="text-sm font-semibold text-gray-700 ml-auto">
-              Últimos 6 meses
-            </h2>
+            <select
+              value={chartRange}
+              onChange={(e) => setChartRange(e.target.value as ChartRange)}
+              className="text-xs font-medium text-gray-600 border-0 bg-transparent cursor-pointer focus:outline-none ml-auto"
+            >
+              <option value="semana">Essa semana</option>
+              <option value="mes">Esse mês</option>
+              <option value="3m">Últimos 3 meses</option>
+              <option value="6m">Últimos 6 meses</option>
+              <option value="12m">Últimos 12 meses</option>
+            </select>
           </div>
-          <GraficoEvolucao data={monthlyTotals} />
+          <GraficoEvolucao data={chartData} />
         </div>
 
         {/* Despesas por categoria */}
@@ -266,13 +296,35 @@ export default function DashboardView({
 
       {/* ── Faturas ── */}
       {invoiceCards.length > 0 && (
-        <div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">Faturas</h2>
+        <div className="bg-white rounded-xl border border-gray-100 p-5">
+          <h2 className="text-sm font-semibold text-gray-700 mb-4">Faturas</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {invoiceCards.map(({ card, monthTotal, payment }) => (
+            {invoiceCards.map(({ card, monthTotal, payment }) => {
+              const [cy, cm] = currentMonth.split("-").map(Number);
+              const dueDate = new Date(cy, cm - 1, card.due_day);
+              const todayMidnight = new Date();
+              todayMidnight.setHours(0, 0, 0, 0);
+              const daysUntilDue = Math.ceil(
+                (dueDate.getTime() - todayMidnight.getTime()) / (1000 * 60 * 60 * 24)
+              );
+
+              let venceClass = "text-gray-400";
+              let venceLabel = `Vence dia ${card.due_day}`;
+
+              if (!payment) {
+                if (daysUntilDue < 0) {
+                  venceClass = "text-red-500";
+                  venceLabel = `Venceu dia ${card.due_day}`;
+                } else if (daysUntilDue <= 3) {
+                  venceClass = "text-amber-500";
+                  venceLabel = `Vence em ${daysUntilDue}d`;
+                }
+              }
+
+              return (
               <div
                 key={card.id}
-                className="bg-white rounded-xl border border-gray-100 p-4 space-y-3"
+                className="bg-gray-50 rounded-xl border border-gray-100 p-4 space-y-3"
               >
                 {/* Nome do cartão */}
                 <div className="flex items-center gap-2">
@@ -283,6 +335,12 @@ export default function DashboardView({
                   <span className="text-sm font-medium text-gray-900 truncate">
                     {card.name}
                   </span>
+                </div>
+
+                {/* Vencimento */}
+                <div className={`flex items-center gap-1 text-xs ${venceClass}`}>
+                  <Calendar size={11} />
+                  <span>{venceLabel}</span>
                 </div>
 
                 {/* Total do mês */}
@@ -312,62 +370,35 @@ export default function DashboardView({
                   </button>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* ── Próximos Lançamentos ── */}
-      <div className="bg-white rounded-xl border border-gray-100 p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-gray-700">
-            Próximos lançamentos
-          </h2>
-          <Link
-            href={`/transacoes?mes=${currentMonth}`}
-            className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1"
-          >
-            Ver tudo <ExternalLink size={12} />
-          </Link>
-        </div>
-        {upcoming.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-4">
-            Nenhum lançamento pendente
-          </p>
-        ) : (
-          <div className="divide-y divide-gray-50">
-            {upcoming.map((t) => {
-              const isIncome = ["income", "fixed_income"].includes(t.type);
-              return (
-                <div
-                  key={t.id}
-                  className="flex items-center justify-between py-3 gap-3"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    {t.category?.icon && (
-                      <span className="text-lg shrink-0">{t.category.icon}</span>
-                    )}
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">
-                        {t.description}
-                      </p>
-                      <p className="text-xs text-gray-400">{formatDate(t.date)}</p>
-                    </div>
-                  </div>
-                  <span
-                    className={`text-sm font-semibold shrink-0 ${
-                      isIncome ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {isIncome ? "+" : "-"}
-                    {formatCurrency(t.amount)}
-                  </span>
-                </div>
-              );
-            })}
+      {/* ── Aportes do Mês ── */}
+      {aporteCards.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-100 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-gray-700">Aportes do Mês</h2>
+            <Link
+              href="/investimentos"
+              className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1"
+            >
+              Ver todos <ExternalLink size={12} />
+            </Link>
           </div>
-        )}
-      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {aporteCards.map((card) => (
+              <AporteCard
+                key={`${card.investment.id}`}
+                card={card}
+                onConfirm={() => setSelectedAporte(card)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Modal de fatura ── */}
       {selectedInvoice && (
@@ -378,6 +409,68 @@ export default function DashboardView({
           referenceMonth={currentMonth}
           defaultAmount={selectedInvoice.monthTotal}
         />
+      )}
+
+      {/* ── Modal de confirmação de aporte ── */}
+      {selectedAporte && (
+        <ConfirmarAporteModal
+          isOpen
+          onClose={() => setSelectedAporte(null)}
+          onSaved={() => { setSelectedAporte(null); router.refresh(); }}
+          investment={selectedAporte.investment}
+          expectedAmount={selectedAporte.expectedAmount}
+          scheduledDay={selectedAporte.scheduledDay}
+          currentMonth={currentMonth}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── AporteCard (inline) ────────────────────────────────────────────────────────
+
+function AporteCard({ card, onConfirm }: { card: AporteCardData; onConfirm: () => void }) {
+  const typeLabel = INVESTMENT_TYPE_LABELS[card.investment.type as keyof typeof INVESTMENT_TYPE_LABELS] ?? card.investment.type;
+
+  return (
+    <div className="bg-gray-50 rounded-xl border border-gray-100 p-4 space-y-3">
+      {/* Nome + tipo */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-sm font-medium text-gray-900 truncate flex-1">{card.investment.name}</span>
+        <span className="text-xs text-gray-500 bg-white border border-gray-200 rounded-full px-2 py-0.5 shrink-0">{typeLabel}</span>
+      </div>
+
+      {/* Dia programado */}
+      <div className="flex items-center gap-1 text-xs text-gray-400">
+        <Calendar size={11} />
+        <span>Dia {card.scheduledDay} do mês</span>
+      </div>
+
+      {/* Valor esperado */}
+      <div>
+        <p className="text-xs text-gray-400 mb-0.5">Valor esperado</p>
+        <p className="text-lg font-bold text-gray-900">{formatCurrency(card.expectedAmount)}</p>
+      </div>
+
+      {/* Status */}
+      {card.confirmed ? (
+        <div className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 rounded-lg px-3 py-2">
+          <span className="font-medium">
+            ✓ {formatCurrency(card.confirmedAmount!)}
+          </span>
+          {card.confirmedDate && (
+            <span className="text-green-500 ml-auto">
+              {formatDate(card.confirmedDate)}
+            </span>
+          )}
+        </div>
+      ) : (
+        <button
+          onClick={onConfirm}
+          className="w-full text-xs font-medium text-brand-600 border border-brand-200 bg-brand-50 hover:bg-brand-100 rounded-lg py-2 px-3 transition-colors"
+        >
+          Confirmar aporte
+        </button>
       )}
     </div>
   );

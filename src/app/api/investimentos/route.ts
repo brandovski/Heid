@@ -45,6 +45,8 @@ export async function POST(req: NextRequest) {
     goal_amount,
     monthly_contribution_amount,
     monthly_contribution_day,
+    partner_contribution_amount,
+    partner_contribution_day,
     is_eligible_for_projects,
   } = await req.json();
 
@@ -52,12 +54,22 @@ export async function POST(req: NextRequest) {
   if (!type) return NextResponse.json({ error: "Tipo é obrigatório" }, { status: 400 });
   if (!scope) return NextResponse.json({ error: "Escopo é obrigatório" }, { status: 400 });
 
-  // Both or neither for monthly contribution
+  // Both or neither for owner monthly contribution
   const hasAmount = monthly_contribution_amount != null && monthly_contribution_amount !== "";
   const hasDay = monthly_contribution_day != null && monthly_contribution_day !== "";
   if (hasAmount !== hasDay) {
     return NextResponse.json(
       { error: "Valor e dia do aporte mensal devem ser definidos juntos" },
+      { status: 400 }
+    );
+  }
+
+  // Both or neither for partner contribution
+  const hasPartnerAmount = partner_contribution_amount != null && partner_contribution_amount !== "";
+  const hasPartnerDay = partner_contribution_day != null && partner_contribution_day !== "";
+  if (hasPartnerAmount !== hasPartnerDay) {
+    return NextResponse.json(
+      { error: "Valor e dia do aporte do parceiro devem ser definidos juntos" },
       { status: 400 }
     );
   }
@@ -74,6 +86,8 @@ export async function POST(req: NextRequest) {
       goal_amount: goal_amount != null ? parseFloat(goal_amount) : null,
       monthly_contribution_amount: hasAmount ? parseFloat(monthly_contribution_amount) : null,
       monthly_contribution_day: hasDay ? parseInt(monthly_contribution_day) : null,
+      partner_contribution_amount: hasPartnerAmount ? parseFloat(partner_contribution_amount) : null,
+      partner_contribution_day: hasPartnerDay ? parseInt(partner_contribution_day) : null,
       is_eligible_for_projects: is_eligible_for_projects ?? false,
       is_active: true,
     })

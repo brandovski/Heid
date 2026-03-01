@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import type { Scope } from "@/types/database";
 import type { Investment, InvestmentType } from "./types";
@@ -10,11 +11,13 @@ interface Props {
   investment?: Investment;
   onClose: () => void;
   onSaved: (investment: Investment) => void;
+  userName?: string;
+  partnerName?: string;
 }
 
 const TYPE_OPTIONS = Object.entries(INVESTMENT_TYPE_LABELS) as [InvestmentType, string][];
 
-export default function InvestimentoModal({ investment, onClose, onSaved }: Props) {
+export default function InvestimentoModal({ investment, onClose, onSaved, userName, partnerName }: Props) {
   const isEdit = !!investment;
 
   const [name, setName] = useState(investment?.name ?? "");
@@ -22,12 +25,28 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
   const [scope, setScope] = useState<Scope>(investment?.scope ?? "personal");
   const [description, setDescription] = useState(investment?.description ?? "");
   const [goalAmount, setGoalAmount] = useState(investment?.goal_amount != null ? String(investment.goal_amount) : "");
+
+  // Owner contribution
   const [monthlyAmount, setMonthlyAmount] = useState(
     investment?.monthly_contribution_amount != null ? String(investment.monthly_contribution_amount) : ""
   );
   const [monthlyDay, setMonthlyDay] = useState(
     investment?.monthly_contribution_day != null ? String(investment.monthly_contribution_day) : ""
   );
+
+  // Partner contribution
+  const [partnerAmount, setPartnerAmount] = useState(
+    investment?.partner_contribution_amount != null ? String(investment.partner_contribution_amount) : ""
+  );
+  const [partnerDay, setPartnerDay] = useState(
+    investment?.partner_contribution_day != null ? String(investment.partner_contribution_day) : ""
+  );
+
+  // Card expansível
+  const [contributionOpen, setContributionOpen] = useState(
+    !!(investment?.monthly_contribution_amount || investment?.partner_contribution_amount)
+  );
+
   const [eligibleForProjects, setEligibleForProjects] = useState(investment?.is_eligible_for_projects ?? false);
   const [archiving, setArchiving] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -43,6 +62,13 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
       return;
     }
 
+    const hasPartnerAmount = partnerAmount.trim() !== "";
+    const hasPartnerDay = partnerDay.trim() !== "";
+    if (hasPartnerAmount !== hasPartnerDay) {
+      setError("Defina valor e dia do aporte do parceiro juntos (ou deixe ambos em branco)");
+      return;
+    }
+
     setSaving(true);
     setError("");
 
@@ -54,6 +80,8 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
       goal_amount: goalAmount ? parseFloat(goalAmount) : null,
       monthly_contribution_amount: hasAmount ? parseFloat(monthlyAmount) : null,
       monthly_contribution_day: hasDay ? parseInt(monthlyDay) : null,
+      partner_contribution_amount: hasPartnerAmount ? parseFloat(partnerAmount) : null,
+      partner_contribution_day: hasPartnerDay ? parseInt(partnerDay) : null,
       is_eligible_for_projects: eligibleForProjects,
     };
 
@@ -181,33 +209,118 @@ export default function InvestimentoModal({ investment, onClose, onSaved }: Prop
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Aporte Mensal Automático</label>
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <input
-                type="number"
-                value={monthlyAmount}
-                onChange={(e) => setMonthlyAmount(e.target.value)}
-                min="0"
-                step="0.01"
-                placeholder="Valor (R$)"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-              />
+        {/* ── Aporte Mensal — card expansível ── */}
+        <div className="border border-gray-200 rounded-xl overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setContributionOpen((v) => !v)}
+            className="w-full flex items-center justify-between bg-gray-50 px-4 py-3 cursor-pointer hover:bg-gray-100 transition-colors"
+          >
+            <span className="text-sm font-medium text-gray-700">Aporte Mensal</span>
+            <ChevronDown
+              size={16}
+              className={`text-gray-400 transition-transform duration-200 ${contributionOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {contributionOpen && (
+            <div className="px-4 py-3 space-y-4 bg-white">
+              <p className="text-xs text-gray-500">
+                Configure os aportes de cada membro. Você confirmará manualmente todo mês.
+              </p>
+
+              {scope === "personal" ? (
+                <div>
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <input
+                        type="number"
+                        value={monthlyAmount}
+                        onChange={(e) => setMonthlyAmount(e.target.value)}
+                        min="0"
+                        step="0.01"
+                        placeholder="Valor (R$)"
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      />
+                    </div>
+                    <div className="w-28">
+                      <input
+                        type="number"
+                        value={monthlyDay}
+                        onChange={(e) => setMonthlyDay(e.target.value)}
+                        min="1"
+                        max="28"
+                        placeholder="Dia (1–28)"
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">Defina valor e dia juntos, ou deixe ambos em branco.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Seu aporte */}
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 mb-2">{`Aporte de ${userName ?? "Você"}`}</p>
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <input
+                          type="number"
+                          value={monthlyAmount}
+                          onChange={(e) => setMonthlyAmount(e.target.value)}
+                          min="0"
+                          step="0.01"
+                          placeholder="Valor (R$)"
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        />
+                      </div>
+                      <div className="w-28">
+                        <input
+                          type="number"
+                          value={monthlyDay}
+                          onChange={(e) => setMonthlyDay(e.target.value)}
+                          min="1"
+                          max="28"
+                          placeholder="Dia (1–28)"
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Aporte do parceiro */}
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 mb-2">{`Aporte de ${partnerName ?? "Parceiro"}`}</p>
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <input
+                          type="number"
+                          value={partnerAmount}
+                          onChange={(e) => setPartnerAmount(e.target.value)}
+                          min="0"
+                          step="0.01"
+                          placeholder="Valor (R$)"
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        />
+                      </div>
+                      <div className="w-28">
+                        <input
+                          type="number"
+                          value={partnerDay}
+                          onChange={(e) => setPartnerDay(e.target.value)}
+                          min="1"
+                          max="28"
+                          placeholder="Dia (1–28)"
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400">Defina valor e dia juntos, ou deixe ambos em branco para cada membro.</p>
+                </div>
+              )}
             </div>
-            <div className="w-28">
-              <input
-                type="number"
-                value={monthlyDay}
-                onChange={(e) => setMonthlyDay(e.target.value)}
-                min="1"
-                max="28"
-                placeholder="Dia (1–28)"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-              />
-            </div>
-          </div>
-          <p className="text-xs text-gray-400 mt-1">Defina valor e dia juntos, ou deixe ambos em branco.</p>
+          )}
         </div>
 
         <div className="flex items-center gap-3">

@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
     credit_card_id,
     notes,
     scope,
+    status,
   } = await req.json();
+
+  const resolvedStatus = status === "paid" ? "paid" : "pending";
 
   if (!description?.trim() || !amount || !date || !type) {
     return NextResponse.json(
@@ -57,7 +60,7 @@ export async function POST(req: NextRequest) {
       amount,
       date,
       type,
-      status: "pending",
+      status: resolvedStatus,
       category_id: category_id ?? null,
       credit_card_id: credit_card_id ?? null,
       notes: notes ?? null,

@@ -33,7 +33,7 @@ export async function POST(
     return NextResponse.json({ error: "Investimento não encontrado" }, { status: 404 });
   }
 
-  const { type, amount, date, notes } = await req.json();
+  const { type, amount, date, notes, contributor_user_id } = await req.json();
 
   if (!type || !["deposit", "withdrawal"].includes(type)) {
     return NextResponse.json({ error: "Tipo inválido (deposit ou withdrawal)" }, { status: 400 });
@@ -45,8 +45,15 @@ export async function POST(
     return NextResponse.json({ error: "Data é obrigatória" }, { status: 400 });
   }
 
-  const txType = type === "deposit" ? "investment_deposit" : "investment_withdrawal";
   const amountNum = parseFloat(amount);
+  // For deposits: the contributor is the logged-in user (or explicitly passed contributor_user_id)
+  const resolvedContributorId: string = contributor_user_id ?? user.id;
+
+  // For deposits: create a personal expense for the contributor (type "expense")
+  // For withdrawals: keep investment_withdrawal scoped to the investment owner
+  const txType    = type === "deposit" ? "expense" : "investment_withdrawal";
+  const txScope   = type === "deposit" ? "personal" : investment.scope;
+  const txUserId  = type === "deposit" ? resolvedContributorId : investment.user_id;
 
   const systemCategoryId = await getSystemCategoryId(supabase, profile.family_id, "Investimento");
 
@@ -62,8 +69,8 @@ export async function POST(
       status: "paid",
       paid_at: new Date().toISOString(),
       category_id: systemCategoryId,
-      scope: investment.scope,
-      user_id: investment.user_id,
+      scope: txScope,
+      user_id: txUserId,
       is_shared: false,
       auto_generated: false,
       investment_id: params.id,
@@ -75,18 +82,24 @@ export async function POST(
   if (txError) return NextResponse.json({ error: txError.message }, { status: 500 });
 
   // 2. Create investment transaction
+  const invTxInsert: Record<string, unknown> = {
+    investment_id: params.id,
+    family_id: profile.family_id,
+    type,
+    amount: amountNum,
+    date,
+    notes: notes?.trim() ?? null,
+    transaction_id: tx.id,
+    auto_generated: false,
+  };
+
+  if (type === "deposit") {
+    invTxInsert.contributor_user_id = resolvedContributorId;
+  }
+
   const { data: invTx, error: invTxError } = await supabase
     .from("investment_transactions")
-    .insert({
-      investment_id: params.id,
-      family_id: profile.family_id,
-      type,
-      amount: amountNum,
-      date,
-      notes: notes?.trim() ?? null,
-      transaction_id: tx.id,
-      auto_generated: false,
-    })
+    .insert(invTxInsert)
     .select()
     .single();
 

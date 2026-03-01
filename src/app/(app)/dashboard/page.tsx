@@ -8,7 +8,8 @@ import {
   BudgetRow,
   CreditCardRow,
   InvoicePaymentRow,
-  UpcomingRow,
+  InvestmentContributionRow,
+  InvTransactionRow,
   shiftMonth,
 } from "./_components/types";
 
@@ -48,7 +49,6 @@ export default async function DashboardPage({
 
   // ── Parâmetros ────────────────────────────────────────────────────────────────
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
   const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
   const mes = searchParams.mes ?? currentMonth;
   const escopo: EscopoType =
@@ -57,7 +57,7 @@ export default async function DashboardPage({
   const [y, m] = mes.split("-").map(Number);
   const firstDay = `${mes}-01`;
   const lastDay = `${mes}-${String(new Date(y, m, 0).getDate()).padStart(2, "0")}`;
-  const sixMonthsStart = `${shiftMonth(mes, -5)}-01`;
+  const twelveMonthsStart = `${shiftMonth(mes, -11)}-01`;
 
   // Buscar nome do parceiro
   const { data: partnerProfile } = await supabase
@@ -97,7 +97,7 @@ export default async function DashboardPage({
     .from("transactions")
     .select("amount, date, type, status")
     .eq("family_id", profile.family_id)
-    .gte("date", sixMonthsStart)
+    .gte("date", twelveMonthsStart)
     .lte("date", lastDay)
     .neq("status", "cancelled");
 
@@ -120,32 +120,14 @@ export default async function DashboardPage({
     .eq("user_id", user.id)
     .order("created_at");
 
-  // Próximos lançamentos pendentes
-  let upcomingQ = supabase
-    .from("transactions")
-    .select("id, description, amount, date, type, category:categories(name, icon, color)")
-    .eq("family_id", profile.family_id)
-    .eq("status", "pending")
-    .gte("date", todayStr)
-    .order("date", { ascending: true })
-    .limit(10);
-
-  if (escopo === "personal") {
-    upcomingQ = upcomingQ.eq("scope", "personal").eq("user_id", user.id);
-  } else {
-    upcomingQ = upcomingQ
-      .eq("scope", "personal")
-      .eq("is_shared", true)
-      .neq("user_id", user.id);
-  }
-
   const [
     { data: transactions },
     { data: historicalTransactions },
     { data: budgets },
     { data: creditCards },
     { data: invoicePayments },
-    { data: upcoming },
+    { data: investments },
+    { data: invTransactions },
   ] = await Promise.all([
     txCurrentQ,
     txHistoricalQ,
@@ -161,7 +143,21 @@ export default async function DashboardPage({
       .select("id, credit_card_id, reference_month, amount_paid, paid_at, notes")
       .eq("family_id", profile.family_id)
       .eq("reference_month", mes),
-    upcomingQ,
+    // Investimentos com aporte configurado (da família toda)
+    supabase
+      .from("investments")
+      .select("id, name, type, user_id, scope, monthly_contribution_amount, monthly_contribution_day, partner_contribution_amount, partner_contribution_day")
+      .eq("family_id", profile.family_id)
+      .eq("is_active", true),
+    // Investment transactions do mês (depósitos manuais para checar confirmações)
+    supabase
+      .from("investment_transactions")
+      .select("id, investment_id, type, amount, date, contributor_user_id, auto_generated")
+      .eq("family_id", profile.family_id)
+      .gte("date", firstDay)
+      .lte("date", lastDay)
+      .eq("type", "deposit")
+      .eq("auto_generated", false),
   ]);
 
   return (
@@ -175,7 +171,9 @@ export default async function DashboardPage({
       budgets={(budgets as unknown as BudgetRow[]) ?? []}
       creditCards={(creditCards as CreditCardRow[]) ?? []}
       invoicePayments={(invoicePayments as InvoicePaymentRow[]) ?? []}
-      upcoming={(upcoming as unknown as UpcomingRow[]) ?? []}
+      investments={(investments as unknown as InvestmentContributionRow[]) ?? []}
+      invTransactions={(invTransactions as unknown as InvTransactionRow[]) ?? []}
+      currentUserId={user.id}
     />
   );
 }

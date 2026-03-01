@@ -9,6 +9,21 @@ export default async function InvestimentosPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const userId = user.id;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("family_id, full_name")
+    .eq("id", user.id)
+    .single();
+
+  const { data: partnerProfile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("family_id", profile?.family_id ?? "")
+    .neq("id", user.id)
+    .single();
+
   const [
     { data: investments },
     { data: transactions },
@@ -29,6 +44,9 @@ export default async function InvestimentosPage() {
         investments={investments ?? []}
         transactions={transactions ?? []}
         snapshots={snapshots ?? []}
+        userId={userId}
+        userName={profile?.full_name ?? "Você"}
+        partnerName={partnerProfile?.full_name ?? "Parceiro"}
       />
     </div>
   );

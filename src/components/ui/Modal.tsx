@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 interface ModalProps {
@@ -19,7 +20,7 @@ export default function Modal({ title, onClose, children, footer }: ModalProps) 
     return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
-  return (
+  const content = (
     <>
       {/* Overlay fixo independente */}
       <div className="fixed inset-0 z-50 bg-black/40" onClick={onClose} />
@@ -51,4 +52,6 @@ export default function Modal({ title, onClose, children, footer }: ModalProps) 
       </div>
     </>
   );
+
+  return typeof document !== "undefined" ? createPortal(content, document.body) : null;
 }

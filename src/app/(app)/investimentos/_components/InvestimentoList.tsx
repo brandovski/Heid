@@ -1,28 +1,57 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import InvestimentoCard from "./InvestimentoCard";
 import InvestimentoModal from "./InvestimentoModal";
+import ConfirmarAporteModal from "@/components/ui/ConfirmarAporteModal";
+import { computeAporteCards, AporteCardData } from "@/lib/investment-utils";
 import type { Investment, InvestmentTransaction, InvestmentSnapshot } from "./types";
+import { formatCurrency } from "./types";
 
 interface Props {
   investments: Investment[];
   transactions: InvestmentTransaction[];
   snapshots: InvestmentSnapshot[];
+  userId: string;
+  userName: string;
+  partnerName: string;
 }
 
 type Tab = "ativos" | "arquivados";
 
-export default function InvestimentoList({ investments: initial, transactions, snapshots }: Props) {
+export default function InvestimentoList({ investments: initial, transactions, snapshots, userId, userName, partnerName }: Props) {
+  const router = useRouter();
   const [investments, setInvestments] = useState<Investment[]>(initial);
   const [tab, setTab] = useState<Tab>("ativos");
   const [modalInvestment, setModalInvestment] = useState<Investment | undefined>(undefined);
   const [modalOpen, setModalOpen] = useState(false);
+  const [aporteToConfirm, setAporteToConfirm] = useState<AporteCardData | null>(null);
 
   const ativos = investments.filter((i) => i.is_active);
   const arquivados = investments.filter((i) => !i.is_active);
   const displayed = tab === "ativos" ? ativos : arquivados;
+
+  // Compute pending aportes for this month
+  const currentMonth = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  })();
+
+  const aporteTransactions = transactions.filter(
+    (tx) =>
+      tx.date.startsWith(currentMonth) &&
+      tx.auto_generated === false &&
+      tx.type === "deposit"
+  );
+
+  const pendingAportes = computeAporteCards(
+    ativos,
+    aporteTransactions,
+    currentMonth,
+    userId
+  ).filter((c) => !c.confirmed);
 
   function getTxs(investmentId: string) {
     return transactions.filter((t) => t.investment_id === investmentId);
@@ -77,6 +106,33 @@ export default function InvestimentoList({ investments: initial, transactions, s
         </button>
       </div>
 
+      {/* Banner de aportes pendentes (aba Ativos) */}
+      {tab === "ativos" && pendingAportes.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <p className="text-sm font-medium text-amber-800 mb-3">
+            {pendingAportes.length} aporte{pendingAportes.length > 1 ? "s" : ""} pendente{pendingAportes.length > 1 ? "s" : ""} este mês
+          </p>
+          <div className="space-y-2">
+            {pendingAportes.map((card) => (
+              <div key={card.investment.id} className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{card.investment.name}</p>
+                  <p className="text-xs text-gray-500">
+                    Dia {card.scheduledDay} — {formatCurrency(card.expectedAmount)}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setAporteToConfirm(card)}
+                  className="text-xs font-medium text-brand-600 border border-brand-200 bg-brand-50 hover:bg-brand-100 rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  Confirmar
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* List */}
       {displayed.length === 0 ? (
         <div className="text-center py-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
@@ -107,12 +163,27 @@ export default function InvestimentoList({ investments: initial, transactions, s
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modal de criação/edição */}
       {modalOpen && (
         <InvestimentoModal
           investment={modalInvestment}
           onClose={() => setModalOpen(false)}
           onSaved={(saved) => { handleSaved(saved); setModalOpen(false); }}
+          userName={userName}
+          partnerName={partnerName}
+        />
+      )}
+
+      {/* Modal de confirmação de aporte */}
+      {aporteToConfirm && (
+        <ConfirmarAporteModal
+          isOpen
+          onClose={() => setAporteToConfirm(null)}
+          onSaved={() => { setAporteToConfirm(null); router.refresh(); }}
+          investment={aporteToConfirm.investment}
+          expectedAmount={aporteToConfirm.expectedAmount}
+          scheduledDay={aporteToConfirm.scheduledDay}
+          currentMonth={currentMonth}
         />
       )}
     </div>

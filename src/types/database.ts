@@ -288,6 +288,8 @@ export interface Investment {
   goal_amount: number | null;
   monthly_contribution_amount: number | null;
   monthly_contribution_day: number | null;  // 1–28
+  partner_contribution_amount: number | null;
+  partner_contribution_day: number | null;  // 1–28
   is_eligible_for_projects: boolean;
   is_active: boolean;
   created_at: string;
@@ -304,6 +306,7 @@ export interface InvestmentTransaction {
   notes: string | null;
   transaction_id: string | null;  // transação financeira vinculada
   auto_generated: boolean;
+  contributor_user_id: string | null;
   created_at: string;
 }
 

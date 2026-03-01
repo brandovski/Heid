@@ -5,7 +5,7 @@ import { CategoryAmount, formatCurrency } from "./types";
 
 // Paleta moderna e harmônica
 const COLORS = [
-  "#2563eb", // brand-600
+  "#1D2D28", // brand-600
   "#7c3aed", // violet-600
   "#db2777", // pink-600
   "#ea580c", // orange-600
@@ -96,9 +96,10 @@ export default function GraficoCategoria({ data }: Props) {
             data={top}
             cx="50%"
             cy="50%"
-            innerRadius={52}
+            innerRadius={62}
             outerRadius={78}
-            paddingAngle={2}
+            cornerRadius={6}
+            paddingAngle={3}
             dataKey="amount"
             nameKey="name"
             label={({ cx, cy }) => (

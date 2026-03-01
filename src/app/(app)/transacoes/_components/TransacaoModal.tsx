@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CheckCircle2, Clock, CreditCard as CreditCardIcon } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import DatePicker from "@/components/ui/DatePicker";
 import type { Category, CreditCard } from "@/types/database";
@@ -55,6 +56,10 @@ export default function TransacaoModal({
 
   const showParcelamento =
     !isEditing && type === "expense" && paymentMethod === "credit_card";
+
+  const isParcelado = showParcelamento && paymentMode === "parcelado";
+  const autoStatus: "paid" | "pending" =
+    !isParcelado && paymentMethod === "account" && date <= today ? "paid" : "pending";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -119,6 +124,7 @@ export default function TransacaoModal({
 
         if (!isEditing) {
           payload.type = type;
+          payload.status = autoStatus;
         }
 
         const res = await fetch(url, {
@@ -155,6 +161,33 @@ export default function TransacaoModal({
       footer={
         <div>
           {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+
+          {!isEditing && !isParcelado && paymentMethod === "account" && (
+            <p className="text-xs text-gray-400 mb-3 flex items-center gap-1">
+              {autoStatus === "paid" ? (
+                <>
+                  <CheckCircle2 size={11} className="text-green-500 shrink-0" />
+                  Será registrada como{" "}
+                  <span className="text-green-600 font-medium">paga</span>
+                </>
+              ) : (
+                <>
+                  <Clock size={11} className="shrink-0" />
+                  Será registrada como{" "}
+                  <span className="font-medium">pendente</span>
+                </>
+              )}
+            </p>
+          )}
+
+          {!isEditing && paymentMethod === "credit_card" && (
+            <p className="text-xs text-gray-400 mb-3 flex items-center gap-1">
+              <CreditCardIcon size={11} className="shrink-0" />
+              Será registrada na{" "}
+              <span className="font-medium">fatura do cartão</span>
+            </p>
+          )}
+
           <div className="flex gap-3">
             <button
               type="button"

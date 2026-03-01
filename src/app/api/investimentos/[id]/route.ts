@@ -21,6 +21,8 @@ export async function PATCH(
     goal_amount,
     monthly_contribution_amount,
     monthly_contribution_day,
+    partner_contribution_amount,
+    partner_contribution_day,
     is_eligible_for_projects,
     is_active,
   } = body;
@@ -35,6 +37,10 @@ export async function PATCH(
     updates.monthly_contribution_amount = monthly_contribution_amount != null ? parseFloat(monthly_contribution_amount) : null;
   if (monthly_contribution_day !== undefined)
     updates.monthly_contribution_day = monthly_contribution_day != null ? parseInt(monthly_contribution_day) : null;
+  if (partner_contribution_amount !== undefined)
+    updates.partner_contribution_amount = partner_contribution_amount != null ? parseFloat(partner_contribution_amount) : null;
+  if (partner_contribution_day !== undefined)
+    updates.partner_contribution_day = partner_contribution_day != null ? parseInt(partner_contribution_day) : null;
   if (is_eligible_for_projects !== undefined) updates.is_eligible_for_projects = is_eligible_for_projects;
   if (is_active !== undefined) updates.is_active = is_active;
 
