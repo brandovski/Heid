@@ -12,7 +12,7 @@ export async function GET(_req: NextRequest) {
     .eq("id", user.id)
     .single();
 
-  if (!profile?.family_id) return NextResponse.json([]);
+  if (!profile?.family_id) return NextResponse.json([]);  // GET: retorna vazio se sem família
 
   const { data, error } = await supabase
     .from("categories")
@@ -33,13 +33,13 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("family_id")
     .eq("id", user.id)
     .single();
 
-  if (!profile?.family_id) {
+  if (profileError || !profile?.family_id) {
     return NextResponse.json({ error: "Family not configured" }, { status: 400 });
   }
 

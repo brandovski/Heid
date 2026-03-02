@@ -11,6 +11,14 @@ export async function PATCH(
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("family_id")
+    .eq("id", user.id)
+    .single();
+  if (profileError || !profile?.family_id)
+    return NextResponse.json({ error: "Family not configured" }, { status: 400 });
+
   const body = await req.json();
   const updates: Record<string, unknown> = {};
 
@@ -41,6 +49,7 @@ export async function PATCH(
     .from("fixed_expenses")
     .update(updates)
     .eq("id", params.id)
+    .eq("family_id", profile.family_id)
     .select()
     .single();
 

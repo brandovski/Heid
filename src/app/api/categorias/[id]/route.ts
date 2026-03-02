@@ -12,12 +12,13 @@ export async function PATCH(
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   // Verificar se é categoria de sistema (imutável)
-  const { data: categoria } = await supabase
+  const { data: categoria, error: categoriaError } = await supabase
     .from("categories")
     .select("is_system")
     .eq("id", params.id)
     .single();
 
+  if (categoriaError) return NextResponse.json({ error: "Categoria não encontrada" }, { status: 404 });
   if (categoria?.is_system) {
     return NextResponse.json({ error: "Categorias de sistema não podem ser alteradas" }, { status: 403 });
   }

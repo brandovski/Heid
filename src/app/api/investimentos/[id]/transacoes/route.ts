@@ -33,7 +33,7 @@ export async function POST(
     return NextResponse.json({ error: "Investimento não encontrado" }, { status: 404 });
   }
 
-  const { type, amount, date, notes, contributor_user_id } = await req.json();
+  const { type, amount, date, notes } = await req.json();
 
   if (!type || !["deposit", "withdrawal"].includes(type)) {
     return NextResponse.json({ error: "Tipo inválido (deposit ou withdrawal)" }, { status: 400 });
@@ -46,14 +46,12 @@ export async function POST(
   }
 
   const amountNum = parseFloat(amount);
-  // For deposits: the contributor is the logged-in user (or explicitly passed contributor_user_id)
-  const resolvedContributorId: string = contributor_user_id ?? user.id;
-
+  // For deposits: always use the authenticated user as contributor (never allow client override)
   // For deposits: create a personal expense for the contributor (type "expense")
   // For withdrawals: keep investment_withdrawal scoped to the investment owner
-  const txType    = type === "deposit" ? "expense" : "investment_withdrawal";
-  const txScope   = type === "deposit" ? "personal" : investment.scope;
-  const txUserId  = type === "deposit" ? resolvedContributorId : investment.user_id;
+  const txType   = type === "deposit" ? "expense" : "investment_withdrawal";
+  const txScope  = type === "deposit" ? "personal" : investment.scope;
+  const txUserId = type === "deposit" ? user.id : investment.user_id;
 
   const systemCategoryId = await getSystemCategoryId(supabase, profile.family_id, "Investimento");
 
@@ -94,7 +92,7 @@ export async function POST(
   };
 
   if (type === "deposit") {
-    invTxInsert.contributor_user_id = resolvedContributorId;
+    invTxInsert.contributor_user_id = user.id;
   }
 
   const { data: invTx, error: invTxError } = await supabase

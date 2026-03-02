@@ -11,6 +11,14 @@ export async function PATCH(
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("family_id")
+    .eq("id", user.id)
+    .single();
+  if (profileError || !profile?.family_id)
+    return NextResponse.json({ error: "Family not configured" }, { status: 400 });
+
   const { planned_amount, notes } = await req.json();
 
   if (planned_amount !== undefined) {
@@ -28,6 +36,7 @@ export async function PATCH(
     .from("budgets")
     .update(updates)
     .eq("id", params.id)
+    .eq("family_id", profile.family_id)
     .select()
     .single();
 
@@ -45,7 +54,19 @@ export async function DELETE(
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { error } = await supabase.from("budgets").delete().eq("id", params.id);
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("family_id")
+    .eq("id", user.id)
+    .single();
+  if (profileError || !profile?.family_id)
+    return NextResponse.json({ error: "Family not configured" }, { status: 400 });
+
+  const { error } = await supabase
+    .from("budgets")
+    .delete()
+    .eq("id", params.id)
+    .eq("family_id", profile.family_id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return new NextResponse(null, { status: 204 });
 }

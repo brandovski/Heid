@@ -18,13 +18,13 @@ export async function POST(
   }
 
   // Verify the project exists and is accessible (RLS will enforce this)
-  const { data: project } = await supabase
+  const { data: project, error: projectError } = await supabase
     .from("projects")
     .select("id")
     .eq("id", params.id)
     .single();
 
-  if (!project) return NextResponse.json({ error: "Projeto não encontrado" }, { status: 404 });
+  if (projectError || !project) return NextResponse.json({ error: "Projeto não encontrado" }, { status: 404 });
 
   const { data, error } = await supabase
     .from("project_groups")

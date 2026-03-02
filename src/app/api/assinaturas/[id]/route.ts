@@ -11,6 +11,14 @@ export async function PATCH(
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("family_id")
+    .eq("id", user.id)
+    .single();
+  if (profileError || !profile?.family_id)
+    return NextResponse.json({ error: "Family not configured" }, { status: 400 });
+
   const {
     name,
     original_currency,
@@ -51,6 +59,7 @@ export async function PATCH(
     .from("subscriptions")
     .update(updates)
     .eq("id", params.id)
+    .eq("family_id", profile.family_id)
     .select()
     .single();
 
@@ -68,13 +77,22 @@ export async function DELETE(
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: sub } = await supabase
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("family_id")
+    .eq("id", user.id)
+    .single();
+  if (profileError || !profile?.family_id)
+    return NextResponse.json({ error: "Family not configured" }, { status: 400 });
+
+  const { data: sub, error: subError } = await supabase
     .from("subscriptions")
     .select("id, is_active")
     .eq("id", params.id)
+    .eq("family_id", profile.family_id)
     .single();
 
-  if (!sub) {
+  if (subError || !sub) {
     return NextResponse.json({ error: "Assinatura não encontrada" }, { status: 404 });
   }
 
@@ -82,6 +100,7 @@ export async function DELETE(
     .from("subscriptions")
     .update({ is_active: false, cancelled_at: new Date().toISOString() })
     .eq("id", params.id)
+    .eq("family_id", profile.family_id)
     .select()
     .single();
 

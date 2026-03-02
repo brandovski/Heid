@@ -11,6 +11,14 @@ export async function PATCH(
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("family_id")
+    .eq("id", user.id)
+    .single();
+  if (profileError || !profile?.family_id)
+    return NextResponse.json({ error: "Family not configured" }, { status: 400 });
+
   const body = await req.json();
   const updates: Record<string, unknown> = {};
 
@@ -47,6 +55,7 @@ export async function PATCH(
     .from("transactions")
     .update(updates)
     .eq("id", params.id)
+    .eq("family_id", profile.family_id)
     .select()
     .single();
 
@@ -64,13 +73,22 @@ export async function DELETE(
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: tx } = await supabase
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("family_id")
+    .eq("id", user.id)
+    .single();
+  if (profileError || !profile?.family_id)
+    return NextResponse.json({ error: "Family not configured" }, { status: 400 });
+
+  const { data: tx, error: txError } = await supabase
     .from("transactions")
     .select("auto_generated")
     .eq("id", params.id)
+    .eq("family_id", profile.family_id)
     .single();
 
-  if (!tx) {
+  if (txError || !tx) {
     return NextResponse.json({ error: "Transação não encontrada" }, { status: 404 });
   }
 
@@ -84,7 +102,8 @@ export async function DELETE(
   const { error } = await supabase
     .from("transactions")
     .delete()
-    .eq("id", params.id);
+    .eq("id", params.id)
+    .eq("family_id", profile.family_id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });

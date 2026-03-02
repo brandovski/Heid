@@ -101,13 +101,13 @@ export async function DELETE(
 
   if (isPermanent) {
     // Hard delete — só permite para itens já cancelados
-    const { data: item } = await supabase
+    const { data: item, error: itemError } = await supabase
       .from("project_items")
       .select("status")
       .eq("id", params.id)
       .single();
 
-    if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (itemError || !item) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     if (item.status !== "cancelled") {
       return NextResponse.json(
