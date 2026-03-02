@@ -275,6 +275,43 @@
 
 ---
 
+## Melhorias pós-Fase 11 (Sessões 028–030c)
+
+**Objetivo:** melhorias incrementais de qualidade, UX e estrutura aplicadas após a conclusão das 11 fases principais.
+
+### Categorias de sistema (Sessão 028)
+- [x] Migration 023: coluna `is_system` em `categories` + 3 categorias internas (Projeto, Caixa Familiar, Investimento)
+- [x] Helper `getSystemCategoryId()` — usado automaticamente nas APIs de pagamento
+- [x] `GET /api/categorias` filtra categorias de sistema; `PATCH` protege contra edição
+- [x] Projetos: campo `category_id` removido de itens; `ItemModal` simplificado
+- [x] Hard delete de itens de projeto cancelados (`?permanent=true`) com botão `Trash2`
+
+### Aportes mensais com confirmação manual (Sessão 029)
+- [x] Migration 024: `partner_contribution_amount/day` em `investments` + `contributor_user_id` em `investment_transactions`
+- [x] `src/lib/investment-utils.ts`: `computeAporteCards()` para calcular pendências do mês
+- [x] `ConfirmarAporteModal` — toggle integral/outro valor, DatePicker, notes
+- [x] `InvestimentoModal` com card expansível "Aporte Mensal" (personal e family)
+- [x] Cron `generate-monthly` não gera mais aportes automáticos — confirmação é manual
+- [x] Dashboard: widget "Aportes do Mês" com status e botão "Confirmar"
+- [x] `InvestimentoList`: banner âmbar de pendências com botão "Confirmar"
+
+### Formulário de parcelamento inteligente (Sessão 030)
+- [x] `ScopeSelector` removido do `ParcelamentoModal` (scope hardcoded como personal)
+- [x] Campo "Data da 1ª parcela" renomeado para "Data da compra"
+- [x] `rawPaidCycles()` + detecção automática de parcelas pagas via `closing_day` do cartão
+- [x] Banner com 3 estados: neutro / âmbar (parcialmente pago) / verde (compra quitada)
+- [x] `route.ts` aceita `paid_installments` com geração de transações `paid` retroativas
+
+### ConfirmModal + header desktop fixo (Sessão 030c)
+- [x] `src/components/ui/ConfirmModal.tsx`: wrapper sobre `Modal.tsx` com variants `danger`/`warning`, loading state, spinner
+- [x] 7 `confirm()` nativos substituídos por `ConfirmModal` em toda a aplicação
+- [x] Header desktop fixo com `backdrop-blur-xl` (parity com mobile)
+- [x] `layout.tsx`: `sm:mt-16` para compensar o nav desktop fixo
+
+**Critério de conclusão:** zero `confirm()` nativos, aportes confirmados manualmente, formulário de parcelamento com detecção automática de parcelas pagas, navbar desktop fixa. ✅ **Concluído em 2026-03-02**
+
+---
+
 ## Backlog (pós v1.0)
 
 - Relatórios e exportação (PDF / CSV)
@@ -287,4 +324,4 @@
 
 ---
 
-*Atualizado em: 2026-02-28*
+*Atualizado em: 2026-03-02*
