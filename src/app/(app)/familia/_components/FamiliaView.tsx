@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus, Users, Pencil, XCircle, CheckCircle, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import DatePicker from "@/components/ui/DatePicker";
 import ContribuicaoModal from "./ContribuicaoModal";
 import TransacaoFamiliarModal from "./TransacaoFamiliarModal";
@@ -164,6 +165,7 @@ export default function FamiliaView({
   const [isTransacaoOpen, setIsTransacaoOpen] = useState(false);
   const [editingTransacao, setEditingTransacao] = useState<FamilyTransaction | null>(null);
   const [pagandoTransacao, setPagandoTransacao] = useState<FamilyTransaction | null>(null);
+  const [pendingDeleteTx, setPendingDeleteTx] = useState<FamilyTransaction | null>(null);
 
   const { memberContribs, totalContribuicoes, totalGasto, totalReceita, saldoLivre } =
     computeCaixaFamiliar(contributions, members, familyTransactions);
@@ -188,9 +190,10 @@ export default function FamiliaView({
     router.refresh();
   }
 
-  async function handleDelete(tx: FamilyTransaction) {
-    if (!confirm("Excluir esta transação permanentemente?")) return;
-    await fetch(`/api/transacoes/${tx.id}`, { method: "DELETE" });
+  async function handleDelete() {
+    if (!pendingDeleteTx) return;
+    await fetch(`/api/transacoes/${pendingDeleteTx.id}`, { method: "DELETE" });
+    setPendingDeleteTx(null);
     router.refresh();
   }
 
@@ -416,7 +419,7 @@ export default function FamiliaView({
                       {/* Excluir — apenas manuais cancelados */}
                       {isManual && tx.status === "cancelled" && (
                         <button
-                          onClick={() => handleDelete(tx)}
+                          onClick={() => setPendingDeleteTx(tx)}
                           className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                           title="Excluir permanentemente"
                         >
@@ -456,6 +459,16 @@ export default function FamiliaView({
           onSaved={handleSaved}
         />
       )}
+
+      <ConfirmModal
+        isOpen={pendingDeleteTx !== null}
+        onClose={() => setPendingDeleteTx(null)}
+        onConfirm={handleDelete}
+        title="Excluir transação"
+        description="Excluir esta transação permanentemente? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        variant="danger"
+      />
     </div>
   );
 }

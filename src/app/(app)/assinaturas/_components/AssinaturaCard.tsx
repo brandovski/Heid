@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Pencil, XCircle } from "lucide-react";
 import type { SubscriptionWithRelations } from "./types";
 import { formatCurrency } from "./types";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 interface Props {
   assinatura: SubscriptionWithRelations;
@@ -11,17 +13,18 @@ interface Props {
 }
 
 export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props) {
+  const [showConfirm, setShowConfirm] = useState(false);
   const isUsd = a.original_currency === "USD";
   const scopeColor =
     a.scope === "personal" ? "bg-purple-50 text-purple-700" : "bg-brand-50 text-brand-700";
 
   async function handleCancel() {
-    if (!confirm(`Cancelar a assinatura "${a.name}"?`)) return;
     await fetch(`/api/assinaturas/${a.id}`, { method: "DELETE" });
     onSaved();
   }
 
   return (
+    <>
     <div
       className={`px-4 py-3 rounded-xl border ${
         !a.is_active
@@ -83,7 +86,7 @@ export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props
                   <Pencil size={14} />
                 </button>
                 <button
-                  onClick={handleCancel}
+                  onClick={() => setShowConfirm(true)}
                   className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                   title="Cancelar assinatura"
                 >
@@ -95,5 +98,16 @@ export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props
         </div>
       </div>
     </div>
+
+    <ConfirmModal
+      isOpen={showConfirm}
+      onClose={() => setShowConfirm(false)}
+      onConfirm={handleCancel}
+      title="Cancelar assinatura"
+      description={`Cancelar a assinatura "${a.name}"? As transações futuras não serão mais geradas.`}
+      confirmLabel="Cancelar assinatura"
+      variant="warning"
+    />
+  </>
   );
 }

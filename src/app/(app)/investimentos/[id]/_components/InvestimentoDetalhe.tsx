@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowLeft, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import Link from "next/link";
 import ProgressBar from "@/components/ui/ProgressBar";
 import InvestimentoModal from "../../_components/InvestimentoModal";
@@ -56,6 +57,7 @@ export default function InvestimentoDetalhe({
   const [transactions, setTransactions] = useState<InvestmentTransaction[]>(initialTxs);
   const [snapshots, setSnapshots] = useState<InvestmentSnapshot[]>(initialSnaps);
   const [modal, setModal] = useState<Modal>({ type: "none" });
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const totalAportado = calcTotalAportado(transactions);
   const saldoAtual = calcSaldoAtual(snapshots, transactions);
@@ -74,15 +76,17 @@ export default function InvestimentoDetalhe({
     window.location.reload();
   }
 
-  async function handleDeleteTx(txId: string) {
-    if (!confirm("Excluir esta movimentação e a transação financeira vinculada?")) return;
-    const res = await fetch(`/api/investimentos/transacoes/${txId}`, { method: "DELETE" });
+  function handleDeleteTx(txId: string) {
+    setPendingDeleteId(txId);
+  }
+
+  async function doDeleteTx() {
+    if (!pendingDeleteId) return;
+    const res = await fetch(`/api/investimentos/transacoes/${pendingDeleteId}`, { method: "DELETE" });
     if (res.ok) {
-      setTransactions((prev) => prev.filter((t) => t.id !== txId));
-    } else {
-      const d = await res.json();
-      alert(d.error ?? "Erro ao excluir");
+      setTransactions((prev) => prev.filter((t) => t.id !== pendingDeleteId));
     }
+    setPendingDeleteId(null);
   }
 
   const rentPositive = rentReais != null && rentReais >= 0;
@@ -298,6 +302,16 @@ export default function InvestimentoDetalhe({
           onSaved={reloadData}
         />
       )}
+
+      <ConfirmModal
+        isOpen={pendingDeleteId !== null}
+        onClose={() => setPendingDeleteId(null)}
+        onConfirm={doDeleteTx}
+        title="Excluir movimentação"
+        description="Excluir esta movimentação e a transação financeira vinculada? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        variant="danger"
+      />
     </div>
   );
 }

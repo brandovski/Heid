@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import type { Scope } from "@/types/database";
 import type { Investment, InvestmentType } from "./types";
 import { INVESTMENT_TYPE_LABELS } from "./types";
@@ -51,6 +52,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
   const [archiving, setArchiving] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
 
   async function handleSave() {
     if (!name.trim()) { setError("Nome é obrigatório"); return; }
@@ -106,7 +108,6 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
   }
 
   async function handleArchive() {
-    if (!confirm("Arquivar este investimento? Ele não aparecerá mais na lista ativa.")) return;
     setArchiving(true);
     const res = await fetch(`/api/investimentos/${investment!.id}`, {
       method: "PATCH",
@@ -124,6 +125,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
   }
 
   return (
+    <>
     <Modal
       title={isEdit ? "Editar Investimento" : "Novo Investimento"}
       onClose={onClose}
@@ -340,7 +342,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
           <div className="pt-2 border-t border-gray-100">
             <button
               type="button"
-              onClick={handleArchive}
+              onClick={() => setShowArchiveConfirm(true)}
               disabled={archiving}
               className="w-full px-4 py-2.5 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-60 transition-colors"
             >
@@ -350,5 +352,16 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
         )}
       </div>
     </Modal>
+
+    <ConfirmModal
+      isOpen={showArchiveConfirm}
+      onClose={() => setShowArchiveConfirm(false)}
+      onConfirm={handleArchive}
+      title="Arquivar investimento"
+      description="Este investimento não aparecerá mais na lista ativa. Você poderá reativá-lo depois."
+      confirmLabel="Arquivar"
+      variant="warning"
+    />
+  </>
   );
 }

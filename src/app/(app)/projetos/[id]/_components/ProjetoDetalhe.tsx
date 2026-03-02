@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, CheckCircle } from "lucide-react";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import GrupoSection from "./GrupoSection";
 import GrupoModal from "./GrupoModal";
 import ItemModal from "./ItemModal";
@@ -44,6 +45,7 @@ export default function ProjetoDetalhe({
   const [project, setProject] = useState<Project>(initialProject);
   const [groups, setGroups] = useState<ProjectGroupWithItems[]>(initialGroups);
   const [modal, setModal] = useState<ModalState>({ type: "none" });
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   // Compute summary stats
   const allItems = groups.flatMap((g) => g.items);
@@ -80,12 +82,17 @@ export default function ProjetoDetalhe({
     });
   }
 
-  async function handleDeleteGroup(id: string) {
-    if (!confirm("Excluir grupo e todos os seus itens?")) return;
-    const res = await fetch(`/api/projetos/grupos/${id}`, { method: "DELETE" });
+  function handleDeleteGroup(id: string) {
+    setPendingDeleteId(id);
+  }
+
+  async function doDeleteGroup() {
+    if (!pendingDeleteId) return;
+    const res = await fetch(`/api/projetos/grupos/${pendingDeleteId}`, { method: "DELETE" });
     if (res.ok) {
-      setGroups((prev) => prev.filter((g) => g.id !== id));
+      setGroups((prev) => prev.filter((g) => g.id !== pendingDeleteId));
     }
+    setPendingDeleteId(null);
   }
 
   function handleItemSaved(item: ProjectItem) {
@@ -305,6 +312,16 @@ export default function ProjetoDetalhe({
           onSaved={(item) => { handleItemSaved(item); setModal({ type: "none" }); }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={pendingDeleteId !== null}
+        onClose={() => setPendingDeleteId(null)}
+        onConfirm={doDeleteGroup}
+        title="Excluir grupo"
+        description="Excluir este grupo e todos os seus itens? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir grupo"
+        variant="danger"
+      />
     </div>
   );
 }

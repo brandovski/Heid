@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { XCircle } from "lucide-react";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import type { InstallmentGroupWithRelations, InstallmentSummary } from "./types";
 import { groupStatus, formatCurrency, formatDate } from "./types";
 
@@ -19,14 +20,13 @@ const STATUS_BADGE = {
 
 export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
   const [loading, setLoading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const status = groupStatus(summary);
   const badge = STATUS_BADGE[status];
   const scopeColor =
     group.scope === "personal" ? "bg-purple-50 text-purple-700" : "bg-brand-50 text-brand-700";
 
   async function handleCancelRemaining() {
-    if (!confirm(`Cancelar as ${summary.pending} parcela(s) pendente(s) de "${group.description}"?`))
-      return;
     setLoading(true);
     await fetch(`/api/parcelamentos/${group.id}`, { method: "DELETE" });
     setLoading(false);
@@ -34,6 +34,7 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
   }
 
   return (
+    <>
     <div
       className={`px-4 py-3 rounded-xl border ${
         status === "cancelled"
@@ -96,7 +97,7 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
 
           {status === "active" && (
             <button
-              onClick={handleCancelRemaining}
+              onClick={() => setShowConfirm(true)}
               disabled={loading}
               className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
               title="Cancelar parcelas restantes"
@@ -107,5 +108,16 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
         </div>
       </div>
     </div>
+
+    <ConfirmModal
+      isOpen={showConfirm}
+      onClose={() => setShowConfirm(false)}
+      onConfirm={handleCancelRemaining}
+      title="Cancelar parcelas"
+      description={`Cancelar as ${summary.pending} parcela(s) pendente(s) de "${group.description}"?`}
+      confirmLabel="Cancelar parcelas"
+      variant="warning"
+    />
+  </>
   );
 }

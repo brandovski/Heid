@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { CheckCircle, XCircle, Pencil, Trash2 } from "lucide-react";
 import type { TransactionWithRelations } from "./types";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import {
   isIncome,
   TYPE_LABELS,
@@ -31,6 +33,7 @@ export default function TransacaoCard({
   onPagar,
   onSaved,
 }: Props) {
+  const [showConfirm, setShowConfirm] = useState(false);
   const income = isIncome(t.type);
   const badge = STATUS_BADGE[t.status] ?? STATUS_BADGE.pending;
   const typeLabel = TYPE_LABELS[t.type] ?? t.type;
@@ -46,7 +49,6 @@ export default function TransacaoCard({
   }
 
   async function handleDelete() {
-    if (!confirm("Excluir esta transação permanentemente?")) return;
     await fetch(`/api/transacoes/${t.id}`, { method: "DELETE" });
     onSaved();
   }
@@ -58,6 +60,7 @@ export default function TransacaoCard({
   const scopeLabel = t.scope === "personal" ? "Pessoal" : "Familiar";
 
   return (
+    <>
     <div
       className={`px-4 py-3 rounded-xl border ${
         t.status === "cancelled"
@@ -151,7 +154,7 @@ export default function TransacaoCard({
             {/* Excluir — apenas manuais cancelados (quando callback disponível) */}
             {onEdit && isManual && t.status === "cancelled" && (
               <button
-                onClick={handleDelete}
+                onClick={() => setShowConfirm(true)}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                 title="Excluir permanentemente"
               >
@@ -162,5 +165,16 @@ export default function TransacaoCard({
         </div>
       </div>
     </div>
+
+    <ConfirmModal
+      isOpen={showConfirm}
+      onClose={() => setShowConfirm(false)}
+      onConfirm={handleDelete}
+      title="Excluir transação"
+      description="Excluir esta transação permanentemente? Esta ação não pode ser desfeita."
+      confirmLabel="Excluir"
+      variant="danger"
+    />
+  </>
   );
 }
