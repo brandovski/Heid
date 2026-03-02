@@ -312,6 +312,29 @@
 
 ---
 
+## Hardening de Segurança e Qualidade (Sessão 031)
+
+**Objetivo:** resolver vulnerabilidades identificadas em revisão abrangente do projeto.
+
+### Segurança de API
+- [x] CRON_SECRET fail-closed: `if (cronSecret && ...)` → `if (!cronSecret || ...)` em 3 endpoints de cron
+- [x] `contributor_user_id` removido do body do `POST /api/investimentos/[id]/transacoes` — sempre usa `user.id` autenticado
+- [x] `family_id` adicionado a todas as queries UPDATE/DELETE em 8 routes de `[id]` (defesa em profundidade além do RLS)
+- [x] `.single()` error handling padronizado em ~17 arquivos — `profileError`/`itemError`/`subError`/`txError` verificados
+
+### Migration 025 — Categorias de sistema automáticas
+- [x] Trigger `trg_system_categories_on_new_profile` cria automaticamente as 3 categorias de sistema por família
+- [x] Corrige bug da migration 023 que hardcodava `family_id` da família de desenvolvimento
+- [x] Backfill executado para família existente via `insert_system_categories_for_family()`
+
+### Qualidade e UX
+- [x] `loading.tsx` criado em 5 segments (`dashboard`, `transacoes`, `investimentos`, `orcamento`, `familia`) com skeletons `animate-pulse`
+- [x] `src/app/(app)/error.tsx` — Error Boundary global (client component) com brand styling e botão reset
+
+**Critério de conclusão:** zero vulnerabilidades críticas nas API routes; loading states e error boundary em todos os segmentos principais. ✅ **Concluído em 2026-03-02**
+
+---
+
 ## Backlog (pós v1.0)
 
 - Relatórios e exportação (PDF / CSV)
@@ -324,4 +347,4 @@
 
 ---
 
-*Atualizado em: 2026-03-02*
+*Atualizado em: 2026-03-02 (sessão 031)*
