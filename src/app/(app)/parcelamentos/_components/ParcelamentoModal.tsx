@@ -1,16 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Clock, CheckCircle2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import DatePicker from "@/components/ui/DatePicker";
-import ScopeSelector from "@/components/ui/ScopeSelector";
-import type { Category, CreditCard, Scope } from "@/types/database";
+import type { Category, CreditCard } from "@/types/database";
 
 interface Props {
   categorias: Pick<Category, "id" | "name" | "icon">[];
-  cartoes: Pick<CreditCard, "id" | "name" | "brand">[];
+  cartoes: Pick<CreditCard, "id" | "name" | "brand" | "closing_day">[];
   onClose: () => void;
   onSaved: () => void;
+}
+
+function rawPaidCycles(purchaseDateStr: string, closingDay: number): number {
+  const purchase = new Date(purchaseDateStr + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const purchaseIdx = purchase.getFullYear() * 12 + purchase.getMonth();
+  const firstInvoiceIdx = purchase.getDate() <= closingDay ? purchaseIdx : purchaseIdx + 1;
+
+  const todayIdx = today.getFullYear() * 12 + today.getMonth();
+  const currentCycleIdx = today.getDate() <= closingDay ? todayIdx : todayIdx + 1;
+
+  return Math.max(0, currentCycleIdx - firstInvoiceIdx);
 }
 
 export default function ParcelamentoModal({ categorias, cartoes, onClose, onSaved }: Props) {
@@ -19,12 +33,10 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
   const [description, setDescription] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
   const [installmentsCount, setInstallmentsCount] = useState("2");
-  const [firstDate, setFirstDate] = useState(today);
+  const [purchaseDate, setPurchaseDate] = useState(today);
   const [creditCardId, setCreditCardId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [notes, setNotes] = useState("");
-  const [scope, setScope] = useState<Scope>("family");
-  const [isShared, setIsShared] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,10 +45,26 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
   const total = parseFloat(totalAmount) || 0;
   const installmentValue = count > 0 && total > 0 ? total / count : 0;
 
+  const selectedCard = useMemo(
+    () => cartoes.find((c) => c.id === creditCardId) ?? null,
+    [cartoes, creditCardId]
+  );
+
+  const rawCycles = useMemo(
+    () =>
+      purchaseDate && selectedCard
+        ? rawPaidCycles(purchaseDate, selectedCard.closing_day)
+        : 0,
+    [purchaseDate, selectedCard]
+  );
+
+  const isCompleted = count > 0 && rawCycles >= count;
+  const paidInstallments = isCompleted ? count : Math.min(rawCycles, Math.max(0, count - 1));
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!description.trim() || !totalAmount || !installmentsCount || !firstDate || !creditCardId) {
+    if (!description.trim() || !totalAmount || !installmentsCount || !purchaseDate || !creditCardId) {
       setError("Preencha todos os campos obrigatórios");
       return;
     }
@@ -59,12 +87,11 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
         description: description.trim(),
         total_amount: total,
         installments_count: count,
-        first_installment_date: firstDate,
+        first_installment_date: purchaseDate,
         credit_card_id: creditCardId,
         category_id: categoryId || null,
         notes: notes || null,
-        scope,
-        is_shared: isShared,
+        paid_installments: paidInstallments,
       }),
     });
 
@@ -157,14 +184,49 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
             <span className="font-semibold text-gray-700">
               {installmentValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
             </span>
+            {isCompleted ? (
+              <span className="text-emerald-600"> · todas pagas</span>
+            ) : paidInstallments > 0 ? (
+              <span className="text-gray-400"> · {count - paidInstallments} a pagar</span>
+            ) : null}
           </p>
         )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Data da 1ª parcela <span className="text-red-500">*</span>
+            Data da compra <span className="text-red-500">*</span>
           </label>
-          <DatePicker value={firstDate} onChange={setFirstDate} placeholder="Selecione a data" />
+          <DatePicker value={purchaseDate} onChange={setPurchaseDate} placeholder="Selecione a data" />
+          {purchaseDate && selectedCard && (
+            isCompleted ? (
+              <div className="mt-2 flex gap-2.5 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-md pl-3 py-2.5">
+                <CheckCircle2 className="size-3.5 text-emerald-600 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-emerald-800">Compra quitada</p>
+                  <p className="text-xs text-emerald-700 mt-0.5">
+                    Todos os {count} ciclos de cobrança já passaram (fechamento dia {selectedCard.closing_day}).
+                    Todas as parcelas serão registradas como pagas.
+                  </p>
+                </div>
+              </div>
+            ) : paidInstallments > 0 ? (
+              <div className="mt-2 flex gap-2.5 bg-amber-50 border-l-4 border-amber-400 rounded-r-md pl-3 py-2">
+                <Clock className="size-3.5 text-amber-500 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-xs text-amber-700">
+                    {paidInstallments} parcela{paidInstallments > 1 ? "s" : ""} paga{paidInstallments > 1 ? "s" : ""}, considerando o fechamento do cartão (dia {selectedCard.closing_day}).
+                  </p>
+                  <p className="text-xs text-amber-700">
+                    Restam {count - paidInstallments} a pagar.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-400 mt-1">
+                Primeira parcela ainda não foi cobrada.
+              </p>
+            )
+          )}
         </div>
 
         <div>
@@ -212,13 +274,6 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
           />
         </div>
-
-        <ScopeSelector
-          scope={scope}
-          isShared={isShared}
-          onScopeChange={setScope}
-          onIsSharedChange={setIsShared}
-        />
       </form>
     </Modal>
   );

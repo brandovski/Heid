@@ -36,8 +36,7 @@ export async function POST(req: NextRequest) {
     credit_card_id,
     category_id,
     notes,
-    scope,
-    is_shared,
+    paid_installments = 0,
   } = await req.json();
 
   if (
@@ -61,6 +60,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const paidCount = Number(paid_installments);
+  if (paidCount < 0 || paidCount > count) {
+    return NextResponse.json({ error: "paid_installments inválido" }, { status: 400 });
+  }
+
   const { data: group, error: groupError } = await supabase
     .from("installment_groups")
     .insert({
@@ -72,9 +76,9 @@ export async function POST(req: NextRequest) {
       credit_card_id,
       category_id: category_id || null,
       notes: notes || null,
-      scope: scope ?? "family",
-      user_id: scope === "personal" ? user.id : null,
-      is_shared: scope === "personal" ? (is_shared ?? false) : false,
+      scope: "personal",
+      user_id: user.id,
+      is_shared: false,
     })
     .select()
     .single();
@@ -96,12 +100,12 @@ export async function POST(req: NextRequest) {
       amount: (isLast ? installmentCents + remainderCents : installmentCents) / 100,
       date: addMonths(first_installment_date, i),
       type: "installment" as const,
-      status: "pending" as const,
+      status: (i < paidCount ? "paid" : "pending") as "paid" | "pending",
       category_id: category_id || null,
       credit_card_id,
       installment_group_id: group.id,
-      scope: scope ?? "family",
-      user_id: scope === "personal" ? user.id : null,
+      scope: "personal" as const,
+      user_id: user.id,
       auto_generated: false,
     };
   });

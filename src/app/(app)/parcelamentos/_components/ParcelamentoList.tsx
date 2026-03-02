@@ -21,7 +21,7 @@ interface Props {
   groups: InstallmentGroupWithRelations[];
   transactions: InstallmentTx[];
   categorias: Pick<Category, "id" | "name" | "icon">[];
-  cartoes: Pick<CreditCard, "id" | "name" | "brand">[];
+  cartoes: Pick<CreditCard, "id" | "name" | "brand" | "closing_day">[];
 }
 
 type StatusFilter = "all" | "active" | "done";

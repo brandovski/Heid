@@ -29,7 +29,7 @@ export default async function ParcelamentosPage() {
       .order("name"),
     supabase
       .from("credit_cards")
-      .select("id, name, brand")
+      .select("id, name, brand, closing_day")
       .eq("is_active", true)
       .order("name"),
   ]);
