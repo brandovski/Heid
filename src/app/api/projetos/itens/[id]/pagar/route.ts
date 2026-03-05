@@ -77,7 +77,66 @@ export async function POST(
       return NextResponse.json({ error: "Investimento não vinculado ao item" }, { status: 400 });
     }
 
-    // Criar withdrawal no investimento (sem lançar no extrato financeiro)
+    if (item.payment_type === "deposit_remainder") {
+      if (!item.deposit_amount || !item.remainder_date) {
+        return NextResponse.json({ error: "Sinal e data do restante são obrigatórios" }, { status: 400 });
+      }
+
+      if (!item.deposit_transaction_id) {
+        // PASSO 1: Debitar sinal do investimento
+        const { data: invTx, error: invTxError } = await supabase
+          .from("investment_transactions")
+          .insert({
+            investment_id: item.investment_id,
+            family_id: profile.family_id,
+            type: "withdrawal" as const,
+            amount: item.deposit_amount,
+            date: today,
+            notes: `Pagamento: ${item.name} — Sinal`,
+            auto_generated: false,
+          })
+          .select()
+          .single();
+
+        if (invTxError) return NextResponse.json({ error: invTxError.message }, { status: 500 });
+
+        const { error: updateError } = await supabase
+          .from("project_items")
+          .update({ deposit_transaction_id: invTx.id })
+          .eq("id", params.id);
+
+        if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+
+        return NextResponse.json({ step: "deposit" });
+      } else {
+        // PASSO 2: Debitar restante do investimento
+        const remainder = item.actual_amount - (item.deposit_amount ?? 0);
+        const { error: invTxError } = await supabase
+          .from("investment_transactions")
+          .insert({
+            investment_id: item.investment_id,
+            family_id: profile.family_id,
+            type: "withdrawal" as const,
+            amount: remainder,
+            date: today,
+            notes: `Pagamento: ${item.name} — Restante`,
+            auto_generated: false,
+          });
+
+        if (invTxError) return NextResponse.json({ error: invTxError.message }, { status: 500 });
+
+        const { error: updateError } = await supabase
+          .from("project_items")
+          .update({ status: "paid" })
+          .eq("id", params.id);
+
+        if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+
+        return NextResponse.json({ step: "remainder" });
+      }
+    }
+
+    // Pagamento único (cash, card — sem dois passos)
     const { error: invTxError } = await supabase
       .from("investment_transactions")
       .insert({
