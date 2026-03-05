@@ -64,7 +64,6 @@ export function formatDayHeader(dateStr: string): string {
 export const INCOME_TYPES = [
   "income",
   "fixed_income",
-  "investment_withdrawal",
 ] as const;
 
 export function isIncomeType(type: string): boolean {
@@ -81,7 +80,6 @@ export function typeToBadge(type: string): string {
     case "installment":
       return "parcela";
     case "investment_deposit":
-    case "investment_withdrawal":
       return "investimento";
     default:
       return "avulso";

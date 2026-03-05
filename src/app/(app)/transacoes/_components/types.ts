@@ -26,7 +26,6 @@ export interface FaturaGrupo {
 export const INCOME_TYPES = [
   "income",
   "fixed_income",
-  "investment_withdrawal",
 ] as const;
 
 export const EXPENSE_TYPES = [
@@ -46,11 +45,15 @@ export const TYPE_LABELS: Record<string, string> = {
   expense: "Despesa",
   installment: "Parcela",
   subscription: "Assinatura",
-  fixed_income: "Fixa",
-  fixed_expense: "Fixa",
+  fixed_income: "Recorrente",
+  fixed_expense: "Recorrente",
   investment_deposit: "Aporte",
-  investment_withdrawal: "Resgate",
 };
+
+export function getTypeLabel(type: string, investmentId: string | null): string {
+  if (type === "income" && investmentId) return "Resgate";
+  return TYPE_LABELS[type] ?? type;
+}
 
 export const MONTH_NAMES = [
   "Janeiro",

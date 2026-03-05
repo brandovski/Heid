@@ -15,6 +15,15 @@ interface Props {
 export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
   const isUsd = a.original_currency === "USD";
+
+  // Verificar se está no período promocional
+  const isInPromo = (() => {
+    if (a.promotional_amount == null || a.promotional_months == null) return false;
+    const today = new Date();
+    const [startYear, startMonth] = a.start_date.split("-").map(Number);
+    const monthsActive = (today.getFullYear() * 12 + today.getMonth() + 1) - (startYear * 12 + startMonth);
+    return monthsActive < a.promotional_months;
+  })();
   const scopeColor =
     a.scope === "personal" ? "bg-purple-50 text-purple-700" : "bg-brand-50 text-brand-700";
 
@@ -55,6 +64,12 @@ export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props
         </p>
 
         <div className="flex items-center gap-1 shrink-0">
+          {isInPromo && (
+            <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-emerald-50 text-emerald-700">
+              Promo
+            </span>
+          )}
+
           {isUsd && (
             <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-yellow-50 text-yellow-700">
               USD

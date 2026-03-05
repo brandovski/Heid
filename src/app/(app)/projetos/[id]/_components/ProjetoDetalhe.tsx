@@ -52,7 +52,11 @@ export default function ProjetoDetalhe({
   const activeItems = allItems.filter((i) => i.status !== "cancelled");
   const paidItems = allItems.filter((i) => i.status === "paid");
   const budgetPrevisto = activeItems.reduce((s, i) => s + (i.budget_amount ?? 0), 0);
-  const gastoReal = paidItems.reduce((s, i) => s + (i.actual_amount ?? 0), 0);
+  // Inclui depósitos pagos de itens deposit_remainder ainda em "confirmed"
+  const depositosParciais = allItems
+    .filter((i) => i.status === "confirmed" && i.deposit_transaction_id)
+    .reduce((s, i) => s + (i.deposit_amount ?? 0), 0);
+  const gastoReal = paidItems.reduce((s, i) => s + (i.actual_amount ?? 0), 0) + depositosParciais;
   const saldoEstimado = project.total_budget - budgetPrevisto;
   const saldoReal = project.total_budget - gastoReal;
 

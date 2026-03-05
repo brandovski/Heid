@@ -41,6 +41,17 @@ export default function AssinaturaModal({
   const [scope, setScope] = useState<Scope>(assinatura?.scope ?? "family");
   const [isShared, setIsShared] = useState(assinatura?.is_shared ?? false);
 
+  // Valor promocional
+  const [hasPromo, setHasPromo] = useState(
+    assinatura?.promotional_amount != null && assinatura?.promotional_months != null
+  );
+  const [promoAmount, setPromoAmount] = useState(
+    assinatura?.promotional_amount?.toString() ?? ""
+  );
+  const [promoMonths, setPromoMonths] = useState(
+    assinatura?.promotional_months?.toString() ?? ""
+  );
+
   const [rateStatus, setRateStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [rate, setRate] = useState<number | null>(null);
 
@@ -115,6 +126,14 @@ export default function AssinaturaModal({
 
     if (!isEditing) {
       payload.start_date = startDate;
+    }
+
+    if (hasPromo && promoAmount && promoMonths) {
+      payload.promotional_amount = parseFloat(promoAmount);
+      payload.promotional_months = parseInt(promoMonths);
+    } else {
+      payload.promotional_amount = null;
+      payload.promotional_months = null;
     }
 
     const url = isEditing ? `/api/assinaturas/${assinatura.id}` : "/api/assinaturas";
@@ -314,6 +333,57 @@ export default function AssinaturaModal({
             placeholder="Opcional"
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
           />
+        </div>
+
+        {/* Valor promocional */}
+        <div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={hasPromo}
+              onChange={(e) => {
+                setHasPromo(e.target.checked);
+                if (!e.target.checked) {
+                  setPromoAmount("");
+                  setPromoMonths("");
+                }
+              }}
+              className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+            />
+            <span className="text-sm font-medium text-gray-700">Tem valor promocional?</span>
+          </label>
+          {hasPromo && (
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Valor promo (R$) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={promoAmount}
+                  onChange={(e) => setPromoAmount(e.target.value)}
+                  placeholder="0,00"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Nº de meses <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={promoMonths}
+                  onChange={(e) => setPromoMonths(e.target.value)}
+                  placeholder="Ex: 3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         <ScopeSelector

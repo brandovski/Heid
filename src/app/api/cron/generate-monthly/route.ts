@@ -170,10 +170,18 @@ export async function GET(req: NextRequest) {
       .filter((sub) => !existingSubIds.has(sub.id))
       .map((sub) => {
         const isUsd = sub.original_currency === "USD";
+        // Verificar se está dentro do período promocional
+        const [startYear, startMonth] = sub.start_date.split("-").map(Number);
+        const monthsActive = (year * 12 + month) - (startYear * 12 + startMonth);
+        const isInPromo =
+          sub.promotional_amount != null &&
+          sub.promotional_months != null &&
+          monthsActive < sub.promotional_months;
+        const effectiveAmount = isInPromo ? sub.promotional_amount! : sub.amount_brl;
         return {
           family_id: sub.family_id,
-          description: sub.name,
-          amount: sub.amount_brl,
+          description: isInPromo ? `${sub.name} (Promo)` : sub.name,
+          amount: effectiveAmount,
           date: dateStr(year, month, sub.billing_day),
           type: "subscription" as const,
           status: "pending" as const,

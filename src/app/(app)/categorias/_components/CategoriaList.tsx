@@ -34,6 +34,10 @@ export default function CategoriaList({ initialData }: Props) {
   const active = initialData.filter((c) => c.is_active);
   const inactive = initialData.filter((c) => !c.is_active);
 
+  const activeIncome = active.filter((c) => c.type === "income");
+  const activeExpense = active.filter((c) => c.type === "expense");
+  const activeBoth = active.filter((c) => c.type == null);
+
   return (
     <div>
       <button
@@ -58,16 +62,38 @@ export default function CategoriaList({ initialData }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {active.map((cat) => (
-          <CategoriaCard
-            key={cat.id}
-            categoria={cat}
-            onEdit={handleEdit}
-            onSaved={handleSaved}
-          />
-        ))}
-      </div>
+      {activeIncome.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2">Receitas</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {activeIncome.map((cat) => (
+              <CategoriaCard key={cat.id} categoria={cat} onEdit={handleEdit} onSaved={handleSaved} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeExpense.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-xs font-semibold text-red-700 uppercase tracking-wider mb-2">Despesas</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {activeExpense.map((cat) => (
+              <CategoriaCard key={cat.id} categoria={cat} onEdit={handleEdit} onSaved={handleSaved} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeBoth.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Receita ou Despesa</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {activeBoth.map((cat) => (
+              <CategoriaCard key={cat.id} categoria={cat} onEdit={handleEdit} onSaved={handleSaved} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {inactive.length > 0 && (
         <div className="mt-8">

@@ -60,7 +60,7 @@ export default async function TransacoesPage({
       .order("created_at", { ascending: false }),
     supabase
       .from("categories")
-      .select("id, name, icon, color")
+      .select("id, name, icon, color, type")
       .eq("is_active", true)
       .order("name"),
     supabase

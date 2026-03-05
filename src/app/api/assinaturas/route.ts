@@ -30,6 +30,8 @@ export async function POST(req: NextRequest) {
     notes,
     scope,
     is_shared,
+    promotional_amount,
+    promotional_months,
   } = await req.json();
 
   if (!name?.trim() || !amount_original || !billing_day || !credit_card_id || !start_date) {
@@ -68,6 +70,8 @@ export async function POST(req: NextRequest) {
       scope: scope ?? "family",
       user_id: scope === "personal" ? user.id : null,
       is_shared: scope === "personal" ? (is_shared ?? false) : false,
+      promotional_amount: promotional_amount ?? null,
+      promotional_months: promotional_months ?? null,
     })
     .select()
     .single();

@@ -57,9 +57,9 @@ export async function POST(req: NextRequest) {
       notes: notes ?? null,
       payment_method,
       credit_card_id: payment_method === "credit_card" ? credit_card_id : null,
-      scope: scope ?? "family",
-      user_id: scope === "personal" ? user.id : null,
-      is_shared: scope === "personal" ? (is_shared ?? false) : false,
+      scope: "personal",
+      user_id: user.id,
+      is_shared: false,
     })
     .select()
     .single();

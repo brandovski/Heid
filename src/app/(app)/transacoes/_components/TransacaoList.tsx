@@ -21,7 +21,7 @@ import FaturaGrupoCard from "./FaturaGrupoCard";
 
 interface Props {
   transacoes: TransactionWithRelations[];
-  categorias: Pick<Category, "id" | "name" | "icon" | "color">[];
+  categorias: Pick<Category, "id" | "name" | "icon" | "color" | "type">[];
   cartoes: Pick<CreditCard, "id" | "name" | "brand" | "color">[];
   invoicePayments: InvoicePaymentSimple[];
   mes: string;
@@ -256,7 +256,7 @@ export default function TransacaoList({
           className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
         >
           <Settings size={12} />
-          Gerenciar Transações Fixas
+          Gerenciar Recorrências
         </Link>
       </div>
 

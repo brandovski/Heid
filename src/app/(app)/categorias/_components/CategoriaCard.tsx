@@ -1,7 +1,9 @@
 "use client";
 
-import { Archive, Pencil, RotateCcw } from "lucide-react";
+import { useState } from "react";
+import { Archive, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import type { Category } from "@/types/database";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 interface Props {
   categoria: Category;
@@ -10,6 +12,9 @@ interface Props {
 }
 
 export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
   async function handleToggleActive() {
     await fetch(`/api/categorias/${categoria.id}`, {
       method: "PATCH",
@@ -19,7 +24,26 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
     onSaved();
   }
 
+  async function handleDelete() {
+    const res = await fetch(`/api/categorias/${categoria.id}`, { method: "DELETE" });
+    if (res.ok) {
+      onSaved();
+    } else {
+      const { error } = await res.json();
+      setDeleteError(error ?? "Erro ao excluir");
+    }
+    setShowDeleteConfirm(false);
+  }
+
+  const typeLabel = categoria.type === "income" ? "Receita" : categoria.type === "expense" ? "Despesa" : null;
+  const typeBadgeClass = categoria.type === "income"
+    ? "bg-green-50 text-green-700"
+    : categoria.type === "expense"
+    ? "bg-red-50 text-red-700"
+    : null;
+
   return (
+    <>
     <div
       className={`flex items-center justify-between p-4 rounded-xl border ${
         categoria.is_active
@@ -37,7 +61,14 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
           {categoria.icon ?? "📁"}
         </div>
         <div>
-          <p className="text-sm font-medium text-gray-900">{categoria.name}</p>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <p className="text-sm font-medium text-gray-900">{categoria.name}</p>
+            {typeLabel && typeBadgeClass && (
+              <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${typeBadgeClass}`}>
+                {typeLabel}
+              </span>
+            )}
+          </div>
           {categoria.color && (
             <div className="flex items-center gap-1 mt-0.5">
               <div
@@ -46,6 +77,9 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
               />
               <span className="text-xs text-gray-400">{categoria.color}</span>
             </div>
+          )}
+          {deleteError && (
+            <p className="text-xs text-red-500 mt-0.5">{deleteError}</p>
           )}
         </div>
       </div>
@@ -67,7 +101,27 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
         >
           {categoria.is_active ? <Archive size={15} /> : <RotateCcw size={15} />}
         </button>
+        {!categoria.is_active && (
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+            title="Excluir permanentemente"
+          >
+            <Trash2 size={15} />
+          </button>
+        )}
       </div>
     </div>
+
+    <ConfirmModal
+      isOpen={showDeleteConfirm}
+      onClose={() => setShowDeleteConfirm(false)}
+      onConfirm={handleDelete}
+      title="Excluir categoria"
+      description={`Excluir permanentemente a categoria "${categoria.name}"? Esta ação não pode ser desfeita.`}
+      confirmLabel="Excluir"
+      variant="danger"
+    />
+    </>
   );
 }

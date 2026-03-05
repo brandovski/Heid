@@ -6,7 +6,7 @@ import type { TransactionWithRelations } from "./types";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import {
   isIncome,
-  TYPE_LABELS,
+  getTypeLabel,
   formatDate,
   formatCurrency,
 } from "./types";
@@ -36,7 +36,7 @@ export default function TransacaoCard({
   const [showConfirm, setShowConfirm] = useState(false);
   const income = isIncome(t.type);
   const badge = STATUS_BADGE[t.status] ?? STATUS_BADGE.pending;
-  const typeLabel = TYPE_LABELS[t.type] ?? t.type;
+  const typeLabel = getTypeLabel(t.type, t.investment_id);
   const isManual = !t.auto_generated;
 
   async function handleCancel() {

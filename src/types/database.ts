@@ -5,8 +5,7 @@ export type TransactionType =
   | "subscription"
   | "fixed_income"
   | "fixed_expense"
-  | "investment_deposit"
-  | "investment_withdrawal";
+  | "investment_deposit";
 
 export type TransactionStatus = "pending" | "paid" | "cancelled";
 
@@ -27,6 +26,7 @@ export interface Category {
   color: string | null;
   is_active: boolean;
   is_system: boolean;
+  type: 'income' | 'expense' | null;
   created_at: string;
 }
 
@@ -104,6 +104,9 @@ export interface Subscription {
   scope: Scope;
   user_id: string | null;
   is_shared: boolean;
+  // Valor promocional (migration 026)
+  promotional_amount: number | null;
+  promotional_months: number | null;
   created_at: string;
 }
 

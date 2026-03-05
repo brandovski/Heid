@@ -48,8 +48,8 @@ export async function POST(
   const amountNum = parseFloat(amount);
   // For deposits: always use the authenticated user as contributor (never allow client override)
   // For deposits: create a personal expense for the contributor (type "expense")
-  // For withdrawals: keep investment_withdrawal scoped to the investment owner
-  const txType   = type === "deposit" ? "expense" : "investment_withdrawal";
+  // For withdrawals: create an income transaction scoped to the investment owner
+  const txType   = type === "deposit" ? "expense" : "income";
   const txScope  = type === "deposit" ? "personal" : investment.scope;
   const txUserId = type === "deposit" ? user.id : investment.user_id;
 

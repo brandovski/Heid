@@ -36,12 +36,10 @@ export async function PATCH(
     if (body[field] !== undefined) updates[field] = body[field];
   }
 
-  if (body.scope !== undefined) {
-    updates.scope = body.scope;
-    updates.user_id = body.scope === "personal" ? user.id : null;
-    updates.is_shared =
-      body.scope === "personal" ? (body.is_shared ?? false) : false;
-  }
+  // Scope sempre personal (recorrências não têm escopo configurável)
+  updates.scope = "personal";
+  updates.user_id = user.id;
+  updates.is_shared = false;
 
   const { data, error } = await supabase
     .from("fixed_incomes")

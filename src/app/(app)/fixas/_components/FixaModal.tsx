@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
-import ScopeSelector from "@/components/ui/ScopeSelector";
 import DatePicker from "@/components/ui/DatePicker";
 import type {
   FixedIncome,
   FixedExpense,
   Category,
   CreditCard,
-  Scope,
 } from "@/types/database";
 import type { FixaTab } from "./FixaList";
 
@@ -18,7 +16,7 @@ type FixaItem = FixedIncome | FixedExpense;
 interface Props {
   item: FixaItem | null;
   tab: FixaTab;
-  categorias: Pick<Category, "id" | "name" | "icon">[];
+  categorias: Pick<Category, "id" | "name" | "icon" | "type">[];
   cartoes: Pick<CreditCard, "id" | "name" | "brand">[];
   onClose: () => void;
   onSaved: () => void;
@@ -47,8 +45,6 @@ export default function FixaModal({
     item?.start_date ?? new Date().toISOString().split("T")[0]
   );
   const [notes, setNotes] = useState(item?.notes ?? "");
-  const [scope, setScope] = useState<Scope>(item?.scope ?? "family");
-  const [isShared, setIsShared] = useState(item?.is_shared ?? false);
 
   const [paymentMethod, setPaymentMethod] = useState<"account" | "credit_card">(
     expense?.payment_method ?? "account"
@@ -83,8 +79,8 @@ export default function FixaModal({
       category_id: categoryId || null,
       start_date: startDate,
       notes: notes || null,
-      scope,
-      is_shared: scope === "personal" ? isShared : false,
+      scope: "personal",
+      is_shared: false,
     };
 
     if (isDespesa) {
@@ -109,8 +105,8 @@ export default function FixaModal({
   }
 
   const title = isDespesa
-    ? item ? "Editar Despesa Fixa" : "Nova Despesa Fixa"
-    : item ? "Editar Receita Fixa" : "Nova Receita Fixa";
+    ? item ? "Editar Despesa Recorrente" : "Nova Despesa Recorrente"
+    : item ? "Editar Receita Recorrente" : "Nova Receita Recorrente";
 
   const formId = "fixa-form";
 
@@ -196,12 +192,14 @@ export default function FixaModal({
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="">Sem categoria</option>
-            {categorias.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.icon ? `${c.icon} ` : ""}
-                {c.name}
-              </option>
-            ))}
+            {categorias
+              .filter((c) => c.type == null || c.type === (isDespesa ? "expense" : "income"))
+              .map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.icon ? `${c.icon} ` : ""}
+                  {c.name}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -281,12 +279,6 @@ export default function FixaModal({
           />
         </div>
 
-        <ScopeSelector
-          scope={scope}
-          isShared={isShared}
-          onScopeChange={setScope}
-          onIsSharedChange={setIsShared}
-        />
       </form>
     </Modal>
   );

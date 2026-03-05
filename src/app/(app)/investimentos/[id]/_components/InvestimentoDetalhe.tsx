@@ -38,6 +38,7 @@ interface Props {
   transactions: InvestmentTransaction[];
   snapshots: InvestmentSnapshot[];
   projectItems: ProjectItemRef[];
+  members: { id: string; full_name: string | null }[];
 }
 
 type Modal =
@@ -52,6 +53,7 @@ export default function InvestimentoDetalhe({
   transactions: initialTxs,
   snapshots: initialSnaps,
   projectItems,
+  members,
 }: Props) {
   const [investment, setInvestment] = useState<Investment>(initialInvestment);
   const [transactions, setTransactions] = useState<InvestmentTransaction[]>(initialTxs);
@@ -229,11 +231,21 @@ export default function InvestimentoDetalhe({
                     <p className="text-sm font-medium text-gray-800">
                       {tx.type === "deposit" ? "Aporte" : "Resgate"}
                     </p>
-                    <p className="text-xs text-gray-400">
-                      {new Date(tx.date + "T12:00:00").toLocaleDateString("pt-BR")}
-                      {tx.auto_generated && " · Automático"}
-                      {tx.notes && ` · ${tx.notes}`}
-                    </p>
+                    <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                      <span className="text-xs text-gray-400">
+                        {new Date(tx.date + "T12:00:00").toLocaleDateString("pt-BR")}
+                        {tx.auto_generated && " · Automático"}
+                        {tx.notes && ` · ${tx.notes}`}
+                      </span>
+                      {tx.type === "deposit" && tx.contributor_user_id && (() => {
+                        const contributor = members.find((m) => m.id === tx.contributor_user_id);
+                        return contributor ? (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 font-medium">
+                            {contributor.full_name ?? "Membro"}
+                          </span>
+                        ) : null;
+                      })()}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

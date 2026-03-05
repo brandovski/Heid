@@ -46,9 +46,9 @@ export async function POST(req: NextRequest) {
       category_id: category_id ?? null,
       start_date: start_date ?? new Date().toISOString().split("T")[0],
       notes: notes ?? null,
-      scope: scope ?? "family",
-      user_id: scope === "personal" ? user.id : null,
-      is_shared: scope === "personal" ? (is_shared ?? false) : false,
+      scope: "personal",
+      user_id: user.id,
+      is_shared: false,
     })
     .select()
     .single();

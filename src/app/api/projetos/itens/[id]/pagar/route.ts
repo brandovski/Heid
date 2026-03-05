@@ -70,6 +70,38 @@ export async function POST(
     auto_generated: false,
   };
 
+  // Verificar payment_origin=investment ANTES dos branches de payment_type
+  // pois anteriormente o else-if nunca era alcançado.
+  if (item.payment_origin === "investment") {
+    if (!item.investment_id) {
+      return NextResponse.json({ error: "Investimento não vinculado ao item" }, { status: 400 });
+    }
+
+    // Criar withdrawal no investimento (sem lançar no extrato financeiro)
+    const { error: invTxError } = await supabase
+      .from("investment_transactions")
+      .insert({
+        investment_id: item.investment_id,
+        family_id: profile.family_id,
+        type: "withdrawal" as const,
+        amount: item.actual_amount,
+        date: today,
+        notes: `Pagamento: ${item.name}`,
+        auto_generated: false,
+      });
+
+    if (invTxError) return NextResponse.json({ error: invTxError.message }, { status: 500 });
+
+    const { error: updateError } = await supabase
+      .from("project_items")
+      .update({ status: "paid" })
+      .eq("id", params.id);
+
+    if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+
+    return NextResponse.json({ ok: true });
+  }
+
   if (item.payment_type === "cash") {
     // Single expense transaction, paid
     const { data: tx, error: txError } = await supabase
@@ -224,34 +256,6 @@ export async function POST(
 
       return NextResponse.json({ step: "remainder" });
     }
-  } else if (item.payment_origin === "investment") {
-    if (!item.investment_id) {
-      return NextResponse.json({ error: "Investimento não vinculado ao item" }, { status: 400 });
-    }
-
-    // Create withdrawal investment_transaction (no financial transaction in extrato)
-    const { error: invTxError } = await supabase
-      .from("investment_transactions")
-      .insert({
-        investment_id: item.investment_id,
-        family_id: profile.family_id,
-        type: "withdrawal" as const,
-        amount: item.actual_amount,
-        date: today,
-        notes: `Pagamento: ${item.name}`,
-        auto_generated: false,
-      });
-
-    if (invTxError) return NextResponse.json({ error: invTxError.message }, { status: 500 });
-
-    const { error: updateError } = await supabase
-      .from("project_items")
-      .update({ status: "paid" })
-      .eq("id", params.id);
-
-    if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
-
-    return NextResponse.json({ ok: true });
   }
 
   return NextResponse.json({ error: "Tipo de pagamento inválido" }, { status: 400 });

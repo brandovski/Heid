@@ -13,7 +13,7 @@ type FixaItem = FixedIncome | FixedExpense;
 interface Props {
   receitas: FixedIncome[];
   despesas: FixedExpense[];
-  categorias: Pick<Category, "id" | "name" | "icon" | "color">[];
+  categorias: Pick<Category, "id" | "name" | "icon" | "color" | "type">[];
   cartoes: Pick<CreditCard, "id" | "name" | "brand">[];
 }
 
@@ -94,7 +94,7 @@ export default function FixaList({
         <div className="text-center py-12 text-gray-400">
           <p>
             Nenhum
-            {tab === "receitas" ? "a receita" : "a despesa"} fixa cadastrada.
+            {tab === "receitas" ? "a receita" : "a despesa"} recorrente cadastrada.
           </p>
         </div>
       )}

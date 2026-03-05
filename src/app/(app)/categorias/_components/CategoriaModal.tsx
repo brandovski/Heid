@@ -20,6 +20,7 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
   const [name, setName] = useState(categoria?.name ?? "");
   const [icon, setIcon] = useState(categoria?.icon ?? "");
   const [color, setColor] = useState(categoria?.color ?? "");
+  const [type, setType] = useState<'income' | 'expense' | null>(categoria?.type ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -39,7 +40,7 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: name.trim(), icon: icon || null, color: color || null }),
+      body: JSON.stringify({ name: name.trim(), icon: icon || null, color: color || null, type: type ?? null }),
     });
 
     setLoading(false);
@@ -90,6 +91,30 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
             placeholder="Ex: Alimentação"
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+          <div className="grid grid-cols-3 gap-2">
+            {([
+              { value: null, label: "Ambos" },
+              { value: "income" as const, label: "Receita" },
+              { value: "expense" as const, label: "Despesa" },
+            ] as const).map(({ value, label }) => (
+              <button
+                key={String(value)}
+                type="button"
+                onClick={() => setType(value)}
+                className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
+                  type === value
+                    ? "bg-brand-50 border-brand-500 text-brand-700"
+                    : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div>

@@ -15,7 +15,7 @@ export default async function FixasPage() {
     supabase.from("fixed_expenses").select("*").order("description"),
     supabase
       .from("categories")
-      .select("id, name, icon, color")
+      .select("id, name, icon, color, type")
       .eq("is_active", true)
       .order("name"),
     supabase
@@ -30,7 +30,7 @@ export default async function FixasPage() {
       <div className="flex items-center gap-3 mb-6">
         <Repeat className="text-brand-600" size={24} />
         <h1 className="text-2xl font-bold text-gray-900">
-          Receitas e Despesas Fixas
+          Recorrências
         </h1>
       </div>
       <FixaList

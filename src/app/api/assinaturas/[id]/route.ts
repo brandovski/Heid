@@ -30,6 +30,8 @@ export async function PATCH(
     notes,
     scope,
     is_shared,
+    promotional_amount,
+    promotional_months,
   } = await req.json();
 
   const updates: Record<string, unknown> = {};
@@ -50,6 +52,8 @@ export async function PATCH(
   else if (original_currency === "BRL" && amount_original !== undefined) {
     updates.amount_brl = parseFloat(amount_original);
   }
+  if (promotional_amount !== undefined) updates.promotional_amount = promotional_amount ?? null;
+  if (promotional_months !== undefined) updates.promotional_months = promotional_months ?? null;
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nenhum campo para atualizar" }, { status: 400 });

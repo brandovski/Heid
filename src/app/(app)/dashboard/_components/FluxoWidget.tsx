@@ -149,7 +149,7 @@ export default function FluxoWidget({ transactions, creditCards, currentMonth, e
             }
 
             // Cash item
-            const isIncome = ["income", "fixed_income", "investment_withdrawal"].includes(item.type);
+            const isIncome = ["income", "fixed_income"].includes(item.type);
             return (
               <div key={item.id} className="flex items-center justify-between py-2.5 gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">

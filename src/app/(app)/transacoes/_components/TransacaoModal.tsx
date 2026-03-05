@@ -9,7 +9,7 @@ import type { TransactionWithRelations } from "./types";
 
 interface Props {
   transacao: TransactionWithRelations | null;
-  categorias: Pick<Category, "id" | "name" | "icon">[];
+  categorias: Pick<Category, "id" | "name" | "icon" | "type">[];
   cartoes: Pick<CreditCard, "id" | "name" | "brand">[];
   onClose: () => void;
   onSaved: () => void;
@@ -29,7 +29,7 @@ export default function TransacaoModal({
 
   const [type, setType] = useState<"income" | "expense">(
     transacao
-      ? ["income", "fixed_income", "investment_withdrawal"].includes(transacao.type)
+      ? ["income", "fixed_income"].includes(transacao.type)
         ? "income"
         : "expense"
       : "expense"
@@ -304,12 +304,14 @@ export default function TransacaoModal({
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="">Sem categoria</option>
-            {categorias.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.icon ? `${c.icon} ` : ""}
-                {c.name}
-              </option>
-            ))}
+            {categorias
+              .filter((c) => c.type == null || c.type === (type === "income" ? "income" : "expense"))
+              .map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.icon ? `${c.icon} ` : ""}
+                  {c.name}
+                </option>
+              ))}
           </select>
         </div>
 

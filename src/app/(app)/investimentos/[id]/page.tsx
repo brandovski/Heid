@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import InvestimentoDetalhe from "./_components/InvestimentoDetalhe";
+import type { Profile } from "@/types/database";
 
 export default async function InvestimentoDetalhePage({
   params,
@@ -13,11 +14,18 @@ export default async function InvestimentoDetalhePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("family_id")
+    .eq("id", user.id)
+    .single();
+
   const [
     { data: investment },
     { data: transactions },
     { data: snapshots },
     { data: projectItems },
+    { data: members },
   ] = await Promise.all([
     supabase.from("investments").select("*").eq("id", params.id).single(),
     supabase
@@ -36,6 +44,12 @@ export default async function InvestimentoDetalhePage({
       .select("id, name, actual_amount, budget_amount, expected_payment_date, status, payment_type, deposit_amount, remainder_date, deposit_transaction_id")
       .eq("investment_id", params.id)
       .in("status", ["confirmed", "paid"]),
+    profile?.family_id
+      ? supabase
+          .from("profiles")
+          .select("id, full_name")
+          .eq("family_id", profile.family_id)
+      : Promise.resolve({ data: [] }),
   ]);
 
   if (!investment) notFound();
@@ -47,6 +61,7 @@ export default async function InvestimentoDetalhePage({
         transactions={transactions ?? []}
         snapshots={snapshots ?? []}
         projectItems={projectItems ?? []}
+        members={(members ?? []) as Pick<Profile, "id" | "full_name">[]}
       />
     </div>
   );

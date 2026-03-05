@@ -25,7 +25,7 @@ import type { Category, CreditCard as CreditCardDB } from "@/types/database";
 type MenuView = "main" | "cartoes";
 
 interface QuickAddData {
-  categorias: Pick<Category, "id" | "name" | "icon">[];
+  categorias: Pick<Category, "id" | "name" | "icon" | "type">[];
   cartoes: Pick<CreditCardDB, "id" | "name" | "brand">[];
 }
 
@@ -42,6 +42,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/perfil": "Perfil",
   "/fluxo": "Fluxo",
   "/categorias": "Categorias",
+  "/fixas": "Recorrências",
 };
 
 const desktopCartoesItems = [
