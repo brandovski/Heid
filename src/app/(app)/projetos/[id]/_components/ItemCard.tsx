@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, MoreHorizontal, Trash2 } from "lucide-react";
+import DatePicker from "@/components/ui/DatePicker";
 import type { ProjectItemWithRelations, ProjectItem, ProjectGroup } from "../../_components/types";
 import {
   formatCurrency,
@@ -23,7 +25,7 @@ interface Props {
   projectId: string;
   onEdit: (item: ProjectItemWithRelations) => void;
   onConfirm: (item: ProjectItemWithRelations) => void;
-  onPay: (item: ProjectItemWithRelations) => void;
+  onPay: (item: ProjectItemWithRelations, date: string) => Promise<void>;
   onCancel: (id: string) => void;
   onDelete: (id: string) => void;
 }
@@ -38,15 +40,24 @@ export default function ItemCard({
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [payDate, setPayDate] = useState("");        // "" = modal fechado
+  const [payLabel, setPayLabel] = useState("");      // label do botão que abriu o modal
 
   const isPaid = item.status === "paid";
   const isCancelled = item.status === "cancelled";
   const isDepositRemainder = item.payment_type === "deposit_remainder";
   const depositPaid = !!(item.deposit_transaction_id || item.investment_deposit_id);
 
-  async function handlePay() {
+  function openPayModal(label: string) {
+    setPayLabel(label);
+    setPayDate(new Date().toISOString().split("T")[0]);
+    setMenuOpen(false);
+  }
+
+  async function confirmPay() {
     setPaying(true);
-    await onPay(item);
+    await onPay(item, payDate);
+    setPayDate("");
     setPaying(false);
   }
 
@@ -147,31 +158,28 @@ export default function ItemCard({
 
                 {item.status === "confirmed" && !isDepositRemainder && (
                   <button
-                    onClick={() => { setMenuOpen(false); handlePay(); }}
-                    disabled={paying}
-                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50 disabled:opacity-60"
+                    onClick={() => openPayModal("Pagar")}
+                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50"
                   >
-                    {paying ? "Pagando..." : "Pagar"}
+                    Pagar
                   </button>
                 )}
 
                 {item.status === "confirmed" && isDepositRemainder && !depositPaid && (
                   <button
-                    onClick={() => { setMenuOpen(false); handlePay(); }}
-                    disabled={paying}
-                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50 disabled:opacity-60"
+                    onClick={() => openPayModal("Pagar Entrada")}
+                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50"
                   >
-                    {paying ? "Pagando..." : "Pagar Entrada"}
+                    Pagar Entrada
                   </button>
                 )}
 
                 {item.status === "confirmed" && isDepositRemainder && depositPaid && (
                   <button
-                    onClick={() => { setMenuOpen(false); handlePay(); }}
-                    disabled={paying}
-                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50 disabled:opacity-60"
+                    onClick={() => openPayModal("Pagar Restante")}
+                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50"
                   >
-                    {paying ? "Pagando..." : "Pagar Restante"}
+                    Pagar Restante
                   </button>
                 )}
 
@@ -185,6 +193,36 @@ export default function ItemCard({
             </>
           )}
         </div>
+      )}
+
+      {/* Modal de data de pagamento */}
+      {payDate && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setPayDate("")} />
+          <div className="relative z-10 w-full max-w-sm bg-white rounded-t-2xl sm:rounded-xl shadow-xl p-5 mx-0 sm:mx-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-1">{payLabel}</h3>
+            <p className="text-xs text-gray-400 mb-4">Selecione a data em que o pagamento foi realizado</p>
+            <DatePicker value={payDate} onChange={setPayDate} />
+            <div className="flex gap-2 mt-4">
+              <button
+                type="button"
+                onClick={() => setPayDate("")}
+                className="flex-1 px-4 py-2.5 text-sm text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmPay}
+                disabled={paying}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 disabled:opacity-60 transition-colors"
+              >
+                {paying ? "Salvando..." : "Confirmar"}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

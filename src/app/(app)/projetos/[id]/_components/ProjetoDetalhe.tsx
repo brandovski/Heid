@@ -112,8 +112,12 @@ export default function ProjetoDetalhe({
     );
   }
 
-  async function handlePayItem(item: ProjectItemWithRelations) {
-    const res = await fetch(`/api/projetos/itens/${item.id}/pagar`, { method: "POST" });
+  async function handlePayItem(item: ProjectItemWithRelations, date: string) {
+    const res = await fetch(`/api/projetos/itens/${item.id}/pagar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ payment_date: date }),
+    });
     if (res.ok) {
       const data = await res.json();
       setGroups((prev) =>

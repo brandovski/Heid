@@ -13,7 +13,7 @@ function addMonths(dateStr: string, months: number): string {
 }
 
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const supabase = await createClient();
@@ -51,7 +51,8 @@ export async function POST(
     return NextResponse.json({ error: "Item sem valor real definido" }, { status: 400 });
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const body = await req.json().catch(() => ({}));
+  const paymentDate: string = body.payment_date ?? new Date().toISOString().split("T")[0];
 
   // Resolve scope/user_id based on payment_origin
   const txScope = item.payment_origin === "family" ? "family" : "personal";
@@ -91,7 +92,7 @@ export async function POST(
             family_id: profile.family_id,
             type: "withdrawal" as const,
             amount: item.deposit_amount,
-            date: today,
+            date: paymentDate,
             notes: `Pagamento: ${item.name} — Sinal`,
             auto_generated: false,
           })
@@ -118,7 +119,7 @@ export async function POST(
             family_id: profile.family_id,
             type: "withdrawal" as const,
             amount: remainder,
-            date: today,
+            date: paymentDate,
             notes: `Pagamento: ${item.name} — Restante`,
             auto_generated: false,
           });
@@ -144,7 +145,7 @@ export async function POST(
         family_id: profile.family_id,
         type: "withdrawal" as const,
         amount: item.actual_amount,
-        date: today,
+        date: paymentDate,
         notes: `Pagamento: ${item.name}`,
         auto_generated: false,
       });
@@ -169,7 +170,7 @@ export async function POST(
         ...baseTransaction,
         description: item.name,
         amount: item.actual_amount,
-        date: today,
+        date: paymentDate,
         status: "paid",
         paid_at: new Date().toISOString(),
         notes: item.notes,
@@ -199,7 +200,7 @@ export async function POST(
         description: item.name,
         total_amount: item.actual_amount,
         installments_count: count,
-        first_installment_date: today,
+        first_installment_date: paymentDate,
         credit_card_id: item.credit_card_id,
         category_id: item.category_id,
         notes: item.notes,
@@ -222,7 +223,7 @@ export async function POST(
         ...baseTransaction,
         description: `${item.name} (${i + 1}/${count})`,
         amount: (isLast ? installmentCents + remainderCents : installmentCents) / 100,
-        date: addMonths(today, i),
+        date: addMonths(paymentDate, i),
         status: "pending" as const,
         credit_card_id: item.credit_card_id,
         installment_group_id: group.id,
@@ -269,7 +270,7 @@ export async function POST(
           ...baseTransaction,
           description: `${item.name} — Sinal`,
           amount: item.deposit_amount,
-          date: today,
+          date: paymentDate,
           status: "paid",
           paid_at: new Date().toISOString(),
           notes: item.notes,
@@ -296,7 +297,7 @@ export async function POST(
           ...baseTransaction,
           description: `${item.name} — Restante`,
           amount: remainderAmount,
-          date: today,
+          date: paymentDate,
           status: "paid",
           paid_at: new Date().toISOString(),
           notes: item.notes,

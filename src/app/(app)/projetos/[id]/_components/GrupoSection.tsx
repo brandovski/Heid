@@ -18,7 +18,7 @@ interface Props {
   onAddItem: (groupId: string) => void;
   onEditItem: (item: ProjectItemWithRelations) => void;
   onConfirmItem: (item: ProjectItemWithRelations) => void;
-  onPayItem: (item: ProjectItemWithRelations) => Promise<void>;
+  onPayItem: (item: ProjectItemWithRelations, date: string) => Promise<void>;
   onCancelItem: (id: string) => void;
   onDeleteItem: (id: string) => void;
 }
