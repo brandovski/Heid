@@ -95,6 +95,7 @@ export async function POST(
             date: paymentDate,
             notes: `Pagamento: ${item.name} — Sinal`,
             auto_generated: false,
+            project_item_id: params.id,
           })
           .select()
           .single();
@@ -122,6 +123,7 @@ export async function POST(
             date: paymentDate,
             notes: `Pagamento: ${item.name} — Restante`,
             auto_generated: false,
+            project_item_id: params.id,
           });
 
         if (invTxError) return NextResponse.json({ error: invTxError.message }, { status: 500 });
@@ -148,6 +150,7 @@ export async function POST(
         date: paymentDate,
         notes: `Pagamento: ${item.name}`,
         auto_generated: false,
+        project_item_id: params.id,
       });
 
     if (invTxError) return NextResponse.json({ error: invTxError.message }, { status: 500 });

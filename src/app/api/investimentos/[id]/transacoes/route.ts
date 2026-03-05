@@ -46,12 +46,11 @@ export async function POST(
   }
 
   const amountNum = parseFloat(amount);
-  // For deposits: always use the authenticated user as contributor (never allow client override)
-  // For deposits: create a personal expense for the contributor (type "expense")
-  // For withdrawals: create an income transaction scoped to the investment owner
+  // For deposits: personal expense for the contributor
+  // For withdrawals: personal income for whoever is redeeming (authenticated user)
   const txType   = type === "deposit" ? "expense" : "income";
-  const txScope  = type === "deposit" ? "personal" : investment.scope;
-  const txUserId = type === "deposit" ? user.id : investment.user_id;
+  const txScope  = "personal";
+  const txUserId = user.id;
 
   const systemCategoryId = await getSystemCategoryId(supabase, profile.family_id, "Investimento");
 
@@ -91,9 +90,7 @@ export async function POST(
     auto_generated: false,
   };
 
-  if (type === "deposit") {
-    invTxInsert.contributor_user_id = user.id;
-  }
+  invTxInsert.contributor_user_id = user.id;
 
   const { data: invTx, error: invTxError } = await supabase
     .from("investment_transactions")

@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import Modal from "@/components/ui/Modal";
 import DatePicker from "@/components/ui/DatePicker";
-import ScopeSelector from "@/components/ui/ScopeSelector";
-import type { Category, CreditCard, Scope } from "@/types/database";
+import type { Category, CreditCard } from "@/types/database";
 import type { SubscriptionWithRelations } from "./types";
 
 interface Props {
@@ -38,9 +37,6 @@ export default function AssinaturaModal({
   const [categoryId, setCategoryId] = useState(assinatura?.category_id ?? "");
   const [startDate, setStartDate] = useState(assinatura?.start_date ?? today);
   const [notes, setNotes] = useState(assinatura?.notes ?? "");
-  const [scope, setScope] = useState<Scope>(assinatura?.scope ?? "family");
-  const [isShared, setIsShared] = useState(assinatura?.is_shared ?? false);
-
   // Valor promocional
   const [hasPromo, setHasPromo] = useState(
     assinatura?.promotional_amount != null && assinatura?.promotional_months != null
@@ -120,8 +116,6 @@ export default function AssinaturaModal({
       credit_card_id: creditCardId,
       category_id: categoryId || null,
       notes: notes || null,
-      scope,
-      is_shared: isShared,
     };
 
     if (!isEditing) {
@@ -386,12 +380,6 @@ export default function AssinaturaModal({
           )}
         </div>
 
-        <ScopeSelector
-          scope={scope}
-          isShared={isShared}
-          onScopeChange={setScope}
-          onIsSharedChange={setIsShared}
-        />
       </form>
     </Modal>
   );

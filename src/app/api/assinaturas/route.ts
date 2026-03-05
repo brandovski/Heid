@@ -28,8 +28,6 @@ export async function POST(req: NextRequest) {
     category_id,
     start_date,
     notes,
-    scope,
-    is_shared,
     promotional_amount,
     promotional_months,
   } = await req.json();
@@ -67,9 +65,9 @@ export async function POST(req: NextRequest) {
       start_date,
       is_active: true,
       notes: notes || null,
-      scope: scope ?? "family",
-      user_id: scope === "personal" ? user.id : null,
-      is_shared: scope === "personal" ? (is_shared ?? false) : false,
+      scope: "personal",
+      user_id: user.id,
+      is_shared: false,
       promotional_amount: promotional_amount ?? null,
       promotional_months: promotional_months ?? null,
     })

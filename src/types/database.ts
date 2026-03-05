@@ -312,6 +312,7 @@ export interface InvestmentTransaction {
   transaction_id: string | null;  // transação financeira vinculada
   auto_generated: boolean;
   contributor_user_id: string | null;
+  project_item_id: string | null;  // migration 033
   created_at: string;
 }
 

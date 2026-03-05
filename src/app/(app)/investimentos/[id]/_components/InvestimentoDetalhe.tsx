@@ -31,6 +31,8 @@ interface ProjectItemRef {
   deposit_amount?: number | null;
   remainder_date?: string | null;
   deposit_transaction_id?: string | null;
+  investment_deposit_id?: string | null;
+  project?: { id: string; name: string } | { id: string; name: string }[] | null;
 }
 
 interface Props {
@@ -237,11 +239,22 @@ export default function InvestimentoDetalhe({
                         {tx.auto_generated && " · Automático"}
                         {tx.notes && ` · ${tx.notes}`}
                       </span>
-                      {tx.type === "deposit" && tx.contributor_user_id && (() => {
-                        const contributor = members.find((m) => m.id === tx.contributor_user_id);
-                        return contributor ? (
+                      {tx.contributor_user_id && (() => {
+                        const m = members.find((m) => m.id === tx.contributor_user_id);
+                        return m ? (
                           <span className="text-xs px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 font-medium">
-                            {contributor.full_name ?? "Membro"}
+                            {m.full_name ?? "Membro"}
+                          </span>
+                        ) : null;
+                      })()}
+                      {(() => {
+                        const pi = projectItems.find((p) => p.id === tx.project_item_id);
+                        const proj = pi?.project
+                          ? Array.isArray(pi.project) ? pi.project[0] : pi.project
+                          : null;
+                        return proj ? (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-medium">
+                            Projeto · {proj.name}
                           </span>
                         ) : null;
                       })()}

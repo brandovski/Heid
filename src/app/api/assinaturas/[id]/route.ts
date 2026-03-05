@@ -28,8 +28,6 @@ export async function PATCH(
     credit_card_id,
     category_id,
     notes,
-    scope,
-    is_shared,
     promotional_amount,
     promotional_months,
   } = await req.json();
@@ -41,11 +39,6 @@ export async function PATCH(
   if (credit_card_id !== undefined) updates.credit_card_id = credit_card_id;
   if (category_id !== undefined) updates.category_id = category_id || null;
   if (notes !== undefined) updates.notes = notes || null;
-  if (scope !== undefined) {
-    updates.scope = scope;
-    updates.user_id = scope === "personal" ? user.id : null;
-    updates.is_shared = scope === "personal" ? (is_shared ?? false) : false;
-  }
   if (original_currency !== undefined) updates.original_currency = original_currency;
   if (amount_original !== undefined) updates.amount_original = parseFloat(amount_original);
   if (amount_brl !== undefined) updates.amount_brl = parseFloat(amount_brl);

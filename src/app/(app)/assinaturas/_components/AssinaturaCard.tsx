@@ -24,9 +24,6 @@ export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props
     const monthsActive = (today.getFullYear() * 12 + today.getMonth() + 1) - (startYear * 12 + startMonth);
     return monthsActive < a.promotional_months;
   })();
-  const scopeColor =
-    a.scope === "personal" ? "bg-purple-50 text-purple-700" : "bg-brand-50 text-brand-700";
-
   async function handleCancel() {
     await fetch(`/api/assinaturas/${a.id}`, { method: "DELETE" });
     onSaved();
@@ -75,10 +72,6 @@ export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props
               USD
             </span>
           )}
-
-          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${scopeColor}`}>
-            {a.scope === "personal" ? "Pessoal" : "Familiar"}
-          </span>
 
           {a.is_active ? (
             <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-green-50 text-green-700">
