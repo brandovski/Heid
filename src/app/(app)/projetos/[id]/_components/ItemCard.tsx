@@ -7,6 +7,7 @@ import DatePicker from "@/components/ui/DatePicker";
 import type { ProjectItemWithRelations, ProjectItem, ProjectGroup } from "../../_components/types";
 import {
   formatCurrency,
+  formatDate,
   ITEM_STATUS_LABELS,
   ITEM_STATUS_COLORS,
   PAYMENT_TYPE_LABELS,
@@ -87,7 +88,7 @@ export default function ItemCard({
         </div>
 
         {/* Row 2: amounts */}
-        <div className="flex items-center gap-3 mt-0.5">
+        <div className="flex items-center gap-3 mt-0.5 flex-wrap">
           {item.budget_amount != null && (
             <span className="text-xs text-gray-400">
               Orçado: {formatCurrency(item.budget_amount)}
@@ -96,6 +97,11 @@ export default function ItemCard({
           {item.actual_amount != null && (
             <span className={`text-xs font-medium ${isPaid ? "text-green-700" : "text-brand-700"}`}>
               Real: {formatCurrency(item.actual_amount)}
+            </span>
+          )}
+          {isPaid && item.paid_at && (
+            <span className="text-xs text-green-600">
+              pago em {formatDate(item.paid_at)}
             </span>
           )}
         </div>

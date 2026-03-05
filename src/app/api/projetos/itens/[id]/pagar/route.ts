@@ -128,7 +128,7 @@ export async function POST(
 
         const { error: updateError } = await supabase
           .from("project_items")
-          .update({ status: "paid" })
+          .update({ status: "paid", paid_at: paymentDate })
           .eq("id", params.id);
 
         if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
@@ -154,7 +154,7 @@ export async function POST(
 
     const { error: updateError } = await supabase
       .from("project_items")
-      .update({ status: "paid" })
+      .update({ status: "paid", paid_at: paymentDate })
       .eq("id", params.id);
 
     if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
@@ -182,7 +182,7 @@ export async function POST(
 
     const { error: updateError } = await supabase
       .from("project_items")
-      .update({ status: "paid", transaction_id: tx.id })
+      .update({ status: "paid", paid_at: paymentDate, transaction_id: tx.id })
       .eq("id", params.id);
 
     if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
@@ -245,7 +245,7 @@ export async function POST(
 
     const { error: updateError } = await supabase
       .from("project_items")
-      .update({ status: "paid", transaction_id: firstTxId })
+      .update({ status: "paid", paid_at: paymentDate, transaction_id: firstTxId })
       .eq("id", params.id);
 
     if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
@@ -309,7 +309,7 @@ export async function POST(
 
       const { error: updateError } = await supabase
         .from("project_items")
-        .update({ status: "paid", remainder_transaction_id: remainderTx.id })
+        .update({ status: "paid", paid_at: paymentDate, remainder_transaction_id: remainderTx.id })
         .eq("id", params.id);
 
       if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
