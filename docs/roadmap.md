@@ -335,6 +335,35 @@
 
 ---
 
+## Melhorias pós-Fase 11 — Sessões 032–036
+
+### Migrations retrospectivas (Sessão 032)
+- [x] `supabase/migrations/024_partner_contribution.sql` criado retroativamente para rastreabilidade (schema já aplicado)
+
+### Fix: investment_deposit_id (Sessão 035)
+- [x] Migration 031: `investment_deposit_id UUID REFERENCES investment_transactions(id)` em `project_items` — corrige bug de FK incorreta com `deposit_transaction_id`
+- [x] Migration 032: coluna `paid_at DATE` em `project_items` para data real de pagamento
+- [x] `pagar/route.ts` usa `investment_deposit_id` como guard de two-step e salva via UPDATE
+
+### Fix: resgate → transação pessoal (Sessão 036)
+- [x] `transacoes/route.ts`: withdrawal usa `scope="personal"` e `user_id=user.id` (autenticado) — não mais o dono do investimento
+- [x] `contributor_user_id` setado em aportes **e** resgates (antes só em aportes)
+
+### Tags nos resgates (Sessão 036)
+- [x] Migration 033: `project_item_id UUID REFERENCES project_items(id)` em `investment_transactions`
+- [x] Backfill de 5 transações existentes via `investment_deposit_id` e padrão de notes
+- [x] `pagar/route.ts`: `project_item_id` setado nos 3 tipos de insert (sinal, restante, único)
+- [x] `InvestimentoDetalhe`: badge de contribuinte em aportes e resgates + badge roxo "Projeto · Nome"
+
+### Assinaturas sempre pessoais (Sessão 036)
+- [x] Migration 034: 3 assinaturas `family` migradas para `personal` (Netflix, Google One, Live Academia → User 2)
+- [x] `AssinaturaModal`: `ScopeSelector` removido; scope hardcoded na UI e nas APIs
+- [x] `AssinaturaCard`: badge de escopo removido
+
+**Critério de conclusão:** resgates contabilizados corretamente no extrato pessoal; movimentações rastreáveis por contribuinte e por projeto; assinaturas sempre pessoais. ✅ **Concluído em 2026-03-05**
+
+---
+
 ## Backlog (pós v1.0)
 
 - Relatórios e exportação (PDF / CSV)
@@ -347,4 +376,4 @@
 
 ---
 
-*Atualizado em: 2026-03-02 (sessão 031)*
+*Atualizado em: 2026-03-05 (sessão 036)*

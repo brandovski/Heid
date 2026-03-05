@@ -169,28 +169,33 @@ CREATE TABLE fixed_expenses (
 
 ### `subscriptions`
 
-Adicionados em `013`: `scope`, `user_id`, `is_shared`.
+Adicionados em `013`: `scope`, `user_id`, `is_shared`. Adicionado em `026`: `promotional_amount`, `promotional_months`.
+
+> **Migration 034 (sessão 036):** todas as assinaturas migradas para `scope='personal'`. Assinaturas são sempre pessoais — nunca familiares.
 
 ```sql
 CREATE TABLE subscriptions (
-  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  family_id         UUID NOT NULL,
-  name              TEXT NOT NULL,
-  original_currency TEXT NOT NULL DEFAULT 'BRL',
-  amount_original   NUMERIC(12,2) NOT NULL,
-  amount_brl        NUMERIC(12,2) NOT NULL,
-  billing_day       SMALLINT NOT NULL,
-  credit_card_id    UUID NOT NULL REFERENCES credit_cards(id),
-  category_id       UUID REFERENCES categories(id),
-  start_date        DATE NOT NULL,
-  cancelled_at      TIMESTAMPTZ,
-  notes             TEXT,
-  is_active         BOOLEAN DEFAULT true,
-  -- Escopo (migration 013)
-  scope             TEXT NOT NULL DEFAULT 'family',
-  user_id           UUID REFERENCES auth.users(id),
-  is_shared         BOOLEAN NOT NULL DEFAULT false,
-  created_at        TIMESTAMPTZ DEFAULT now(),
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  family_id           UUID NOT NULL,
+  name                TEXT NOT NULL,
+  original_currency   TEXT NOT NULL DEFAULT 'BRL',
+  amount_original     NUMERIC(12,2) NOT NULL,
+  amount_brl          NUMERIC(12,2) NOT NULL,
+  billing_day         SMALLINT NOT NULL,
+  credit_card_id      UUID NOT NULL REFERENCES credit_cards(id),
+  category_id         UUID REFERENCES categories(id),
+  start_date          DATE NOT NULL,
+  cancelled_at        TIMESTAMPTZ,
+  notes               TEXT,
+  is_active           BOOLEAN DEFAULT true,
+  -- Escopo (migration 013) — sempre 'personal' a partir da migration 034
+  scope               TEXT NOT NULL DEFAULT 'personal',
+  user_id             UUID REFERENCES auth.users(id),
+  is_shared           BOOLEAN NOT NULL DEFAULT false,
+  -- Valor promocional (migration 026)
+  promotional_amount  NUMERIC(12,2),
+  promotional_months  SMALLINT,
+  created_at          TIMESTAMPTZ DEFAULT now(),
   CONSTRAINT chk_currency CHECK (original_currency IN ('BRL', 'USD')),
   CONSTRAINT chk_subscriptions_scope CHECK (scope IN ('personal', 'family'))
 );
@@ -442,6 +447,13 @@ CREATE TABLE project_items (
   deposit_transaction_id   UUID REFERENCES transactions(id) ON DELETE SET NULL,
   remainder_transaction_id UUID REFERENCES transactions(id) ON DELETE SET NULL,
 
+  -- Vínculo com investment_transaction de sinal (migration 031 — sessão 035)
+  -- FK correta: aponta para investment_transactions, não para transactions
+  investment_deposit_id    UUID REFERENCES investment_transactions(id) ON DELETE SET NULL,
+
+  -- Data real de pagamento (migration 032 — sessão 035)
+  paid_at                  DATE,
+
   created_at               TIMESTAMPTZ DEFAULT now(),
   updated_at               TIMESTAMPTZ DEFAULT now(),
 
@@ -604,20 +616,25 @@ CREATE INDEX idx_investments_eligible ON investments(family_id)
 
 ---
 
-### `investment_transactions` *(migration 017)*
+### `investment_transactions` *(migration 017, atualizado em 024 e 033)*
 
 ```sql
 CREATE TABLE investment_transactions (
-  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  investment_id  UUID        NOT NULL REFERENCES investments(id) ON DELETE CASCADE,
-  family_id      UUID        NOT NULL,
-  type           TEXT        NOT NULL,   -- 'deposit' | 'withdrawal'
-  amount         NUMERIC(12,2) NOT NULL  CHECK (amount > 0),
-  date           DATE        NOT NULL,
-  notes          TEXT,
-  transaction_id UUID        REFERENCES transactions(id) ON DELETE SET NULL,
-  auto_generated BOOLEAN     NOT NULL DEFAULT false,
-  created_at     TIMESTAMPTZ DEFAULT now(),
+  id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  investment_id       UUID        NOT NULL REFERENCES investments(id) ON DELETE CASCADE,
+  family_id           UUID        NOT NULL,
+  type                TEXT        NOT NULL,   -- 'deposit' | 'withdrawal'
+  amount              NUMERIC(12,2) NOT NULL  CHECK (amount > 0),
+  date                DATE        NOT NULL,
+  notes               TEXT,
+  transaction_id      UUID        REFERENCES transactions(id) ON DELETE SET NULL,
+  auto_generated      BOOLEAN     NOT NULL DEFAULT false,
+  -- Quem fez o aporte ou resgate (migration 024 — sessão 029)
+  -- Setado para deposits E withdrawals desde a sessão 036
+  contributor_user_id UUID        REFERENCES auth.users(id),
+  -- Item de projeto vinculado a este resgate (migration 033 — sessão 036)
+  project_item_id     UUID        REFERENCES project_items(id) ON DELETE SET NULL,
+  created_at          TIMESTAMPTZ DEFAULT now(),
 
   CONSTRAINT chk_inv_tx_type CHECK (type IN ('deposit', 'withdrawal'))
 );
@@ -633,6 +650,11 @@ CREATE UNIQUE INDEX idx_inv_tx_auto_month
 ```
 
 **RLS:** `family_access` — herda visibilidade do investimento pai via subquery.
+
+**Regras de negócio:**
+- `contributor_user_id` é sempre `user.id` autenticado — nunca o dono do investimento (hardcoded no servidor desde sessão 031)
+- Para withdrawals, é o resgatador; para deposits, é quem fez o aporte
+- `project_item_id` é preenchido automaticamente por `pagar/route.ts` quando o pagamento de um item de projeto debita do investimento; backfill feito via migration 033 para registros anteriores
 
 ---
 

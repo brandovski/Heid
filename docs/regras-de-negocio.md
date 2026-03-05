@@ -111,8 +111,8 @@ Transações representam toda e qualquer movimentação financeira registrada na
 | `subscription` | Automática (cron) | Assinatura recorrente no cartão |
 | `fixed_income` | Automática (cron) | Gerada a partir de uma Receita Fixa |
 | `fixed_expense` | Automática (cron) | Gerada a partir de uma Despesa Fixa |
-| `investment_deposit` | Manual / cron | Aporte em investimento (saída financeira) |
-| `investment_withdrawal` | Manual | Resgate de investimento (entrada financeira) |
+| `investment_deposit` | Manual / cron | Aporte em investimento — tipo `expense`, scope pessoal do contribuinte |
+| `income` (com `investment_id`) | Manual | Resgate de investimento — tipo `income`, scope pessoal de quem resgatou (migrado de `investment_withdrawal` na sessão 033) |
 
 #### 3.5.2 Campos da Transação
 
@@ -191,7 +191,9 @@ A fatura de um cartão para um determinado mês de referência (`YYYY-MM`) é ca
 
 Assinaturas são cobranças recorrentes mensais vinculadas a um cartão de crédito. Não possuem data de término definida e não consomem limite além do valor mensal cobrado.
 
-**Campos:** `id`, `family_id`, `scope` (`personal` | `family`), `user_id` (nullable), `is_shared`, `name`, `amount_brl` (último valor convertido em BRL), `original_currency` (`BRL` ou `USD`), `amount_original` (valor na moeda original), `billing_day` (dia de cobrança), `credit_card_id`, `category_id`, `start_date`, `cancelled_at` (nullable), `notes`, `is_active`
+> **Regra (sessão 036):** assinaturas são **sempre pessoais** — `scope` é fixo em `"personal"` e `user_id` é sempre o usuário autenticado que cria a assinatura. Não existe assinatura familiar. O `ScopeSelector` foi removido da UI e as APIs hardcodam `scope="personal"`.
+
+**Campos:** `id`, `family_id`, `scope` (sempre `'personal'`), `user_id` (dono — NOT NULL), `is_shared` (sempre `false`), `name`, `amount_brl` (último valor convertido em BRL), `original_currency` (`BRL` ou `USD`), `amount_original` (valor na moeda original), `billing_day` (dia de cobrança), `credit_card_id`, `category_id`, `start_date`, `cancelled_at` (nullable), `notes`, `is_active`, `promotional_amount` (nullable), `promotional_months` (nullable)
 
 #### 3.7.1 Assinaturas em Moeda Estrangeira
 
@@ -708,8 +710,16 @@ Cada aporte ou resgate gera um registro em `investment_transactions`:
 | `date` | Data do aporte/resgate |
 | `transaction_id` | Referência opcional à transação financeira vinculada |
 | `auto_generated` | `true` se gerado pelo cron mensal |
+| `contributor_user_id` | Quem fez o aporte ou resgate — sempre `user.id` autenticado (migration 024) |
+| `project_item_id` | Item de projeto vinculado quando o resgate é pagamento de projeto (migration 033) |
 
 **Idempotência do cron:** o índice único `idx_inv_tx_auto_month` garante um único aporte automático por investimento por mês-calendário.
+
+**Regras de negócio (sessão 036):**
+- **Aportes:** geram transação financeira do tipo `expense`, `scope="personal"`, `user_id=user.id` (contribuinte)
+- **Resgates:** geram transação financeira do tipo `income`, `scope="personal"`, `user_id=user.id` (resgatador — nunca o dono do investimento)
+- `contributor_user_id` é salvo em **ambos** aportes e resgates, permitindo rastrear quem fez cada movimentação em investimentos familiares
+- Quando um item de projeto (`payment_origin='investment'`) é pago, `project_item_id` é preenchido automaticamente na(s) `investment_transaction(s)` criada(s)
 
 ### 12.5 Snapshots de Saldo (`investment_snapshots`)
 
@@ -753,12 +763,12 @@ O cron mensal `generate-monthly` (Fase 5) será estendido para:
 
 ### 12.10 Tipos de Transação Financeira
 
-Os novos valores do enum `transaction_type` são:
-
 | Valor | Descrição |
 |---|---|
-| `investment_deposit` | Aporte em investimento (saída financeira) |
-| `investment_withdrawal` | Resgate de investimento (entrada financeira) |
+| `expense` (com `investment_id`) | Aporte em investimento — saída pessoal do contribuinte |
+| `income` (com `investment_id`) | Resgate de investimento — entrada pessoal de quem resgatou |
+
+> **Nota histórica:** o tipo `investment_withdrawal` foi renomeado para `income` na migration 029 (sessão 033). O campo `investment_id` distingue resgates de receitas comuns. A função `getTypeLabel(type, investmentId)` exibe "Resgate" quando `type='income'` e `investment_id` está preenchido.
 
 ---
 
