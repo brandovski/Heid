@@ -260,6 +260,7 @@ export interface ProjectItem {
   transaction_id: string | null;
   deposit_transaction_id: string | null;
   remainder_transaction_id: string | null;
+  investment_deposit_id: string | null;   // refs investment_transactions.id (sessão 035)
   created_at: string;
   updated_at: string;
 }

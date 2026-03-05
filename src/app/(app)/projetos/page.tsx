@@ -18,11 +18,11 @@ export default async function ProjetosPage() {
       .order("created_at", { ascending: false }),
     supabase
       .from("project_items")
-      .select("id, project_id, status, budget_amount, actual_amount, deposit_transaction_id, deposit_amount"),
+      .select("id, project_id, status, budget_amount, actual_amount, deposit_transaction_id, deposit_amount, investment_deposit_id"),
   ]);
 
   const projectList = (projects ?? []) as Project[];
-  const itemList = (items ?? []) as Pick<ProjectItem, "id" | "project_id" | "status" | "budget_amount" | "actual_amount" | "deposit_transaction_id" | "deposit_amount">[];
+  const itemList = (items ?? []) as Pick<ProjectItem, "id" | "project_id" | "status" | "budget_amount" | "actual_amount" | "deposit_transaction_id" | "deposit_amount" | "investment_deposit_id">[];
 
   const projectsWithStats = projectList.map((p) => {
     const projectItems = itemList.filter((i) => i.project_id === p.id) as ProjectItem[];

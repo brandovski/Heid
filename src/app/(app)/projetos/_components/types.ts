@@ -23,7 +23,7 @@ export function computeProjectStats(
   const activeItems = items.filter((i) => i.status !== "cancelled");
   const budget_previsto = activeItems.reduce((s, i) => s + (i.budget_amount ?? 0), 0);
   const depositosParciais = items
-    .filter((i) => i.status === "confirmed" && i.deposit_transaction_id)
+    .filter((i) => i.status === "confirmed" && (i.deposit_transaction_id || i.investment_deposit_id))
     .reduce((s, i) => s + (i.deposit_amount ?? 0), 0);
   const gasto_real =
     items.filter((i) => i.status === "paid").reduce((s, i) => s + (i.actual_amount ?? 0), 0) +

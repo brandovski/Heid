@@ -54,7 +54,7 @@ export default function ProjetoDetalhe({
   const budgetPrevisto = activeItems.reduce((s, i) => s + (i.budget_amount ?? 0), 0);
   // Inclui depósitos pagos de itens deposit_remainder ainda em "confirmed"
   const depositosParciais = allItems
-    .filter((i) => i.status === "confirmed" && i.deposit_transaction_id)
+    .filter((i) => i.status === "confirmed" && (i.deposit_transaction_id || i.investment_deposit_id))
     .reduce((s, i) => s + (i.deposit_amount ?? 0), 0);
   const gastoReal = paidItems.reduce((s, i) => s + (i.actual_amount ?? 0), 0) + depositosParciais;
   const saldoEstimado = project.total_budget - budgetPrevisto;
@@ -122,6 +122,9 @@ export default function ProjetoDetalhe({
           items: g.items.map((i) => {
             if (i.id !== item.id) return i;
             if (data.step === "deposit") {
+              if (i.payment_origin === "investment") {
+                return { ...i, investment_deposit_id: data.investment_deposit_id };
+              }
               return { ...i, deposit_transaction_id: data.deposit_transaction_id };
             }
             return { ...i, status: "paid" as const };

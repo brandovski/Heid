@@ -82,7 +82,7 @@ export async function POST(
         return NextResponse.json({ error: "Sinal e data do restante são obrigatórios" }, { status: 400 });
       }
 
-      if (!item.deposit_transaction_id) {
+      if (!item.investment_deposit_id) {
         // PASSO 1: Debitar sinal do investimento
         const { data: invTx, error: invTxError } = await supabase
           .from("investment_transactions")
@@ -102,12 +102,12 @@ export async function POST(
 
         const { error: updateError } = await supabase
           .from("project_items")
-          .update({ deposit_transaction_id: invTx.id })
+          .update({ investment_deposit_id: invTx.id })
           .eq("id", params.id);
 
         if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 
-        return NextResponse.json({ step: "deposit" });
+        return NextResponse.json({ step: "deposit", investment_deposit_id: invTx.id });
       } else {
         // PASSO 2: Debitar restante do investimento
         const remainder = item.actual_amount - (item.deposit_amount ?? 0);

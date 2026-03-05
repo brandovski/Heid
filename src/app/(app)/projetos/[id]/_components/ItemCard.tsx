@@ -42,7 +42,7 @@ export default function ItemCard({
   const isPaid = item.status === "paid";
   const isCancelled = item.status === "cancelled";
   const isDepositRemainder = item.payment_type === "deposit_remainder";
-  const depositPaid = !!item.deposit_transaction_id;
+  const depositPaid = !!(item.deposit_transaction_id || item.investment_deposit_id);
 
   async function handlePay() {
     setPaying(true);
