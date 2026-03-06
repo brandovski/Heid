@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Calendar, CreditCard, ExternalLink } from "lucide-react";
-import type { TransactionRow, CreditCardRow } from "./types";
+import type { TransactionRow, InvoiceCardData } from "./types";
 
 function formatCurrency(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -29,7 +29,7 @@ function typeBadgeLabel(type: string): string {
 
 interface Props {
   transactions: TransactionRow[];
-  creditCards: CreditCardRow[];
+  invoiceCards: InvoiceCardData[];
   currentMonth: string;
   escopo: "personal" | "parceiro";
 }
@@ -55,7 +55,7 @@ type FaturaItem = {
 
 type FluxoItem = CashItem | FaturaItem;
 
-export default function FluxoWidget({ transactions, creditCards, currentMonth, escopo }: Props) {
+export default function FluxoWidget({ transactions, invoiceCards, currentMonth, escopo }: Props) {
   const todayStr = new Date().toISOString().split("T")[0];
   const [y, mo] = currentMonth.split("-").map(Number);
   const daysInMonth = new Date(y, mo, 0).getDate();
@@ -76,27 +76,21 @@ export default function FluxoWidget({ transactions, creditCards, currentMonth, e
       category: t.category,
     }));
 
-  // 2. Card pendentes → um item de fatura por cartão
-  const cardPending = transactions.filter((t) => t.status === "pending" && !!t.credit_card_id);
-
-  const faturaItems: FaturaItem[] = creditCards
-    .flatMap((card) => {
-      const txs = cardPending.filter((t) => t.credit_card_id === card.id);
-      if (txs.length === 0) return [];
-      const total = txs.reduce((s, t) => s + t.amount, 0);
-      const dueDay = Math.min(card.due_day, daysInMonth);
-      const dateStr = `${currentMonth}-${String(dueDay).padStart(2, "0")}`;
-      return [
-        {
-          kind: "fatura" as const,
-          id: `fatura-${card.id}`,
-          date: dateStr,
-          cardName: card.name,
-          cardColor: card.color,
-          total,
-        },
-      ];
+  // 2. Faturas → usar invoiceCards (ciclo correto via closing_day), excluir já pagas
+  const faturaItems: FaturaItem[] = invoiceCards
+    .filter((ic) => ic.payment === null && ic.monthTotal > 0)
+    .map((ic) => {
+      const dueDay = Math.min(ic.card.due_day, daysInMonth);
+      return {
+        kind: "fatura" as const,
+        id: `fatura-${ic.card.id}`,
+        date: `${currentMonth}-${String(dueDay).padStart(2, "0")}`,
+        cardName: ic.card.name,
+        cardColor: ic.card.color,
+        total: ic.monthTotal,
+      };
     })
+    .filter((item) => item.date >= todayStr)
     .sort((a, b) => a.date.localeCompare(b.date));
 
   // 3. Merge → ordenar por data → primeiros 4

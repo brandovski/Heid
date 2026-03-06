@@ -183,7 +183,7 @@ export default function DashboardView({
       {/* ── Fluxo Widget ── */}
       <FluxoWidget
         transactions={transactions}
-        creditCards={creditCards}
+        invoiceCards={invoiceCards}
         currentMonth={currentMonth}
         escopo={escopo}
       />
