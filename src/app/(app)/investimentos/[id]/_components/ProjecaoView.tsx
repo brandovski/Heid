@@ -23,8 +23,11 @@ interface ProjectItemRef {
 
 interface Props {
   saldoAtual: number;
+  investmentUserId: string;
   monthlyContributionAmount: number | null;
   monthlyContributionDay: number | null;
+  partnerContributionAmount: number | null;
+  partnerContributionDay: number | null;
   investmentTransactions: InvestmentTransaction[];
   projectItems: ProjectItemRef[];
 }
@@ -58,8 +61,11 @@ function formatMonthLabel(mes: string): string {
 
 export default function ProjecaoView({
   saldoAtual,
+  investmentUserId,
   monthlyContributionAmount,
   monthlyContributionDay,
+  partnerContributionAmount,
+  partnerContributionDay,
   investmentTransactions,
   projectItems,
 }: Props) {
@@ -81,32 +87,59 @@ export default function ProjecaoView({
       kind: tx.type === "deposit" ? "aporte_real" : "retirada",
     }));
 
-  // 2. Aportes mensais projetados (apenas se monthlyContributionAmount > 0)
+  // 2. Aportes mensais projetados — rastreia meses cobertos por auto-gen por contribuidor
   const projetadosEvents: ProjecaoItem[] = [];
-  if (monthlyContributionAmount && monthlyContributionAmount > 0 && monthlyContributionDay) {
-    // Meses já cobertos por transações automáticas geradas
-    const autoGenMonths = new Set(
-      investmentTransactions
-        .filter((tx) => tx.auto_generated && tx.type === "deposit")
-        .map((tx) => tx.date.slice(0, 7))
-    );
 
+  // Agrupa meses com auto-gen por contributor_user_id
+  const autoGenByContributor = new Map<string | null, Set<string>>();
+  for (const tx of investmentTransactions) {
+    if (!tx.auto_generated || tx.type !== "deposit") continue;
+    const key = tx.contributor_user_id;
+    if (!autoGenByContributor.has(key)) autoGenByContributor.set(key, new Set());
+    autoGenByContributor.get(key)!.add(tx.date.slice(0, 7));
+  }
+
+  // Aporte do dono do investimento
+  if (monthlyContributionAmount && monthlyContributionAmount > 0 && monthlyContributionDay) {
+    const userAutoGen = autoGenByContributor.get(investmentUserId) ?? new Set<string>();
     for (let i = 0; i <= 24; i++) {
       const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
       const mesStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      if (autoGenMonths.has(mesStr)) continue;
-
+      if (userAutoGen.has(mesStr)) continue;
       const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
       const day = Math.min(monthlyContributionDay, lastDay);
       const dateStr = `${mesStr}-${String(day).padStart(2, "0")}`;
-
       if (dateStr < todayStr) continue;
-
       projetadosEvents.push({
-        id: `aporte-proj-${mesStr}`,
+        id: `aporte-proj-user-${mesStr}`,
         date: dateStr,
         description: "Aporte mensal",
         amount: monthlyContributionAmount,
+        kind: "aporte_projetado",
+      });
+    }
+  }
+
+  // Aporte do parceiro
+  if (partnerContributionAmount && partnerContributionAmount > 0 && partnerContributionDay) {
+    // Meses cobertos por auto-gen de qualquer contributor que NÃO seja o dono
+    const partnerAutoGen = new Set<string>();
+    for (const [key, months] of autoGenByContributor) {
+      if (key !== investmentUserId) months.forEach((m) => partnerAutoGen.add(m));
+    }
+    for (let i = 0; i <= 24; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+      const mesStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      if (partnerAutoGen.has(mesStr)) continue;
+      const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+      const day = Math.min(partnerContributionDay, lastDay);
+      const dateStr = `${mesStr}-${String(day).padStart(2, "0")}`;
+      if (dateStr < todayStr) continue;
+      projetadosEvents.push({
+        id: `aporte-proj-partner-${mesStr}`,
+        date: dateStr,
+        description: "Aporte mensal (parceiro)",
+        amount: partnerContributionAmount,
         kind: "aporte_projetado",
       });
     }

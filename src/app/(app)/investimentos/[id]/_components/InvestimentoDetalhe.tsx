@@ -284,8 +284,11 @@ export default function InvestimentoDetalhe({
       {/* Projeção de Saldo */}
       <ProjecaoView
         saldoAtual={saldoAtual ?? 0}
+        investmentUserId={investment.user_id}
         monthlyContributionAmount={investment.monthly_contribution_amount}
         monthlyContributionDay={investment.monthly_contribution_day}
+        partnerContributionAmount={investment.partner_contribution_amount}
+        partnerContributionDay={investment.partner_contribution_day}
         investmentTransactions={transactions}
         projectItems={projectItems}
       />
