@@ -362,6 +362,23 @@
 
 **Critério de conclusão:** resgates contabilizados corretamente no extrato pessoal; movimentações rastreáveis por contribuinte e por projeto; assinaturas sempre pessoais. ✅ **Concluído em 2026-03-05**
 
+### Ciclo de faturamento + fixes de dashboard e projeção (Sessão 037)
+- [x] `src/lib/fatura-utils.ts`: `getInvoiceMonth()` e `getFatureDateRange()` — lógica de ciclo por `closing_day`
+- [x] `dashboard/page.tsx`: query `faturaTransacoes` com range estendido (mês anterior + mês atual)
+- [x] `computeInvoiceCards()` refatorado para usar `getInvoiceMonth` em vez de filtro por mês calendário
+- [x] Fix: transações de cartão aparecem na lista principal de `/transacoes`
+- [x] Fix: data da compra preservada ao alternar para parcelado no `TransacaoModal`
+- [x] Fix: projeção de investimento familiar conta aportes de ambos os contribuidores
+- [x] Badge com nome do contribuidor nos aportes da projeção de investimento
+
+### Fix: FluxoWidget usa ciclo correto de faturamento (Sessão 038)
+- [x] `FluxoWidget.tsx`: prop `creditCards` removida; prop `invoiceCards: InvoiceCardData[]` adicionada
+- [x] `faturaItems` no widget calculado a partir de `invoiceCards` (elimina duplicação com lógica incorreta)
+- [x] `DashboardView.tsx`: passa `invoiceCards={invoiceCards}` ao FluxoWidget
+- [x] Totais do widget agora batem com os cards de fatura do dashboard
+
+**Critério de conclusão:** FluxoWidget exibe totais de fatura consistentes com os cards de fatura, respeitando o ciclo de fechamento (`closing_day`). ✅ **Concluído em 2026-03-06**
+
 ---
 
 ## Backlog (pós v1.0)
@@ -376,4 +393,4 @@
 
 ---
 
-*Atualizado em: 2026-03-05 (sessão 036)*
+*Atualizado em: 2026-03-06 (sessão 038)*
