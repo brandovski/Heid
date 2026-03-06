@@ -32,7 +32,6 @@ export default function AssinaturaModal({
     assinatura?.amount_original?.toString() ?? ""
   );
   const [amountBrl, setAmountBrl] = useState(assinatura?.amount_brl?.toString() ?? "");
-  const [billingDay, setBillingDay] = useState(assinatura?.billing_day?.toString() ?? "5");
   const [creditCardId, setCreditCardId] = useState(assinatura?.credit_card_id ?? "");
   const [categoryId, setCategoryId] = useState(assinatura?.category_id ?? "");
   const [startDate, setStartDate] = useState(assinatura?.start_date ?? today);
@@ -95,7 +94,7 @@ export default function AssinaturaModal({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!name.trim() || !amountOriginal || !billingDay || !creditCardId || !startDate) {
+    if (!name.trim() || !amountOriginal || !creditCardId || !startDate) {
       setError("Preencha todos os campos obrigatórios");
       return;
     }
@@ -112,7 +111,6 @@ export default function AssinaturaModal({
       original_currency: currency,
       amount_original: parseFloat(amountOriginal),
       amount_brl: currency === "BRL" ? parseFloat(amountOriginal) : parseFloat(amountBrl),
-      billing_day: Number(billingDay),
       credit_card_id: creditCardId,
       category_id: categoryId || null,
       notes: notes || null,
@@ -259,29 +257,14 @@ export default function AssinaturaModal({
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
+        {!isEditing && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Dia de cobrança <span className="text-red-500">*</span>
+              Data de início (1ª cobrança) <span className="text-red-500">*</span>
             </label>
-            <input
-              type="number"
-              min="1"
-              max="28"
-              value={billingDay}
-              onChange={(e) => setBillingDay(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-            />
+            <DatePicker value={startDate} onChange={setStartDate} placeholder="Selecione" />
           </div>
-          {!isEditing && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Início <span className="text-red-500">*</span>
-              </label>
-              <DatePicker value={startDate} onChange={setStartDate} placeholder="Selecione" />
-            </div>
-          )}
-        </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -24,7 +24,6 @@ export async function PATCH(
     original_currency,
     amount_original,
     amount_brl,
-    billing_day,
     credit_card_id,
     category_id,
     notes,
@@ -35,7 +34,6 @@ export async function PATCH(
   const updates: Record<string, unknown> = {};
 
   if (name !== undefined) updates.name = name.trim();
-  if (billing_day !== undefined) updates.billing_day = Number(billing_day);
   if (credit_card_id !== undefined) updates.credit_card_id = credit_card_id;
   if (category_id !== undefined) updates.category_id = category_id || null;
   if (notes !== undefined) updates.notes = notes || null;
