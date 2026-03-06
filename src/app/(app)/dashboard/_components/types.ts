@@ -1,3 +1,5 @@
+import { getInvoiceMonth } from "@/lib/fatura-utils";
+
 export type EscopoType = "personal" | "parceiro";
 
 // ── Investment utils re-exports ─────────────────────────────────────────────────
@@ -50,6 +52,7 @@ export interface CreditCardRow {
   name: string;
   color: string | null;
   due_day: number;
+  closing_day: number;
   scope: string;
   user_id: string | null;
   is_shared: boolean;
@@ -172,16 +175,18 @@ export function computeBudgetStats(
 
 export function computeInvoiceCards(
   cards: CreditCardRow[],
-  transactions: TransactionRow[],
-  invoicePayments: InvoicePaymentRow[]
+  faturaTransactions: TransactionRow[],
+  invoicePayments: InvoicePaymentRow[],
+  currentMonth: string
 ): InvoiceCardData[] {
   return cards
     .map((card) => {
-      const cardTxs = transactions.filter(
+      const cardTxs = faturaTransactions.filter(
         (t) =>
           t.credit_card_id === card.id &&
           EXPENSE_TYPES.includes(t.type) &&
-          t.status !== "cancelled"
+          t.status !== "cancelled" &&
+          getInvoiceMonth(t.date, card.closing_day) === currentMonth
       );
       const monthTotal = cardTxs.reduce((s, t) => s + t.amount, 0);
       const payment = invoicePayments.find((p) => p.credit_card_id === card.id) ?? null;

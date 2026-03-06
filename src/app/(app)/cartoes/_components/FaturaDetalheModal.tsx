@@ -7,6 +7,7 @@ import Modal from "@/components/ui/Modal";
 import PagarFaturaModal from "@/components/ui/PagarFaturaModal";
 import { createClient } from "@/lib/supabase/client";
 import type { CreditCard } from "@/types/database";
+import { getFatureDateRange } from "@/lib/fatura-utils";
 
 // ── Tipos locais ───────────────────────────────────────────────────────────────
 
@@ -75,9 +76,7 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
   const fetchData = useCallback(async () => {
     setLoading(true);
     const supabase = createClient();
-    const [y, m] = month.split("-").map(Number);
-    const firstDay = `${month}-01`;
-    const lastDay = `${month}-${String(new Date(y, m, 0).getDate()).padStart(2, "0")}`;
+    const { start: firstDay, end: lastDay } = getFatureDateRange(month, cartao.closing_day);
 
     const [{ data: txs }, { data: pmt }] = await Promise.all([
       supabase

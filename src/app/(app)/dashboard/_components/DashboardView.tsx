@@ -48,6 +48,7 @@ interface Props {
   budgets: BudgetRow[];
   creditCards: CreditCardRow[];
   invoicePayments: InvoicePaymentRow[];
+  faturaTransacoes: TransactionRow[];
   investments: InvestmentContributionRow[];
   invTransactions: InvTransactionRow[];
   currentUserId: string;
@@ -63,6 +64,7 @@ export default function DashboardView({
   budgets,
   creditCards,
   invoicePayments,
+  faturaTransacoes,
   investments,
   invTransactions,
   currentUserId,
@@ -91,7 +93,7 @@ export default function DashboardView({
 
   const categoryDistribution = computeCategoryDistribution(transactions);
   const budgetsWithStats = computeBudgetStats(budgets, transactions);
-  const invoiceCards = computeInvoiceCards(creditCards, transactions, invoicePayments);
+  const invoiceCards = computeInvoiceCards(creditCards, faturaTransacoes, invoicePayments, currentMonth);
   const aporteCards = computeAporteCards(investments, invTransactions, currentMonth, currentUserId);
 
   // ── Navegação ─────────────────────────────────────────────────────────────────

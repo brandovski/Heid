@@ -59,6 +59,13 @@ export default async function DashboardPage({
   const lastDay = `${mes}-${String(new Date(y, m, 0).getDate()).padStart(2, "0")}`;
   const twelveMonthsStart = `${shiftMonth(mes, -11)}-01`;
 
+  // Range estendido para ciclo de faturamento (mês anterior dia 1 até fim do mês atual)
+  const prevDate = new Date(y, m - 2, 1);
+  const prevYear = prevDate.getFullYear();
+  const prevMonth = String(prevDate.getMonth() + 1).padStart(2, "0");
+  const faturaStart = `${prevYear}-${prevMonth}-01`;
+  const faturaEnd = lastDay;
+
   // Buscar nome do parceiro
   const { data: partnerProfile } = await supabase
     .from("profiles")
@@ -128,13 +135,14 @@ export default async function DashboardPage({
     { data: invoicePayments },
     { data: investments },
     { data: invTransactions },
+    { data: faturaTransacoes },
   ] = await Promise.all([
     txCurrentQ,
     txHistoricalQ,
     budgetsQ,
     supabase
       .from("credit_cards")
-      .select("id, name, color, due_day, scope, user_id, is_shared")
+      .select("id, name, color, due_day, closing_day, scope, user_id, is_shared")
       .eq("family_id", profile.family_id)
       .eq("is_active", true)
       .order("name"),
@@ -158,6 +166,14 @@ export default async function DashboardPage({
       .lte("date", lastDay)
       .eq("type", "deposit")
       .eq("auto_generated", false),
+    // Transações de cartão no range estendido (para agrupamento por ciclo de faturamento)
+    supabase
+      .from("transactions")
+      .select("id, description, amount, date, type, status, scope, user_id, category_id, credit_card_id, category:categories(name, icon, color)")
+      .eq("family_id", profile.family_id)
+      .not("credit_card_id", "is", null)
+      .gte("date", faturaStart)
+      .lte("date", faturaEnd),
   ]);
 
   return (
@@ -170,6 +186,7 @@ export default async function DashboardPage({
       historicalTransactions={(historicalTransactions as HistoricalTxRow[]) ?? []}
       budgets={(budgets as unknown as BudgetRow[]) ?? []}
       creditCards={(creditCards as CreditCardRow[]) ?? []}
+      faturaTransacoes={(faturaTransacoes as unknown as TransactionRow[]) ?? []}
       invoicePayments={(invoicePayments as InvoicePaymentRow[]) ?? []}
       investments={(investments as unknown as InvestmentContributionRow[]) ?? []}
       invTransactions={(invTransactions as unknown as InvTransactionRow[]) ?? []}

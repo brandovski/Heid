@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { getFatureDateRange } from "@/lib/fatura-utils";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -45,10 +46,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Marca todas as transactions do cartão no mês como pagas
-  const [year, month] = reference_month.split("-").map(Number);
-  const firstDay = `${reference_month}-01`;
-  const lastDay = `${reference_month}-${String(new Date(year, month, 0).getDate()).padStart(2, "0")}`;
+  // Buscar closing_day do cartão para usar o ciclo de faturamento correto
+  const { data: card } = await supabase
+    .from("credit_cards")
+    .select("closing_day")
+    .eq("id", credit_card_id)
+    .single();
+
+  // Marca todas as transactions do ciclo de faturamento do cartão como pagas
+  const { start: firstDay, end: lastDay } = getFatureDateRange(
+    reference_month,
+    card?.closing_day ?? 1
+  );
 
   await supabase
     .from("transactions")

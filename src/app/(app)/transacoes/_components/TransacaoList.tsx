@@ -18,12 +18,14 @@ import TransacaoCard from "./TransacaoCard";
 import TransacaoModal from "./TransacaoModal";
 import PagarModal from "./PagarModal";
 import FaturaGrupoCard from "./FaturaGrupoCard";
+import { getInvoiceMonth } from "@/lib/fatura-utils";
 
 interface Props {
   transacoes: TransactionWithRelations[];
   categorias: Pick<Category, "id" | "name" | "icon" | "color" | "type">[];
-  cartoes: Pick<CreditCard, "id" | "name" | "brand" | "color">[];
+  cartoes: Pick<CreditCard, "id" | "name" | "brand" | "color" | "closing_day">[];
   invoicePayments: InvoicePaymentSimple[];
+  faturaTransacoes: TransactionWithRelations[];
   mes: string;
   currentUserId: string;
   userName: string;
@@ -39,6 +41,7 @@ export default function TransacaoList({
   categorias,
   cartoes,
   invoicePayments,
+  faturaTransacoes,
   mes,
   currentUserId,
   userName,
@@ -96,16 +99,18 @@ export default function TransacaoList({
     }
   }
 
-  // ── Grupos de fatura por cartão (apenas transações pessoais do usuário logado) ──
-  const myTransactions = transacoes.filter((t) => t.user_id === currentUserId);
-  const cardTxs = myTransactions.filter(
-    (t) => t.credit_card_id && t.status !== "cancelled"
+  // ── Grupos de fatura por cartão (ciclo de faturamento correto) ──
+  // Usa faturaTransacoes (range estendido) filtradas pelo ciclo do mês atual
+  const myFaturaTransacoes = faturaTransacoes.filter(
+    (t) => t.user_id === currentUserId && t.status !== "cancelled"
   );
-  const flatTxs = transacoes.filter((t) => !t.credit_card_id);
 
   const grupoMap = new Map<string, FaturaGrupo>();
-  for (const t of cardTxs) {
+  for (const t of myFaturaTransacoes) {
     const cardId = t.credit_card_id!;
+    const card = cartoes.find((c) => c.id === cardId);
+    if (!card) continue;
+    if (getInvoiceMonth(t.date, card.closing_day) !== mes) continue;
     if (!grupoMap.has(cardId)) {
       grupoMap.set(cardId, {
         cartaoId: cardId,
@@ -123,6 +128,23 @@ export default function TransacaoList({
     grupo.total += t.amount;
   }
 
+  // Transações de cartão do mês calendário que não pertencem ao ciclo atual
+  // aparecem na lista principal como despesa do mês
+  const myCardTxs = transacoes.filter(
+    (t) => t.user_id === currentUserId && t.credit_card_id && t.status !== "cancelled"
+  );
+  const outOfCycleTxIds = new Set(
+    myCardTxs
+      .filter((t) => {
+        const card = cartoes.find((c) => c.id === t.credit_card_id);
+        return card && getInvoiceMonth(t.date, card.closing_day) !== mes;
+      })
+      .map((t) => t.id)
+  );
+  const flatTxs = transacoes.filter(
+    (t) => !t.credit_card_id || outOfCycleTxIds.has(t.id)
+  );
+
   // Enriquecer com dados de pagamento
   for (const pmt of invoicePayments) {
     const grupo = grupoMap.get(pmt.credit_card_id);
@@ -134,13 +156,16 @@ export default function TransacaoList({
 
   const faturaGrupos = [...grupoMap.values()].filter((g) => g.total > 0);
 
-  // ── Grupos de fatura do parceiro (somente leitura) ──
-  const partnerCardTxs = transacoes.filter(
+  // ── Grupos de fatura do parceiro (somente leitura, ciclo de faturamento correto) ──
+  const partnerFaturaTransacoes = faturaTransacoes.filter(
     (t) => t.user_id !== currentUserId && t.credit_card_id && t.is_shared && t.status !== "cancelled"
   );
   const partnerGrupoMap = new Map<string, FaturaGrupo>();
-  for (const t of partnerCardTxs) {
+  for (const t of partnerFaturaTransacoes) {
     const cardId = t.credit_card_id!;
+    const card = cartoes.find((c) => c.id === cardId);
+    if (!card) continue;
+    if (getInvoiceMonth(t.date, card.closing_day) !== mes) continue;
     if (!partnerGrupoMap.has(cardId)) {
       partnerGrupoMap.set(cardId, {
         cartaoId: cardId,

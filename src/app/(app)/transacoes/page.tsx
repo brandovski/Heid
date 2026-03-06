@@ -10,6 +10,18 @@ function getMonthRange(mes: string) {
   return { firstDay, lastDay };
 }
 
+function getFaturaRange(mes: string) {
+  const [year, month] = mes.split("-").map(Number);
+  // Range estendido: mês anterior dia 1 até fim do mês atual
+  // Garante capturar transações pós-fechamento do mês anterior
+  const prevDate = new Date(year, month - 2, 1);
+  const prevYear = prevDate.getFullYear();
+  const prevMonth = String(prevDate.getMonth() + 1).padStart(2, "0");
+  const faturaStart = `${prevYear}-${prevMonth}-01`;
+  const faturaEnd = new Date(year, month, 0).toISOString().split("T")[0];
+  return { faturaStart, faturaEnd };
+}
+
 export default async function TransacoesPage({
   searchParams,
 }: {
@@ -27,6 +39,7 @@ export default async function TransacoesPage({
     `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
   const { firstDay, lastDay } = getMonthRange(mes);
+  const { faturaStart, faturaEnd } = getFaturaRange(mes);
 
   // Buscar profile do usuário (para family_id, share_with_partner e full_name)
   const { data: profile } = await supabase
@@ -47,7 +60,7 @@ export default async function TransacoesPage({
     partnerName = partnerProfile?.full_name ?? "Parceiro";
   }
 
-  const [transacoesRes, categoriasRes, cartoesRes, invoicePaymentsRes] = await Promise.all([
+  const [transacoesRes, categoriasRes, cartoesRes, invoicePaymentsRes, faturaTransacoesRes] = await Promise.all([
     supabase
       .from("transactions")
       .select(
@@ -65,13 +78,21 @@ export default async function TransacoesPage({
       .order("name"),
     supabase
       .from("credit_cards")
-      .select("id, name, brand, color")
+      .select("id, name, brand, color, closing_day")
       .eq("is_active", true)
       .order("name"),
     supabase
       .from("invoice_payments")
       .select("id, credit_card_id, amount_paid, paid_at")
       .eq("reference_month", mes),
+    // Transações de cartão no range estendido (para agrupamento por ciclo de faturamento)
+    supabase
+      .from("transactions")
+      .select("*, credit_card:credit_cards(id, name, brand, color)")
+      .eq("scope", "personal")
+      .not("credit_card_id", "is", null)
+      .gte("date", faturaStart)
+      .lte("date", faturaEnd),
   ]);
 
   return (
@@ -81,6 +102,7 @@ export default async function TransacoesPage({
         categorias={categoriasRes.data ?? []}
         cartoes={cartoesRes.data ?? []}
         invoicePayments={(invoicePaymentsRes.data ?? []) as InvoicePaymentSimple[]}
+        faturaTransacoes={(faturaTransacoesRes.data ?? []) as unknown as TransactionWithRelations[]}
         mes={mes}
         currentUserId={user.id}
         userName={profile?.full_name ?? "Eu"}
