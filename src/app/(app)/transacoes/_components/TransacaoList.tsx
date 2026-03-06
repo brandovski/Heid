@@ -128,22 +128,8 @@ export default function TransacaoList({
     grupo.total += t.amount;
   }
 
-  // Transações de cartão do mês calendário que não pertencem ao ciclo atual
-  // aparecem na lista principal como despesa do mês
-  const myCardTxs = transacoes.filter(
-    (t) => t.user_id === currentUserId && t.credit_card_id && t.status !== "cancelled"
-  );
-  const outOfCycleTxIds = new Set(
-    myCardTxs
-      .filter((t) => {
-        const card = cartoes.find((c) => c.id === t.credit_card_id);
-        return card && getInvoiceMonth(t.date, card.closing_day) !== mes;
-      })
-      .map((t) => t.id)
-  );
-  const flatTxs = transacoes.filter(
-    (t) => !t.credit_card_id || outOfCycleTxIds.has(t.id)
-  );
+  // Transações de cartão nunca aparecem na lista principal — apenas nos grupos de fatura
+  const flatTxs = transacoes.filter((t) => !t.credit_card_id);
 
   // Enriquecer com dados de pagamento
   for (const pmt of invoicePayments) {
