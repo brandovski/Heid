@@ -59,8 +59,9 @@ export default async function DashboardPage({
   const lastDay = `${mes}-${String(new Date(y, m, 0).getDate()).padStart(2, "0")}`;
   const twelveMonthsStart = `${shiftMonth(mes, -11)}-01`;
 
-  // Range estendido para ciclo de faturamento (mês anterior dia 1 até fim do mês atual)
-  const prevDate = new Date(y, m - 2, 1);
+  // Range estendido para ciclo de faturamento (2 meses atrás dia 1 até fim do mês atual)
+  // Garante capturar transações quando due_day < closing_day (ciclo começa 2 meses antes do vencimento)
+  const prevDate = new Date(y, m - 3, 1);
   const prevYear = prevDate.getFullYear();
   const prevMonth = String(prevDate.getMonth() + 1).padStart(2, "0");
   const faturaStart = `${prevYear}-${prevMonth}-01`;

@@ -186,7 +186,7 @@ export function computeInvoiceCards(
           t.credit_card_id === card.id &&
           EXPENSE_TYPES.includes(t.type) &&
           t.status !== "cancelled" &&
-          getInvoiceMonth(t.date, card.closing_day) === currentMonth
+          getInvoiceMonth(t.date, card.closing_day, card.due_day) === currentMonth
       );
       const monthTotal = cardTxs.reduce((s, t) => s + t.amount, 0);
       const payment = invoicePayments.find((p) => p.credit_card_id === card.id) ?? null;

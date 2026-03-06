@@ -49,14 +49,15 @@ export async function POST(request: Request) {
   // Buscar closing_day do cartão para usar o ciclo de faturamento correto
   const { data: card } = await supabase
     .from("credit_cards")
-    .select("closing_day")
+    .select("closing_day, due_day")
     .eq("id", credit_card_id)
     .single();
 
   // Marca todas as transactions do ciclo de faturamento do cartão como pagas
   const { start: firstDay, end: lastDay } = getFatureDateRange(
     reference_month,
-    card?.closing_day ?? 1
+    card?.closing_day ?? 1,
+    card?.due_day ?? 1
   );
 
   await supabase

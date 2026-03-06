@@ -23,7 +23,7 @@ import { getInvoiceMonth } from "@/lib/fatura-utils";
 interface Props {
   transacoes: TransactionWithRelations[];
   categorias: Pick<Category, "id" | "name" | "icon" | "color" | "type">[];
-  cartoes: Pick<CreditCard, "id" | "name" | "brand" | "color" | "closing_day">[];
+  cartoes: Pick<CreditCard, "id" | "name" | "brand" | "color" | "closing_day" | "due_day">[];
   invoicePayments: InvoicePaymentSimple[];
   faturaTransacoes: TransactionWithRelations[];
   mes: string;
@@ -110,7 +110,7 @@ export default function TransacaoList({
     const cardId = t.credit_card_id!;
     const card = cartoes.find((c) => c.id === cardId);
     if (!card) continue;
-    if (getInvoiceMonth(t.date, card.closing_day) !== mes) continue;
+    if (getInvoiceMonth(t.date, card.closing_day, card.due_day) !== mes) continue;
     if (!grupoMap.has(cardId)) {
       grupoMap.set(cardId, {
         cartaoId: cardId,
@@ -151,7 +151,7 @@ export default function TransacaoList({
     const cardId = t.credit_card_id!;
     const card = cartoes.find((c) => c.id === cardId);
     if (!card) continue;
-    if (getInvoiceMonth(t.date, card.closing_day) !== mes) continue;
+    if (getInvoiceMonth(t.date, card.closing_day, card.due_day) !== mes) continue;
     if (!partnerGrupoMap.has(cardId)) {
       partnerGrupoMap.set(cardId, {
         cartaoId: cardId,

@@ -12,9 +12,9 @@ function getMonthRange(mes: string) {
 
 function getFaturaRange(mes: string) {
   const [year, month] = mes.split("-").map(Number);
-  // Range estendido: mês anterior dia 1 até fim do mês atual
-  // Garante capturar transações pós-fechamento do mês anterior
-  const prevDate = new Date(year, month - 2, 1);
+  // Range estendido: 2 meses atrás dia 1 até fim do mês atual
+  // Garante capturar transações quando due_day < closing_day (ciclo começa 2 meses antes do vencimento)
+  const prevDate = new Date(year, month - 3, 1);
   const prevYear = prevDate.getFullYear();
   const prevMonth = String(prevDate.getMonth() + 1).padStart(2, "0");
   const faturaStart = `${prevYear}-${prevMonth}-01`;
@@ -78,7 +78,7 @@ export default async function TransacoesPage({
       .order("name"),
     supabase
       .from("credit_cards")
-      .select("id, name, brand, color, closing_day")
+      .select("id, name, brand, color, closing_day, due_day")
       .eq("is_active", true)
       .order("name"),
     supabase

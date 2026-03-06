@@ -76,7 +76,7 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
   const fetchData = useCallback(async () => {
     setLoading(true);
     const supabase = createClient();
-    const { start: firstDay, end: lastDay } = getFatureDateRange(month, cartao.closing_day);
+    const { start: firstDay, end: lastDay } = getFatureDateRange(month, cartao.closing_day, cartao.due_day);
 
     const [{ data: txs }, { data: pmt }] = await Promise.all([
       supabase
