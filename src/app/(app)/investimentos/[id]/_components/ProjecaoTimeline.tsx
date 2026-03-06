@@ -10,6 +10,7 @@ export interface ProjecaoItem {
   description: string;
   amount: number;      // positivo = entrada, negativo = saída
   kind: ProjecaoItemKind;
+  contributorName?: string | null;
 }
 
 function formatCurrency(value: number): string {
@@ -73,10 +74,15 @@ function ItemRow({ item }: { item: ProjecaoItem }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-800 truncate">{item.description}</p>
-        <div className="flex items-center gap-1.5 mt-0.5">
+        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
           <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${getBadgeStyle(item.kind)}`}>
             {getBadgeText(item.kind)}
           </span>
+          {item.contributorName && (
+            <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600">
+              {item.contributorName}
+            </span>
+          )}
         </div>
       </div>
       <span className={`text-sm font-semibold flex-shrink-0 ${isEntrada ? "text-emerald-600" : "text-rose-500"}`}>

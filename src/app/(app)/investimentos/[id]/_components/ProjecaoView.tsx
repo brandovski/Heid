@@ -24,6 +24,8 @@ interface ProjectItemRef {
 interface Props {
   saldoAtual: number;
   investmentUserId: string;
+  userName: string;
+  partnerName: string;
   monthlyContributionAmount: number | null;
   monthlyContributionDay: number | null;
   partnerContributionAmount: number | null;
@@ -62,6 +64,8 @@ function formatMonthLabel(mes: string): string {
 export default function ProjecaoView({
   saldoAtual,
   investmentUserId,
+  userName,
+  partnerName,
   monthlyContributionAmount,
   monthlyContributionDay,
   partnerContributionAmount,
@@ -116,6 +120,7 @@ export default function ProjecaoView({
         description: "Aporte mensal",
         amount: monthlyContributionAmount,
         kind: "aporte_projetado",
+        contributorName: userName,
       });
     }
   }
@@ -138,9 +143,10 @@ export default function ProjecaoView({
       projetadosEvents.push({
         id: `aporte-proj-partner-${mesStr}`,
         date: dateStr,
-        description: "Aporte mensal (parceiro)",
+        description: "Aporte mensal",
         amount: partnerContributionAmount,
         kind: "aporte_projetado",
+        contributorName: partnerName,
       });
     }
   }

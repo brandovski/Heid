@@ -285,6 +285,8 @@ export default function InvestimentoDetalhe({
       <ProjecaoView
         saldoAtual={saldoAtual ?? 0}
         investmentUserId={investment.user_id}
+        userName={members.find((m) => m.id === investment.user_id)?.full_name ?? "Dono"}
+        partnerName={members.find((m) => m.id !== investment.user_id)?.full_name ?? "Parceiro"}
         monthlyContributionAmount={investment.monthly_contribution_amount}
         monthlyContributionDay={investment.monthly_contribution_day}
         partnerContributionAmount={investment.partner_contribution_amount}
