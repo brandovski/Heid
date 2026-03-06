@@ -382,7 +382,10 @@ export default function TransacaoModal({
                     <button
                       key={value}
                       type="button"
-                      onClick={() => setPaymentMode(value)}
+                      onClick={() => {
+                        if (value === "parcelado") setFirstInstallmentDate(date);
+                        setPaymentMode(value);
+                      }}
                       className={`py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
                         paymentMode === value
                           ? "bg-purple-50 border-purple-500 text-purple-700"
