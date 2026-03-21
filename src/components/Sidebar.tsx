@@ -12,7 +12,6 @@ import {
   Target,
   TrendingUp,
   UserRound,
-  HouseHeart,
   LayoutDashboard,
 } from "lucide-react";
 
@@ -51,13 +50,14 @@ export default function Sidebar() {
       <div className="flex flex-col bg-accent-400 rounded-panel shadow-panel">
 
         {/* Logo */}
-        <div className="flex items-center gap-2 px-4 pt-5 pb-4">
-          <div className="w-8 h-8 rounded-card bg-brand-700 flex items-center justify-center shrink-0">
-            <HouseHeart size={15} className="text-accent-300" strokeWidth={1.75} />
-          </div>
-          <span className="font-serif text-xl leading-none text-brand-700">
-            Heid
-          </span>
+        <div className="px-4 pt-5 pb-4">
+          <img
+            src="/assets/logo/logo.svg"
+            alt="Heid"
+            width={96}
+            height={24}
+            className="h-8 w-auto"
+          />
         </div>
 
         {/* Nav groups */}
