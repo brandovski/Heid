@@ -10,7 +10,6 @@ import {
   PieChart,
   Users,
   User,
-  ChevronDown,
   Layers,
   RefreshCw,
   Target,
@@ -45,12 +44,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/fixas": "Recorrências",
 };
 
-const desktopCartoesItems = [
-  { href: "/cartoes", label: "Gerenciar Cartões", icon: CreditCardIcon },
-  { href: "/assinaturas", label: "Assinaturas", icon: RefreshCw },
-  { href: "/parcelamentos", label: "Parcelas", icon: Layers },
-];
-
 type NavSlot =
   | { href: string; label: string; icon: React.ElementType }
   | null;
@@ -67,25 +60,15 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Desktop Cartões dropdown
-  const [cartoesOpen, setCartoesOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Mobile profile menu
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [menuView, setMenuView] = useState<MenuView>("main");
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  // Quick add transaction
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [quickAddLoading, setQuickAddLoading] = useState(false);
   const [quickAddData, setQuickAddData] = useState<QuickAddData | null>(null);
 
   const isActive = (href: string) => pathname.startsWith(href);
-  const isCartoesActive =
-    pathname.startsWith("/cartoes") ||
-    pathname.startsWith("/assinaturas") ||
-    pathname.startsWith("/parcelamentos");
 
   const pageTitle =
     Object.entries(PAGE_TITLES).find(([path]) => pathname.startsWith(path))?.[1] ??
@@ -93,9 +76,6 @@ export default function Navbar() {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setCartoesOpen(false);
-      }
       if (
         profileMenuRef.current &&
         !profileMenuRef.current.contains(e.target as Node)
@@ -132,140 +112,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ─── Desktop top navbar ─── */}
-      <nav className="hidden sm:block fixed top-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-xl border-b border-brand-700/10 shadow-sm shadow-brand-700/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-1">
-              <span className="text-lg font-bold text-brand-700 mr-6">Heid</span>
-
-              <Link
-                href="/dashboard"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive("/dashboard")
-                    ? "bg-accent-200 text-brand-700"
-                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
-                }`}
-              >
-                <Home size={16} />
-                Home
-              </Link>
-
-              <Link
-                href="/transacoes"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive("/transacoes")
-                    ? "bg-accent-200 text-brand-700"
-                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
-                }`}
-              >
-                <ArrowLeftRight size={16} />
-                Transações
-              </Link>
-
-              {/* Cartões dropdown */}
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setCartoesOpen((v) => !v)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isCartoesActive
-                      ? "bg-accent-200 text-brand-700"
-                      : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
-                  }`}
-                >
-                  <CreditCardIcon size={16} />
-                  Cartões
-                  <ChevronDown
-                    size={14}
-                    className={`transition-transform ${cartoesOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                {cartoesOpen && (
-                  <div className="absolute top-full left-0 mt-1 w-48 bg-surface rounded-panel shadow-panel border border-brand-700/10 py-1 z-50">
-                    {desktopCartoesItems.map(({ href, label, icon: Icon }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        onClick={() => setCartoesOpen(false)}
-                        className={`flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
-                          isActive(href)
-                            ? "text-brand-700 bg-accent-200"
-                            : "text-brand-700/70 hover:bg-accent-100"
-                        }`}
-                      >
-                        <Icon size={15} />
-                        {label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <Link
-                href="/orcamento"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive("/orcamento")
-                    ? "bg-accent-200 text-brand-700"
-                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
-                }`}
-              >
-                <PieChart size={16} />
-                Orçamento
-              </Link>
-
-              <Link
-                href="/familia"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive("/familia")
-                    ? "bg-accent-200 text-brand-700"
-                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
-                }`}
-              >
-                <Users size={16} />
-                Família
-              </Link>
-
-              <Link
-                href="/projetos"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive("/projetos")
-                    ? "bg-accent-200 text-brand-700"
-                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
-                }`}
-              >
-                <Target size={16} />
-                Projetos
-              </Link>
-
-              <Link
-                href="/investimentos"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive("/investimentos")
-                    ? "bg-accent-200 text-brand-700"
-                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
-                }`}
-              >
-                <TrendingUp size={16} />
-                Investimentos
-              </Link>
-            </div>
-
-            <Link
-              href="/perfil"
-              className={`p-2 rounded-lg transition-colors ${
-                isActive("/perfil")
-                  ? "bg-accent-200 text-brand-700"
-                  : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
-              }`}
-              aria-label="Perfil"
-            >
-              <User size={18} />
-            </Link>
-          </div>
-        </div>
-      </nav>
-
       {/* ─── Mobile header ─── */}
       <header className="sm:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-surface/90 backdrop-blur-xl border-b border-brand-700/10 shadow-sm shadow-brand-700/5">
         <div className="flex items-center justify-between h-full px-4">
@@ -388,7 +234,6 @@ export default function Navbar() {
       </header>
 
       {/* ─── Mobile FAB ─── */}
-      {/* bottom-11 (44px): FAB de 56px vai de 44–100px; nav de 20–84px → 40px dentro da nav, 16px acima */}
       <button
         type="button"
         onClick={handleOpenQuickAdd}
@@ -403,7 +248,6 @@ export default function Navbar() {
         <div className="flex items-center h-16 px-1">
           {mobileNavSlots.map((item, i) => {
             if (!item) {
-              // Blank space for FAB
               return <div key="fab-slot" className="flex-1" aria-hidden="true" />;
             }
             const { href, label, icon: Icon } = item;
