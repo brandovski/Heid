@@ -3,7 +3,54 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Paleta principal */
+    --color-surface:       #fefcf1;
+    --color-brand:         #1b4437;
+    --color-accent:        #e0d44e;
+    --color-accent-light:  #fbeda3;
+    --color-danger:        #441b1b;
+
+    /* Bordas com opacidade */
+    --border-brand:        rgba(27, 68, 55, 0.20);
+    --border-danger:       rgba(68, 27, 27, 0.20);
+
+    /* Fundos com opacidade */
+    --bg-income-icon:      rgba(27, 68, 55, 0.10);
+    --bg-expense-icon:     rgba(68, 27, 27, 0.10);
+    --bg-card-highlight:   rgba(224, 212, 78, 0.10);
+    --bg-footer:           rgba(224, 212, 78, 0.06);
+
+    /* Raios */
+    --radius-card:   10px;
+    --radius-panel:  20px;
+    --radius-pill:   40px;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-brand);
+    font-family: var(--font-poppins), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   h1 {
     @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .border-brand {
+    border-color: var(--border-brand);
+  }
+  .bg-income-icon {
+    background-color: var(--bg-income-icon);
+  }
+  .bg-expense-icon {
+    background-color: var(--bg-expense-icon);
+  }
+  .bg-card-highlight {
+    background-color: var(--bg-card-highlight);
   }
 }

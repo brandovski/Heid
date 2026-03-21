@@ -133,7 +133,7 @@ export default function Navbar() {
   return (
     <>
       {/* ─── Desktop top navbar ─── */}
-      <nav className="hidden sm:block fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 shadow-sm shadow-black/5">
+      <nav className="hidden sm:block fixed top-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-xl border-b border-brand-700/10 shadow-sm shadow-brand-700/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-1">
@@ -143,8 +143,8 @@ export default function Navbar() {
                 href="/dashboard"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/dashboard")
-                    ? "bg-brand-100 text-brand-700"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-accent-200 text-brand-700"
+                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
                 }`}
               >
                 <Home size={16} />
@@ -155,8 +155,8 @@ export default function Navbar() {
                 href="/transacoes"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/transacoes")
-                    ? "bg-brand-100 text-brand-700"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-accent-200 text-brand-700"
+                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
                 }`}
               >
                 <ArrowLeftRight size={16} />
@@ -169,8 +169,8 @@ export default function Navbar() {
                   onClick={() => setCartoesOpen((v) => !v)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isCartoesActive
-                      ? "bg-brand-100 text-brand-700"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      ? "bg-accent-200 text-brand-700"
+                      : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
                   }`}
                 >
                   <CreditCardIcon size={16} />
@@ -182,7 +182,7 @@ export default function Navbar() {
                 </button>
 
                 {cartoesOpen && (
-                  <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                  <div className="absolute top-full left-0 mt-1 w-48 bg-surface rounded-panel shadow-panel border border-brand-700/10 py-1 z-50">
                     {desktopCartoesItems.map(({ href, label, icon: Icon }) => (
                       <Link
                         key={href}
@@ -190,8 +190,8 @@ export default function Navbar() {
                         onClick={() => setCartoesOpen(false)}
                         className={`flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
                           isActive(href)
-                            ? "text-brand-700 bg-brand-100"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "text-brand-700 bg-accent-200"
+                            : "text-brand-700/70 hover:bg-accent-100"
                         }`}
                       >
                         <Icon size={15} />
@@ -206,8 +206,8 @@ export default function Navbar() {
                 href="/orcamento"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/orcamento")
-                    ? "bg-brand-100 text-brand-700"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-accent-200 text-brand-700"
+                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
                 }`}
               >
                 <PieChart size={16} />
@@ -218,8 +218,8 @@ export default function Navbar() {
                 href="/familia"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/familia")
-                    ? "bg-brand-100 text-brand-700"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-accent-200 text-brand-700"
+                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
                 }`}
               >
                 <Users size={16} />
@@ -230,8 +230,8 @@ export default function Navbar() {
                 href="/projetos"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/projetos")
-                    ? "bg-brand-100 text-brand-700"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-accent-200 text-brand-700"
+                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
                 }`}
               >
                 <Target size={16} />
@@ -242,8 +242,8 @@ export default function Navbar() {
                 href="/investimentos"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/investimentos")
-                    ? "bg-brand-100 text-brand-700"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-accent-200 text-brand-700"
+                    : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
                 }`}
               >
                 <TrendingUp size={16} />
@@ -255,8 +255,8 @@ export default function Navbar() {
               href="/perfil"
               className={`p-2 rounded-lg transition-colors ${
                 isActive("/perfil")
-                  ? "bg-brand-100 text-brand-700"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  ? "bg-accent-200 text-brand-700"
+                  : "text-brand-700/60 hover:text-brand-700 hover:bg-accent-100"
               }`}
               aria-label="Perfil"
             >
@@ -267,9 +267,9 @@ export default function Navbar() {
       </nav>
 
       {/* ─── Mobile header ─── */}
-      <header className="sm:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 shadow-sm shadow-black/5">
+      <header className="sm:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-surface/90 backdrop-blur-xl border-b border-brand-700/10 shadow-sm shadow-brand-700/5">
         <div className="flex items-center justify-between h-full px-4">
-          <span className="text-[1.5rem] font-bold text-gray-900 font-serif">
+          <span className="text-[1.5rem] font-bold text-brand-700 font-serif">
             {pageTitle}
           </span>
 
@@ -282,8 +282,8 @@ export default function Navbar() {
               }}
               className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                 profileMenuOpen
-                  ? "bg-brand-600 text-white shadow-sm"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-brand-700 text-white shadow-sm"
+                  : "bg-accent-200 text-brand-700 hover:bg-accent-300"
               }`}
               aria-label="Abrir menu"
             >
@@ -293,11 +293,11 @@ export default function Navbar() {
             {profileMenuOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={closeProfileMenu} />
-                <div className="absolute right-0 top-[calc(100%+8px)] z-20 w-52 bg-white rounded-2xl shadow-xl shadow-black/10 border border-gray-100 overflow-hidden">
+                <div className="absolute right-0 top-[calc(100%+8px)] z-20 w-52 bg-surface rounded-panel shadow-panel border border-brand-700/10 overflow-hidden">
                   {menuView === "main" ? (
                     <>
                       <div className="px-4 pt-3 pb-1.5">
-                        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                        <p className="text-[10px] font-semibold text-brand-700/40 uppercase tracking-widest">
                           Menu
                         </p>
                       </div>
@@ -305,39 +305,39 @@ export default function Navbar() {
                       <Link
                         href="/perfil"
                         onClick={closeProfileMenu}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-brand-700/80 hover:bg-accent-100 transition-colors"
                       >
-                        <User size={14} className="text-gray-400 shrink-0" />
+                        <User size={14} className="text-brand-700/40 shrink-0" />
                         Meu Perfil
                       </Link>
 
                       <button
                         type="button"
                         onClick={() => setMenuView("cartoes")}
-                        className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-50"
+                        className="w-full flex items-center justify-between px-4 py-3 text-sm text-brand-700/80 hover:bg-accent-100 transition-colors border-t border-brand-700/5"
                       >
                         <div className="flex items-center gap-3">
-                          <CreditCardIcon size={14} className="text-gray-400 shrink-0" />
+                          <CreditCardIcon size={14} className="text-brand-700/40 shrink-0" />
                           Cartões
                         </div>
-                        <ChevronRight size={14} className="text-gray-300" />
+                        <ChevronRight size={14} className="text-brand-700/30" />
                       </button>
 
                       <Link
                         href="/orcamento"
                         onClick={closeProfileMenu}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-50"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-brand-700/80 hover:bg-accent-100 transition-colors border-t border-brand-700/5"
                       >
-                        <PieChart size={14} className="text-gray-400 shrink-0" />
+                        <PieChart size={14} className="text-brand-700/40 shrink-0" />
                         Orçamento
                       </Link>
 
                       <Link
                         href="/familia"
                         onClick={closeProfileMenu}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-50"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-brand-700/80 hover:bg-accent-100 transition-colors border-t border-brand-700/5"
                       >
-                        <Users size={14} className="text-gray-400 shrink-0" />
+                        <Users size={14} className="text-brand-700/40 shrink-0" />
                         Família
                       </Link>
                     </>
@@ -346,7 +346,7 @@ export default function Navbar() {
                       <button
                         type="button"
                         onClick={() => setMenuView("main")}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-brand-600 hover:bg-brand-100/50 transition-colors border-b border-gray-100"
+                        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-brand-700 hover:bg-accent-100 transition-colors border-b border-brand-700/10"
                       >
                         <ChevronLeft size={14} />
                         Cartões
@@ -355,27 +355,27 @@ export default function Navbar() {
                       <Link
                         href="/cartoes"
                         onClick={closeProfileMenu}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-brand-700/80 hover:bg-accent-100 transition-colors"
                       >
-                        <CreditCardIcon size={14} className="text-gray-400 shrink-0" />
+                        <CreditCardIcon size={14} className="text-brand-700/40 shrink-0" />
                         Gerenciar Cartões
                       </Link>
 
                       <Link
                         href="/parcelamentos"
                         onClick={closeProfileMenu}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-50"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-brand-700/80 hover:bg-accent-100 transition-colors border-t border-brand-700/5"
                       >
-                        <Layers size={14} className="text-gray-400 shrink-0" />
+                        <Layers size={14} className="text-brand-700/40 shrink-0" />
                         Parcelas
                       </Link>
 
                       <Link
                         href="/assinaturas"
                         onClick={closeProfileMenu}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-50"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-brand-700/80 hover:bg-accent-100 transition-colors border-t border-brand-700/5"
                       >
-                        <RefreshCw size={14} className="text-gray-400 shrink-0" />
+                        <RefreshCw size={14} className="text-brand-700/40 shrink-0" />
                         Assinatura
                       </Link>
                     </>
@@ -392,14 +392,14 @@ export default function Navbar() {
       <button
         type="button"
         onClick={handleOpenQuickAdd}
-        className="sm:hidden fixed bottom-11 left-1/2 -translate-x-1/2 z-50 w-14 h-14 rounded-full bg-brand-600 ring-4 ring-white shadow-lg shadow-brand-600/40 flex items-center justify-center text-white active:scale-95 transition-transform"
+        className="sm:hidden fixed bottom-11 left-1/2 -translate-x-1/2 z-50 w-14 h-14 rounded-full bg-brand-700 ring-4 ring-surface shadow-lg shadow-brand-700/40 flex items-center justify-center text-white active:scale-95 transition-transform"
         aria-label="Nova transação"
       >
         <Plus size={22} strokeWidth={2.5} />
       </button>
 
       {/* ─── Mobile bottom navigation ─── */}
-      <nav className="sm:hidden fixed bottom-5 left-4 right-4 z-40 bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg shadow-black/10 border border-white/50">
+      <nav className="sm:hidden fixed bottom-5 left-4 right-4 z-40 bg-accent-400/80 backdrop-blur-xl rounded-panel shadow-panel border border-accent-400/30">
         <div className="flex items-center h-16 px-1">
           {mobileNavSlots.map((item, i) => {
             if (!item) {
@@ -414,8 +414,8 @@ export default function Navbar() {
                 href={href}
                 className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-xl transition-all ${
                   active
-                    ? "bg-white/80 text-brand-600"
-                    : "text-gray-400 hover:text-gray-700"
+                    ? "bg-accent-200/80 text-brand-700"
+                    : "text-brand-700/50 hover:text-brand-700"
                 }`}
               >
                 <Icon size={20} strokeWidth={active ? 2.5 : 1.75} />
@@ -430,8 +430,8 @@ export default function Navbar() {
       {showQuickAdd &&
         (quickAddLoading || !quickAddData ? (
           <div className="fixed inset-0 z-[60] bg-black/40 flex items-end sm:items-center justify-center sm:p-4">
-            <div className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl p-12 flex items-center justify-center">
-              <div className="w-5 h-5 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-full sm:max-w-md bg-surface rounded-t-panel sm:rounded-panel p-12 flex items-center justify-center">
+              <div className="w-5 h-5 border-2 border-brand-700 border-t-transparent rounded-full animate-spin" />
             </div>
           </div>
         ) : (
