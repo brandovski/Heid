@@ -24,7 +24,7 @@ export default function MonthNavigator({
   disableNext = false,
 }: MonthNavigatorProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-5">
       <button
         onClick={onPrev}
         className="flex items-center justify-center px-3 py-1.5 rounded-pill bg-accent-200 text-brand-700 hover:bg-accent-300 transition-colors duration-150"
@@ -33,9 +33,9 @@ export default function MonthNavigator({
         <ChevronLeft size={16} strokeWidth={2} />
       </button>
 
-      <span className="text-[13px] font-medium text-brand-700 capitalize min-w-[120px] text-center">
+      <div className="flex items-center justify-center w-[200px] h-[30px] px-3 rounded-pill bg-accent-200 text-[12px] font-medium text-brand-700 capitalize whitespace-nowrap">
         {formatMonth(month)}
-      </span>
+      </div>
 
       <button
         onClick={onNext}
