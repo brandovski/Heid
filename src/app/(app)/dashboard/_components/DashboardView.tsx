@@ -161,7 +161,7 @@ export default function DashboardView({
       />
 
       {/* ── Navegação de mês ── */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-center">
         <MonthNavigator
           month={currentMonth}
           onPrev={() => navigate(-1)}
