@@ -3,18 +3,30 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { CategoryAmount, formatCurrency } from "./types";
 
-// Paleta moderna e harmônica
 const COLORS = [
-  "#1D2D28", // brand-600
-  "#7c3aed", // violet-600
-  "#db2777", // pink-600
-  "#ea580c", // orange-600
-  "#16a34a", // green-600
-  "#0891b2", // cyan-600
-  "#d97706", // amber-600
-  "#9333ea", // purple-600
-  "#dc2626", // red-600
-  "#0d9488", // teal-600
+  "#2563EB",
+  "#16A34A",
+  "#84CC16",
+  "#EC4899",
+  "#8B5CF6",
+  "#EAB308",
+  "#F97316",
+  "#06B6D4",
+  "#EF4444",
+  "#0D9488",
+];
+
+const COLORS_DARK = [
+  "#1D4ED8",
+  "#15803D",
+  "#65A30D",
+  "#DB2777",
+  "#7C3AED",
+  "#CA8A04",
+  "#EA580C",
+  "#0891B2",
+  "#DC2626",
+  "#0F766E",
 ];
 
 interface Props {
@@ -31,17 +43,17 @@ function CustomTooltip({
   if (!active || !payload?.length) return null;
   const item = payload[0];
   return (
-    <div className="bg-white border border-gray-100 shadow-xl rounded-xl px-4 py-3 text-xs min-w-[130px]">
+    <div className="bg-surface border border-brand shadow-panel rounded-card px-4 py-3 text-xs min-w-[130px]">
       <div className="flex items-center gap-2 mb-1">
         <span
           className="w-2 h-2 rounded-full shrink-0"
           style={{ backgroundColor: item.payload.fill }}
         />
-        <span className="font-semibold text-gray-700 truncate max-w-[120px]">
+        <span className="font-medium text-brand-700 truncate max-w-[120px]">
           {item.name}
         </span>
       </div>
-      <p className="font-bold text-gray-900 text-sm mt-1">
+      <p className="font-semibold text-brand-700 text-sm mt-1">
         {formatCurrency(item.value)}
       </p>
     </div>
@@ -64,18 +76,18 @@ function CenterLabel({
         y={cy - 7}
         textAnchor="middle"
         dominantBaseline="middle"
-        fill="#111827"
-        fontSize={15}
-        fontWeight={700}
+        fill="#1b4437"
+        fontSize={14}
+        fontWeight={600}
       >
         {formatCurrency(total)}
       </text>
       <text
         x={cx}
-        y={cy + 12}
+        y={cy + 11}
         textAnchor="middle"
         dominantBaseline="middle"
-        fill="#9ca3af"
+        fill="#1b443799"
         fontSize={10}
       >
         total
@@ -90,16 +102,38 @@ export default function GraficoCategoria({ data }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <ResponsiveContainer width="100%" height={180}>
+      <ResponsiveContainer width="100%" height={220}>
         <PieChart>
+          {/* Camada inferior — extrusion (simula profundidade 3D) */}
+          <Pie
+            data={top}
+            cx="50%"
+            cy="58%"
+            innerRadius={56}
+            outerRadius={82}
+            cornerRadius={4}
+            paddingAngle={2}
+            dataKey="amount"
+            nameKey="name"
+            isAnimationActive={false}
+            stroke="none"
+            tabIndex={-1}
+            style={{ pointerEvents: "none" }}
+          >
+            {top.map((_, i) => (
+              <Cell key={i} fill={COLORS_DARK[i % COLORS_DARK.length]} />
+            ))}
+          </Pie>
+
+          {/* Camada superior — face principal (cor cheia) */}
           <Pie
             data={top}
             cx="50%"
             cy="50%"
-            innerRadius={62}
+            innerRadius={56}
             outerRadius={78}
-            cornerRadius={6}
-            paddingAngle={3}
+            cornerRadius={4}
+            paddingAngle={2}
             dataKey="amount"
             nameKey="name"
             label={({ cx, cy }) => (
@@ -107,15 +141,13 @@ export default function GraficoCategoria({ data }: Props) {
             )}
             labelLine={false}
             isAnimationActive={false}
+            stroke="none"
           >
             {top.map((_, i) => (
-              <Cell
-                key={i}
-                fill={COLORS[i % COLORS.length]}
-                stroke="none"
-              />
+              <Cell key={i} fill={COLORS[i % COLORS.length]} />
             ))}
           </Pie>
+
           <Tooltip content={<CustomTooltip />} />
         </PieChart>
       </ResponsiveContainer>
@@ -128,8 +160,8 @@ export default function GraficoCategoria({ data }: Props) {
               className="w-2 h-2 rounded-full shrink-0"
               style={{ backgroundColor: COLORS[i % COLORS.length] }}
             />
-            <span className="text-gray-600 truncate flex-1">{cat.name}</span>
-            <span className="font-semibold text-gray-800 shrink-0">
+            <span className="text-brand-700/60 truncate flex-1">{cat.name}</span>
+            <span className="font-medium text-brand-700 shrink-0">
               {formatCurrency(cat.amount)}
             </span>
           </div>
