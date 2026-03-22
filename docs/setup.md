@@ -15,7 +15,7 @@
 
 ```bash
 git clone <repo-url>
-cd couple
+cd heid
 npm install
 ```
 
@@ -153,7 +153,7 @@ curl -H "Authorization: Bearer <CRON_SECRET>" http://localhost:3000/api/cron/gen
 ## 7. Estrutura de pastas após setup
 
 ```
-couple/
+heid/
 ├── .env.local              # variáveis de ambiente (não commitado)
 ├── vercel.json             # configuração de crons
 ├── supabase/

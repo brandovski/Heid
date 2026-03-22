@@ -399,7 +399,7 @@ CREATE POLICY "scoped_modify" ON credit_cards FOR ALL USING (
 ## 8. Estrutura de Pastas do Projeto
 
 ```
-couple/
+heid/
 ├── app/
 │   ├── (auth)/
 │   │   └── login/

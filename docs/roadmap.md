@@ -381,6 +381,42 @@
 
 ---
 
+## Fase UI/Branding — Identidade Visual e Layout
+
+**Objetivo:** elevar a qualidade visual do produto com design system consistente, layout fiel ao Figma e assets de marca completos.
+
+### Design system e tokens (Sessão 041)
+- [x] Paleta Tailwind: `brand` (verde floresta `#1b4437`), `accent` (amarelo `#e0d44e`), `danger` (vinho `#441b1b`), `surface` (creme `#fefcf1`)
+- [x] Tokens de border-radius: `card` (10px), `panel` (20px), `pill` (40px)
+- [x] Tokens de box-shadow: `card` e `panel` com tom verde
+- [x] CSS Variables em `:root` para cores com opacidade e raios
+- [x] `body` com background e cor padrão da marca
+
+### Layout e navegação (Sessão 041)
+- [x] `Sidebar.tsx` — sidebar desktop fixa com card amarelo flutuante, logo real, grupos de nav, perfil
+- [x] `Navbar.tsx` — nav desktop removida; mobile com tokens da nova paleta
+- [x] `layout.tsx` — integra sidebar, `sm:ml-[260px]`, `sm:mt-0`
+
+### Assets de logo (Sessão 041)
+- [x] `public/assets/logo/logo.svg` — isotipo + wordmark, fundos claros
+- [x] `public/assets/logo/logo-mark.svg` — isotipo 32×32
+- [x] `public/assets/logo/logo-white.svg` — wordmark creme para fundos escuros
+- [x] `public/assets/logo/logo-mark-192.png` e `logo-mark-512.png` — PWA
+- [x] `src/app/icon.svg` — favicon automático Next.js App Router
+- [x] `src/app/apple-icon.png` — ícone iOS 180×180
+- [x] `src/app/opengraph-image.png` — imagem de compartilhamento 1200×630
+
+### Dashboard redesign (próximo)
+- [ ] Saudação com nome do usuário (Kaisei Tokumin display)
+- [ ] Seletor de mês com chevrons
+- [ ] Grid de 5 cards de resumo (Receitas, Despesas, A receber, A pagar, Saldo)
+- [ ] Layout 2 colunas: gráfico + próximas movimentações
+- [ ] Card full-width de próximas movimentações com botão "Ver tudo"
+
+**Critério de conclusão:** aplicação com identidade visual coerente, sidebar funcional no desktop, favicon e ícones corretos, Dashboard fiel ao Figma.
+
+---
+
 ## Backlog (pós v1.0)
 
 - Relatórios e exportação (PDF / CSV)
@@ -393,4 +429,4 @@
 
 ---
 
-*Atualizado em: 2026-03-06 (sessão 038)*
+*Atualizado em: 2026-03-22 (sessão 041)*

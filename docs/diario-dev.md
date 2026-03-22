@@ -9,11 +9,12 @@
 
 ## Estado Atual do Projeto
 
-**Fase:** Sessão 040 — billing_day derivado de start_date + primeira transação imediata
-**Última sessão:** Sessão 040 — 2026-03-06
-**Próxima ação:** Fase 12 + acionar cron manualmente no Vercel para gerar transações das 4 assinaturas existentes
+**Fase:** UI/Branding — identidade visual, sidebar desktop e assets de logo
+**Última sessão:** Sessão 041 — 2026-03-22
+**Próxima ação:** Implementar layout do Dashboard conforme Figma (saudação, seletor de mês, grid de cards, gráfico + próximas movimentações)
 
 ### O que está feito
+- [x] Sessão 041 — Fase UI/Branding: design system completo a partir do Figma (paleta `brand/accent/danger/surface`, tokens `card/panel/pill`, CSS vars); Sidebar desktop com card amarelo flutuante, logo real, nav agrupada, item ativo em pill; Navbar migrada para novos tokens, nav desktop removida; layout com `sm:ml-[260px]` e `sm:mt-0`; assets de logo completos (`logo.svg`, `logo-mark.svg`, `logo-white.svg`, PNGs 192/512, `icon.svg`, `apple-icon.png`, `opengraph-image.png`). Commits: `7d0655e`, `663df89`, `8a9d421`.
 - [x] Sessão 040 — `billing_day` derivado automaticamente do dia de `start_date` (sem campo na UI); campo "Dia de cobrança" removido do `AssinaturaModal`; `start_date` full-width com label "Data de início (1ª cobrança)"; POST `/api/assinaturas` gera a 1ª transação imediatamente após criar a assinatura (`date=start_date`, `type=subscription`, `status=pending`, `auto_generated=true`, lógica promocional idêntica ao cron); PATCH `/api/assinaturas/[id]` não altera mais `billing_day`. Zero erros TypeScript. Commit: `3a93bff`.
 - [x] Sessão 039 — Agrupamento de faturas por mês de **vencimento** (`due_day`): `getInvoiceMonth(date, closingDay, dueDay)` agora converte mês de fechamento → mês de vencimento (`due_day < closing_day` → +1 mês); `getFatureDateRange(dueMonth, closingDay, dueDay)` converte mês de vencimento → fechamento antes de calcular range; `fatura-utils.ts` reorganizado com `shiftMonth` antes das funções que o usam; `computeInvoiceCards` e ambas as chamadas em `TransacaoList.tsx` passam `card.due_day`; select de cartões em `transacoes/page.tsx` inclui `due_day`; range de fatura estendido para 2 meses atrás em `transacoes/page.tsx` e `dashboard/page.tsx`; `FaturaDetalheModal.tsx` passa `cartao.due_day`; `api/faturas/route.ts` seleciona `due_day` e o passa ao `getFatureDateRange`; migration 035 aplicada (corrige `reference_month` existente para cartões com `due_day < closing_day`). Zero erros TypeScript.
 - [x] Sessão 038 — Fix FluxoWidget: prop `creditCards` substituída por `invoiceCards: InvoiceCardData[]` em `FluxoWidget.tsx`; lógica de cálculo de `faturaItems` reescrita para usar `invoiceCards` (já computado por `computeInvoiceCards` com range estendido e `closing_day`), eliminando a duplicação com a lógica incorreta que somava `transactions` de mês calendário com `status=pending`. `DashboardView.tsx` passa `invoiceCards={invoiceCards}` ao FluxoWidget. Testado em produção: totais do widget agora batem com os cards de fatura. Commit: `8bf6756`.
@@ -63,7 +64,7 @@
 - [x] Dashboard placeholder com aviso de `family_id` pendente
 - [x] `vercel.json` com 3 cron schedules configurados
 - [x] `.env.local` configurado com chaves do Supabase
-- [x] Repositório GitHub criado: `gabrielbrandao-atus/couple`
+- [x] Repositório GitHub criado: `gabrielbrandao-atus/heid`
 - [x] Migrations 001–012 aplicadas no Supabase
 - [x] `src/types/database.ts` atualizado com tipos de investimento e campos de migration 017
 - [x] Fase 3 — CRUD de Transações Manuais (`/transacoes`, filtros, modal, badges de status)
@@ -773,7 +774,7 @@ Assinaturas:
 
 **O que foi feito:**
 - Identificado projeto Supabase "Couple" já existente via Management API
-- Criado repositório GitHub privado `gabrielbrandao-atus/couple`
+- Criado repositório GitHub privado `gabrielbrandao-atus/heid`
 - Setup manual do projeto Next.js 14.2.35 (create-next-app falhou por restrição de nome do diretório com letra maiúscula)
 - Criadas todas as dependências, configurações e arquivos de source
 - Corrigidas 3 issues identificadas pelo agente de planejamento:

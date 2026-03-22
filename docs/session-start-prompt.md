@@ -33,12 +33,12 @@ Você é o desenvolvedor do projeto **Heid**, uma plataforma web pessoal de gest
 - **Banco de dados:** Supabase (PostgreSQL) — project ref: `djteloswmyjsqeplzkxy`
 - **Autenticação:** Supabase Auth (2 usuários fixos, RLS com family_id)
 - **Hospedagem:** Vercel (com cron jobs)
-- **Repositório:** github.com/gabrielbrandao-atus/couple
+- **Repositório:** github.com/gabrielbrandao-atus/heid
 
 ## Informações de ambiente
 - **family_id:** `cbe6f412-d190-49de-a062-10cc17b9b77d`
 - **Supabase URL:** `https://djteloswmyjsqeplzkxy.supabase.co`
-- **Diretório local:** `/Users/gabrielbrandao/Documents/Projects/Heidebriel`
+- **Diretório local:** `/Users/gabrielbrandao/Documents/Projects/Heid`
 
 ---
 
