@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Plus, Users, Pencil, XCircle, CheckCircle, Trash2 } from "lucide-react";
+import { Plus, Users, Pencil, XCircle, CheckCircle, Trash2 } from "lucide-react";
+import MonthNavigator from "@/components/ui/MonthNavigator";
 import Modal from "@/components/ui/Modal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import DatePicker from "@/components/ui/DatePicker";
@@ -203,23 +204,11 @@ export default function FamiliaView({
       <h1 className="text-xl font-bold text-gray-900 hidden sm:block">Família</h1>
 
       {/* Month navigation */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <span className="text-base font-semibold text-gray-800 capitalize">
-          {formatMonth(currentMonth)}
-        </span>
-        <button
-          onClick={() => navigate(1)}
-          className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronRight size={20} />
-        </button>
-      </div>
+      <MonthNavigator
+        month={currentMonth}
+        onPrev={() => navigate(-1)}
+        onNext={() => navigate(1)}
+      />
 
       {/* Caixa Familiar */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">

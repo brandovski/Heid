@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, ChevronLeft, ChevronRight, Share2, Settings } from "lucide-react";
+import { Plus, Share2, Settings } from "lucide-react";
+import MonthNavigator from "@/components/ui/MonthNavigator";
 import type { Category, CreditCard, TransactionStatus } from "@/types/database";
 import type { TransactionWithRelations, FaturaGrupo, InvoicePaymentSimple } from "./types";
 import {
@@ -272,25 +273,13 @@ export default function TransacaoList({
       </div>
 
       {/* Navegação de mês */}
-      <div className="flex items-center justify-center gap-4 mb-6">
-        <button
-          onClick={() => router.push(`/transacoes?mes=${prevMonth(mes)}`)}
-          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-          aria-label="Mês anterior"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <span className="text-base font-semibold text-gray-900 min-w-[160px] text-center">
-          {formatMonthLabel(mes)}
-        </span>
-        <button
-          onClick={() => router.push(`/transacoes?mes=${nextMonth(mes)}`)}
-          disabled={isCurrentMonth}
-          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          aria-label="Próximo mês"
-        >
-          <ChevronRight size={20} />
-        </button>
+      <div className="flex items-center justify-center mb-6">
+        <MonthNavigator
+          month={mes}
+          onPrev={() => router.push(`/transacoes?mes=${prevMonth(mes)}`)}
+          onNext={() => router.push(`/transacoes?mes=${nextMonth(mes)}`)}
+          disableNext={isCurrentMonth}
+        />
       </div>
 
       {/* Resumo */}

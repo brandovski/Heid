@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Plus, Copy } from "lucide-react";
+import { Plus, Copy } from "lucide-react";
+import MonthNavigator from "@/components/ui/MonthNavigator";
 import OrcamentoCard from "./OrcamentoCard";
 import OrcamentoModal from "./OrcamentoModal";
 import {
@@ -101,23 +102,11 @@ export default function OrcamentoList({
       </div>
 
       {/* Navegação de mês */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <span className="text-base font-semibold text-gray-800 capitalize">
-          {formatMonth(currentMonth)}
-        </span>
-        <button
-          onClick={() => navigate(1)}
-          className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronRight size={20} />
-        </button>
-      </div>
+      <MonthNavigator
+        month={currentMonth}
+        onPrev={() => navigate(-1)}
+        onNext={() => navigate(1)}
+      />
 
       {/* Card de totais */}
       {!isEmpty && (

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { List, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { List, CalendarDays } from "lucide-react";
+import MonthNavigator from "@/components/ui/MonthNavigator";
 import FluxoTimeline from "./FluxoTimeline";
 import FluxoCalendario from "./FluxoCalendario";
 import {
@@ -334,24 +335,12 @@ export default function FluxoView({
         </div>
 
         {/* Navegação de mês */}
-        <div className="flex items-center justify-between mt-4">
-          <button
-            onClick={() => navigateMes(prevMonth(mes))}
-            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-            aria-label="Mês anterior"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <span className="text-sm font-semibold text-gray-800 capitalize">
-            {formatMonthLabel(mes)}
-          </span>
-          <button
-            onClick={() => navigateMes(nextMonth(mes))}
-            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-            aria-label="Próximo mês"
-          >
-            <ChevronRight size={18} />
-          </button>
+        <div className="mt-4">
+          <MonthNavigator
+            month={mes}
+            onPrev={() => navigateMes(prevMonth(mes))}
+            onNext={() => navigateMes(nextMonth(mes))}
+          />
         </div>
       </div>
 

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
+import MonthNavigator from "@/components/ui/MonthNavigator";
 import Modal from "@/components/ui/Modal";
 import PagarFaturaModal from "@/components/ui/PagarFaturaModal";
 import { createClient } from "@/lib/supabase/client";
@@ -137,23 +138,11 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
       <div className="space-y-5">
 
         {/* ── Navegação de mês ── */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setMonth(shiftMonth(month, -1))}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <span className="text-sm font-semibold text-gray-700 capitalize">
-            {formatMonth(month)}
-          </span>
-          <button
-            onClick={() => setMonth(shiftMonth(month, 1))}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
+        <MonthNavigator
+          month={month}
+          onPrev={() => setMonth(shiftMonth(month, -1))}
+          onNext={() => setMonth(shiftMonth(month, 1))}
+        />
 
         {/* ── Lista de transações ── */}
         {loading ? (

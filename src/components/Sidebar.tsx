@@ -96,10 +96,9 @@ export default function Sidebar() {
 
         {/* Profile */}
         <div className="px-[10px] pt-3 pb-[10px]">
-          <div className="h-px bg-brand-700/10 mb-2 mx-2" />
           <Link
             href="/perfil"
-            className={`flex items-center gap-[7px] px-3 py-[6px] rounded-pill text-[13px] font-sans transition-all duration-150 ${
+            className={`flex items-center gap-[7px] px-3 py-[6px] rounded-pill border border-brand-700 text-[13px] font-sans transition-all duration-150 ${
               isActive("/perfil")
                 ? "bg-accent-200 text-brand-700 font-medium"
                 : "text-brand-700/65 hover:bg-brand-700/5 hover:text-brand-700"

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { List, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { List, CalendarDays } from "lucide-react";
+import MonthNavigator from "@/components/ui/MonthNavigator";
 import ProjecaoTimeline from "./ProjecaoTimeline";
 import ProjecaoCalendario from "./ProjecaoCalendario";
 import type { ProjecaoItem } from "./ProjecaoTimeline";
@@ -261,25 +262,11 @@ export default function ProjecaoView({
         </p>
 
         {/* Navegação de mês */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setMes(prevMonth(mes))}
-            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-            aria-label="Mês anterior"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <span className="text-sm font-semibold text-gray-800">
-            {formatMonthLabel(mes)}
-          </span>
-          <button
-            onClick={() => setMes(nextMonth(mes))}
-            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-            aria-label="Próximo mês"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
+        <MonthNavigator
+          month={mes}
+          onPrev={() => setMes(prevMonth(mes))}
+          onNext={() => setMes(nextMonth(mes))}
+        />
       </div>
 
       {/* Conteúdo */}

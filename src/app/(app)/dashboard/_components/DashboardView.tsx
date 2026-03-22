@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Calendar, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { Calendar, ExternalLink } from "lucide-react";
 import ProgressBar from "@/components/ui/ProgressBar";
+import MonthNavigator from "@/components/ui/MonthNavigator";
+import InfoCard from "@/components/ui/InfoCard";
 import ConfirmarAporteModal from "@/components/ui/ConfirmarAporteModal";
 import GraficoEvolucao from "./GraficoEvolucao";
 import GraficoCategoria from "./GraficoCategoria";
@@ -106,44 +108,43 @@ export default function DashboardView({
     router.push(`/dashboard?mes=${currentMonth}&escopo=${next}`);
   }
 
-  // ── Cards de resumo ───────────────────────────────────────────────────────────
-  const summaryCards = [
-    { label: "Receitas", value: summary.income, color: "text-green-600", wide: false },
-    { label: "Despesas", value: summary.expense, color: "text-red-600", wide: false },
-    { label: "A receber", value: summary.pendingIncome, color: "text-amber-600", wide: false },
-    { label: "A pagar", value: summary.pendingExpense, color: "text-orange-600", wide: false },
-    { label: "Saldo", value: summary.balance, color: summary.balance >= 0 ? "text-brand-600" : "text-red-600", wide: true },
-  ];
+  // ── Controle de mês futuro ────────────────────────────────────────────────────
+  const todayMonth = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  })();
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-5">
 
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[2rem] leading-[2.5rem] font-bold text-gray-900">Olá, {userName}</h1>
-          <p className="text-sm text-gray-500 capitalize mt-0.5">
-            {formatMonth(currentMonth)}
+          <h1 className="font-serif text-[42px] leading-tight text-brand-700">
+            Olá, {userName}
+          </h1>
+          <p className="font-serif text-[24px] text-brand-700/60 leading-snug">
+            Vamos organizar as suas finanças.
           </p>
         </div>
         {/* Toggle escopo */}
-        <div className="flex rounded-lg border border-gray-200 bg-white p-0.5 text-sm shrink-0">
+        <div className="flex rounded-pill border border-brand p-0.5 text-[13px] shrink-0 mt-2 bg-accent-400/30">
           <button
             onClick={() => escopo !== "personal" && toggleEscopo()}
-            className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-pill font-medium transition-colors duration-150 ${
               escopo === "personal"
-                ? "bg-brand-600 text-white"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-accent-200 text-brand-700"
+                : "text-brand-700/50 hover:text-brand-700"
             }`}
           >
             {userName}
           </button>
           <button
             onClick={() => escopo !== "parceiro" && toggleEscopo()}
-            className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-pill font-medium transition-colors duration-150 ${
               escopo === "parceiro"
-                ? "bg-brand-600 text-white"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-accent-200 text-brand-700"
+                : "text-brand-700/50 hover:text-brand-700"
             }`}
           >
             {partnerName}
@@ -151,36 +152,7 @@ export default function DashboardView({
         </div>
       </div>
 
-      {/* ── Navegação de mês ── */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <span className="text-base font-semibold text-gray-800 capitalize">
-          {formatMonth(currentMonth)}
-        </span>
-        <button
-          onClick={() => navigate(1)}
-          className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronRight size={20} />
-        </button>
-      </div>
-
-      {/* ── Cards de Resumo ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        {summaryCards.map(({ label, value, color, wide }) => (
-          <div key={label} className={`bg-white rounded-xl border border-gray-100 p-4 ${wide ? "col-span-2 sm:col-span-1" : ""}`}>
-            <p className="text-xs text-gray-400 mb-1">{label}</p>
-            <p className={`text-sm font-bold ${color}`}>{formatCurrency(value)}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Fluxo Widget ── */}
+      {/* ── Fluxo Widget (Próximas movimentações) ── */}
       <FluxoWidget
         transactions={transactions}
         invoiceCards={invoiceCards}
@@ -188,24 +160,50 @@ export default function DashboardView({
         escopo={escopo}
       />
 
+      {/* ── Navegação de mês ── */}
+      <div className="flex items-center justify-between">
+        <MonthNavigator
+          month={currentMonth}
+          onPrev={() => navigate(-1)}
+          onNext={() => navigate(1)}
+          disableNext={currentMonth >= todayMonth}
+        />
+      </div>
+
+      {/* ── Cards de Resumo ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-[10px]">
+        <InfoCard label="Receitas" value={formatCurrency(summary.income)} colorVariant="income" />
+        <InfoCard label="Despesas" value={formatCurrency(summary.expense)} colorVariant="expense" />
+        <InfoCard label="A receber" value={formatCurrency(summary.pendingIncome)} />
+        <InfoCard label="A pagar" value={formatCurrency(summary.pendingExpense)} colorVariant="expense" />
+        <div className="col-span-2 sm:col-span-1">
+          <InfoCard
+            label="Saldo"
+            value={formatCurrency(summary.balance)}
+            highlighted
+            colorVariant={summary.balance >= 0 ? "income" : "expense"}
+          />
+        </div>
+      </div>
+
       {/* ── Charts ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-[10px]">
 
         {/* Evolução */}
-        <div className="lg:col-span-3 bg-white rounded-xl border border-gray-100 p-5">
+        <div className="lg:col-span-3 bg-surface rounded-card border border-brand p-5">
           <div className="flex items-center gap-4 mb-5">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-brand-600" />
-              <span className="text-xs text-gray-500">Receitas</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-brand-700" />
+              <span className="text-xs text-brand-700/60">Receitas</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-              <span className="text-xs text-gray-500">Despesas</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-danger-700" />
+              <span className="text-xs text-brand-700/60">Despesas</span>
             </div>
             <select
               value={chartRange}
               onChange={(e) => setChartRange(e.target.value as ChartRange)}
-              className="text-xs font-medium text-gray-600 border-0 bg-transparent cursor-pointer focus:outline-none ml-auto"
+              className="text-xs font-medium text-brand-700/70 border-0 bg-transparent cursor-pointer focus:outline-none ml-auto"
             >
               <option value="semana">Essa semana</option>
               <option value="mes">Esse mês</option>
@@ -218,39 +216,39 @@ export default function DashboardView({
         </div>
 
         {/* Despesas por categoria */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">
+        <div className="lg:col-span-2 bg-surface rounded-card border border-brand p-5">
+          <h2 className="text-[13px] font-medium text-brand-700 mb-4">
             Despesas por categoria
           </h2>
           {categoryDistribution.length > 0 ? (
             <GraficoCategoria data={categoryDistribution} />
           ) : (
             <div className="h-44 flex items-center justify-center">
-              <p className="text-sm text-gray-400">Nenhuma despesa registrada</p>
+              <p className="text-sm text-brand-700/40">Nenhuma despesa registrada</p>
             </div>
           )}
         </div>
       </div>
 
       {/* ── Orçamento ── */}
-      <div className="bg-white rounded-xl border border-gray-100 p-5">
+      <div className="bg-surface rounded-card border border-brand p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-gray-700">Orçamento</h2>
+          <h2 className="text-[13px] font-medium text-brand-700">Orçamento</h2>
           <Link
             href={`/orcamento?mes=${currentMonth}`}
-            className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1"
+            className="text-xs text-brand-700/60 hover:text-brand-700 flex items-center gap-1 transition-colors"
           >
             Ver tudo <ExternalLink size={12} />
           </Link>
         </div>
         {budgetsWithStats.length === 0 ? (
           <div className="text-center py-4">
-            <p className="text-sm text-gray-400 mb-3">
+            <p className="text-sm text-brand-700/40 mb-3">
               Nenhum orçamento configurado para este mês
             </p>
             <Link
               href={`/orcamento?mes=${currentMonth}`}
-              className="text-sm font-medium text-brand-600 hover:text-brand-700"
+              className="text-sm font-medium text-brand-700 hover:text-brand-600 transition-colors"
             >
               Configurar orçamento →
             </Link>
@@ -260,7 +258,7 @@ export default function DashboardView({
             {budgetsWithStats.slice(0, 5).map((b) => (
               <div key={b.id}>
                 <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="text-gray-700 font-medium">
+                  <span className="text-brand-700 font-medium">
                     {b.category?.icon && (
                       <span className="mr-1">{b.category.icon}</span>
                     )}
@@ -268,7 +266,7 @@ export default function DashboardView({
                   </span>
                   <span
                     className={
-                      b.isOverBudget ? "text-red-600 font-semibold" : "text-gray-500"
+                      b.isOverBudget ? "text-danger-700 font-semibold" : "text-brand-700/50"
                     }
                   >
                     {formatCurrency(b.spent + b.committed)} /{" "}
@@ -282,11 +280,11 @@ export default function DashboardView({
               </div>
             ))}
             {budgetsWithStats.length > 5 && (
-              <p className="text-xs text-gray-400 text-center pt-1">
+              <p className="text-xs text-brand-700/40 text-center pt-1">
                 +{budgetsWithStats.length - 5} categorias —{" "}
                 <Link
                   href={`/orcamento?mes=${currentMonth}`}
-                  className="text-brand-600 hover:text-brand-700"
+                  className="text-brand-700 hover:text-brand-600 transition-colors"
                 >
                   ver tudo
                 </Link>
@@ -298,9 +296,9 @@ export default function DashboardView({
 
       {/* ── Faturas ── */}
       {invoiceCards.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">Faturas</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="bg-surface rounded-card border border-brand p-5">
+          <h2 className="text-[13px] font-medium text-brand-700 mb-4">Faturas</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[10px]">
             {invoiceCards.map(({ card, monthTotal, payment }) => {
               const [cy, cm] = currentMonth.split("-").map(Number);
               const dueDate = new Date(cy, cm - 1, card.due_day);
@@ -310,15 +308,15 @@ export default function DashboardView({
                 (dueDate.getTime() - todayMidnight.getTime()) / (1000 * 60 * 60 * 24)
               );
 
-              let venceClass = "text-gray-400";
+              let venceClass = "text-brand-700/40";
               let venceLabel = `Vence dia ${card.due_day}`;
 
               if (!payment) {
                 if (daysUntilDue < 0) {
-                  venceClass = "text-red-500";
+                  venceClass = "text-danger-700";
                   venceLabel = `Venceu dia ${card.due_day}`;
                 } else if (daysUntilDue <= 3) {
-                  venceClass = "text-amber-500";
+                  venceClass = "text-amber-600";
                   venceLabel = `Vence em ${daysUntilDue}d`;
                 }
               }
@@ -326,7 +324,7 @@ export default function DashboardView({
               return (
               <div
                 key={card.id}
-                className="bg-gray-50 rounded-xl border border-gray-100 p-4 space-y-3"
+                className="bg-surface rounded-card border border-brand p-4 space-y-3"
               >
                 {/* Nome do cartão */}
                 <div className="flex items-center gap-2">
@@ -334,7 +332,7 @@ export default function DashboardView({
                     className="w-3 h-3 rounded-full shrink-0"
                     style={{ backgroundColor: card.color ?? "#6366f1" }}
                   />
-                  <span className="text-sm font-medium text-gray-900 truncate">
+                  <span className="text-[13px] font-medium text-brand-700 truncate">
                     {card.name}
                   </span>
                 </div>
@@ -347,26 +345,26 @@ export default function DashboardView({
 
                 {/* Total do mês */}
                 <div>
-                  <p className="text-xs text-gray-400 mb-0.5">Total do mês</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[12px] text-brand-700/50 mb-0.5">Total do mês</p>
+                  <p className="text-[18px] font-medium text-brand-700">
                     {formatCurrency(monthTotal)}
                   </p>
                 </div>
 
                 {/* Status de pagamento */}
                 {payment ? (
-                  <div className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 rounded-lg px-3 py-2">
+                  <div className="flex items-center gap-1.5 text-xs text-brand-700 bg-income-icon rounded-card px-3 py-2">
                     <span className="font-medium">
                       ✓ Pago: {formatCurrency(payment.amount_paid)}
                     </span>
-                    <span className="text-green-500 ml-auto">
+                    <span className="text-brand-700/50 ml-auto">
                       {formatDate(payment.paid_at.split("T")[0])}
                     </span>
                   </div>
                 ) : (
                   <button
                     onClick={() => setSelectedInvoice({ card, monthTotal })}
-                    className="w-full text-xs font-medium text-brand-600 border border-brand-200 bg-brand-50 hover:bg-brand-100 rounded-lg py-2 px-3 transition-colors"
+                    className="w-full text-xs font-medium text-brand-700 border border-brand rounded-card py-2 px-3 hover:bg-brand-700/5 transition-colors"
                   >
                     Registrar pagamento
                   </button>
@@ -380,17 +378,17 @@ export default function DashboardView({
 
       {/* ── Aportes do Mês ── */}
       {aporteCards.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-5">
+        <div className="bg-surface rounded-card border border-brand p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-700">Aportes do Mês</h2>
+            <h2 className="text-[13px] font-medium text-brand-700">Aportes do Mês</h2>
             <Link
               href="/investimentos"
-              className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1"
+              className="text-xs text-brand-700/60 hover:text-brand-700 flex items-center gap-1 transition-colors"
             >
               Ver todos <ExternalLink size={12} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[10px]">
             {aporteCards.map((card) => (
               <AporteCard
                 key={`${card.investment.id}`}
@@ -435,33 +433,33 @@ function AporteCard({ card, onConfirm }: { card: AporteCardData; onConfirm: () =
   const typeLabel = INVESTMENT_TYPE_LABELS[card.investment.type as keyof typeof INVESTMENT_TYPE_LABELS] ?? card.investment.type;
 
   return (
-    <div className="bg-gray-50 rounded-xl border border-gray-100 p-4 space-y-3">
+    <div className="bg-surface rounded-card border border-brand p-4 space-y-3">
       {/* Nome + tipo */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm font-medium text-gray-900 truncate flex-1">{card.investment.name}</span>
-        <span className="text-xs text-gray-500 bg-white border border-gray-200 rounded-full px-2 py-0.5 shrink-0">{typeLabel}</span>
+        <span className="text-[13px] font-medium text-brand-700 truncate flex-1">{card.investment.name}</span>
+        <span className="text-[11px] text-brand-700/50 bg-brand-700/5 border border-brand rounded-pill px-2 py-0.5 shrink-0">{typeLabel}</span>
       </div>
 
       {/* Dia programado */}
-      <div className="flex items-center gap-1 text-xs text-gray-400">
+      <div className="flex items-center gap-1 text-xs text-brand-700/40">
         <Calendar size={11} />
         <span>Dia {card.scheduledDay} do mês</span>
       </div>
 
       {/* Valor esperado */}
       <div>
-        <p className="text-xs text-gray-400 mb-0.5">Valor esperado</p>
-        <p className="text-lg font-bold text-gray-900">{formatCurrency(card.expectedAmount)}</p>
+        <p className="text-[12px] text-brand-700/50 mb-0.5">Valor esperado</p>
+        <p className="text-[18px] font-medium text-brand-700">{formatCurrency(card.expectedAmount)}</p>
       </div>
 
       {/* Status */}
       {card.confirmed ? (
-        <div className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 rounded-lg px-3 py-2">
+        <div className="flex items-center gap-1.5 text-xs text-brand-700 bg-income-icon rounded-card px-3 py-2">
           <span className="font-medium">
             ✓ {formatCurrency(card.confirmedAmount!)}
           </span>
           {card.confirmedDate && (
-            <span className="text-green-500 ml-auto">
+            <span className="text-brand-700/50 ml-auto">
               {formatDate(card.confirmedDate)}
             </span>
           )}
@@ -469,7 +467,7 @@ function AporteCard({ card, onConfirm }: { card: AporteCardData; onConfirm: () =
       ) : (
         <button
           onClick={onConfirm}
-          className="w-full text-xs font-medium text-brand-600 border border-brand-200 bg-brand-50 hover:bg-brand-100 rounded-lg py-2 px-3 transition-colors"
+          className="w-full text-xs font-medium text-brand-700 border border-brand rounded-card py-2 px-3 hover:bg-brand-700/5 transition-colors"
         >
           Confirmar aporte
         </button>
