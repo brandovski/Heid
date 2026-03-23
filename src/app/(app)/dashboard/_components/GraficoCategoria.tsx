@@ -5,8 +5,9 @@ import type { CategoryAmount } from "./types";
 import { formatCurrency } from "./types";
 
 const FALLBACK_COLORS = [
-  "#A8C5B5", "#E8D87A", "#E8A8A8", "#A8C5E8", "#C8B8E8",
-  "#E8C4A0", "#A8DEC0", "#B8D8E0", "#E0B8C0", "#C8D8A8",
+  "#A8C5B5", "#C5DDD3", "#E8D87A", "#F2E8A0",
+  "#E8C4A0", "#DDB896", "#E8A8A8", "#D4A0A0",
+  "#A8C5E8", "#B8D8E0", "#C8B8E8", "#C8D8A8",
 ];
 
 interface Props { data: CategoryAmount[] }
@@ -62,7 +63,7 @@ export default function GraficoCategoria({ data }: Props) {
           innerRadius="62%"
           outerRadius="78%"
           cornerRadius={0}
-          paddingAngle={2}
+          paddingAngle={0}
           strokeWidth={0}
           isAnimationActive={false}
         >

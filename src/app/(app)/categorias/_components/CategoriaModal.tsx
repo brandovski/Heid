@@ -5,9 +5,12 @@ import Modal from "@/components/ui/Modal";
 import type { Category } from "@/types/database";
 
 const PRESET_COLORS = [
-  "#ef4444", "#f97316", "#eab308", "#22c55e",
-  "#06b6d4", "#3b82f6", "#8b5cf6", "#ec4899",
-  "#6b7280", "#84cc16", "#14b8a6", "#f43f5e",
+  "#A8C5B5", "#C5DDD3", // sages (brand green family)
+  "#E8D87A", "#F2E8A0", // dourados (accent family)
+  "#E8C4A0", "#DDB896", // pêssego / terracota
+  "#E8A8A8", "#D4A0A0", // rosa empoeirado / coral
+  "#A8C5E8", "#B8D8E0", // periwinkle / azul pó
+  "#C8B8E8", "#C8D8A8", // lavanda / lima suave
 ];
 
 interface Props {
