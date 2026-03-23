@@ -61,7 +61,7 @@ export default function GraficoCategoria({ data }: Props) {
           nameKey="name"
           innerRadius="62%"
           outerRadius="78%"
-          cornerRadius={5}
+          cornerRadius={0}
           paddingAngle={2}
           strokeWidth={0}
           isAnimationActive={false}
