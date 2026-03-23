@@ -90,21 +90,21 @@ export default function GraficoCategoria({ data }: Props) {
           })}
 
           {/* Label central */}
-          <text
-            x={CX} y={CY - 8}
-            textAnchor="middle" dominantBaseline="middle"
-            fill="#1b4437" fontSize={11} fontWeight={600}
-            style={{ fontFamily: "var(--font-poppins)" }}
-          >
-            {formatCurrency(total)}
-          </text>
-          <text
-            x={CX} y={CY + 8}
-            textAnchor="middle" dominantBaseline="middle"
-            fill="#1b443760" fontSize={9}
-            style={{ fontFamily: "var(--font-poppins)" }}
-          >
-            total
+          <text textAnchor="middle" style={{ fontFamily: "var(--font-poppins)" }}>
+            <tspan
+              x={CX} y={CY - 5}
+              dominantBaseline="middle"
+              fill="#1b4437" fontSize={17} fontWeight={700}
+            >
+              {formatCurrency(total)}
+            </tspan>
+            <tspan
+              x={CX} y={CY + 13}
+              dominantBaseline="middle"
+              fill="#1b443760" fontSize={9}
+            >
+              despesas
+            </tspan>
           </text>
         </svg>
 
@@ -114,11 +114,16 @@ export default function GraficoCategoria({ data }: Props) {
             className="fixed z-50 pointer-events-none bg-surface border border-brand shadow-panel rounded-card px-3 py-2 text-xs whitespace-nowrap"
             style={{ left: tip.x + 14, top: tip.y - 12 }}
           >
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: segs[hovered].color }} />
-              <span className="font-medium text-brand-700">{segs[hovered].name}</span>
+            <div className="flex items-center gap-2">
+              <span
+                className="w-2.5 h-2.5 rounded-sm shrink-0"
+                style={{ backgroundColor: segs[hovered].color }}
+              />
+              <span className="text-brand-700/60">{segs[hovered].name}</span>
+              <span className="ml-auto pl-4 font-medium text-brand-700 tabular-nums">
+                {formatCurrency(segs[hovered].value)}
+              </span>
             </div>
-            <p className="font-semibold text-brand-700">{formatCurrency(segs[hovered].value)}</p>
           </div>
         )}
       </div>
