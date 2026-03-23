@@ -5,8 +5,16 @@ import type { CategoryAmount } from "./types";
 import { formatCurrency } from "./types";
 
 const COLORS = [
-  "#2563EB", "#16A34A", "#84CC16", "#EC4899", "#8B5CF6",
-  "#EAB308", "#F97316", "#06B6D4", "#EF4444", "#0D9488",
+  "#A8C5B5", // sage green (brand family)
+  "#E8D87A", // golden yellow (accent family)
+  "#E8A8A8", // dusty rose
+  "#A8C5E8", // periwinkle
+  "#C8B8E8", // soft lavender
+  "#E8C4A0", // warm peach
+  "#A8DEC0", // mint
+  "#B8D8E0", // powder blue
+  "#E0B8C0", // blush
+  "#C8D8A8", // soft lime
 ];
 
 interface Props { data: CategoryAmount[] }
