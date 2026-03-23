@@ -84,6 +84,7 @@ export interface MonthlyTotal {
 export interface CategoryAmount {
   name: string;
   amount: number;
+  color: string | null;
 }
 
 export interface BudgetWithStats extends BudgetRow {
@@ -142,14 +143,16 @@ export function computeMonthlyTotals(
 export function computeCategoryDistribution(
   transactions: TransactionRow[]
 ): CategoryAmount[] {
-  const map = new Map<string, number>();
+  const map = new Map<string, { amount: number; color: string | null }>();
   for (const t of transactions) {
     if (!EXPENSE_TYPES.includes(t.type) || t.status === "cancelled") continue;
     const name = t.category?.name ?? "Sem categoria";
-    map.set(name, (map.get(name) ?? 0) + t.amount);
+    const color = t.category?.color ?? null;
+    const prev = map.get(name);
+    map.set(name, { amount: (prev?.amount ?? 0) + t.amount, color: prev?.color ?? color });
   }
   return Array.from(map.entries())
-    .map(([name, amount]) => ({ name, amount }))
+    .map(([name, { amount, color }]) => ({ name, amount, color }))
     .sort((a, b) => b.amount - a.amount);
 }
 

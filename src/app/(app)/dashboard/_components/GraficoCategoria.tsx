@@ -4,17 +4,9 @@ import { PieChart, Pie, Cell, Tooltip, Label, ResponsiveContainer } from "rechar
 import type { CategoryAmount } from "./types";
 import { formatCurrency } from "./types";
 
-const COLORS = [
-  "#A8C5B5", // sage green (brand family)
-  "#E8D87A", // golden yellow (accent family)
-  "#E8A8A8", // dusty rose
-  "#A8C5E8", // periwinkle
-  "#C8B8E8", // soft lavender
-  "#E8C4A0", // warm peach
-  "#A8DEC0", // mint
-  "#B8D8E0", // powder blue
-  "#E0B8C0", // blush
-  "#C8D8A8", // soft lime
+const FALLBACK_COLORS = [
+  "#A8C5B5", "#E8D87A", "#E8A8A8", "#A8C5E8", "#C8B8E8",
+  "#E8C4A0", "#A8DEC0", "#B8D8E0", "#E0B8C0", "#C8D8A8",
 ];
 
 interface Props { data: CategoryAmount[] }
@@ -64,7 +56,7 @@ export default function GraficoCategoria({ data }: Props) {
           content={<CustomTooltip />}
         />
         <Pie
-          data={top.map((d, i) => ({ ...d, fill: COLORS[i % COLORS.length] }))}
+          data={top.map((d, i) => ({ ...d, fill: d.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length] }))}
           dataKey="amount"
           nameKey="name"
           innerRadius="62%"
@@ -75,7 +67,7 @@ export default function GraficoCategoria({ data }: Props) {
           isAnimationActive={false}
         >
           {top.map((_, i) => (
-            <Cell key={i} fill={COLORS[i % COLORS.length]} />
+            <Cell key={i} fill={top[i].color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length]} />
           ))}
           <Label
             content={({ viewBox }) => {
