@@ -13,8 +13,8 @@ const COLORS = [
 const R    = 52;                         // raio do arco
 const CX   = 68;                         // centro x
 const CY   = 68;                         // centro y
-const SW   = 6;                          // stroke-width normal
-const SW_H = 8;                          // stroke-width no hover
+const SW   = 10;                         // stroke-width normal
+const SW_H = 12;                         // stroke-width no hover
 const C    = 2 * Math.PI * R;            // circunferência total
 const GAP  = SW + 2;                     // gap visual entre segmentos (≥ SW para não colidir caps)
 
@@ -96,7 +96,7 @@ export default function GraficoCategoria({ data }: Props) {
             fill="#1b4437" fontSize={11} fontWeight={600}
             style={{ fontFamily: "var(--font-poppins)" }}
           >
-            {hovered !== null ? formatCurrency(segs[hovered].value) : formatCurrency(total)}
+            {formatCurrency(total)}
           </text>
           <text
             x={CX} y={CY + 8}
@@ -104,7 +104,7 @@ export default function GraficoCategoria({ data }: Props) {
             fill="#1b443760" fontSize={9}
             style={{ fontFamily: "var(--font-poppins)" }}
           >
-            {hovered !== null ? segs[hovered].name : "total"}
+            total
           </text>
         </svg>
 
@@ -123,8 +123,8 @@ export default function GraficoCategoria({ data }: Props) {
         )}
       </div>
 
-      {/* ── Legenda ── */}
-      <div className="space-y-1.5">
+      {/* ── Legenda (apenas mobile) ── */}
+      <div className="space-y-1.5 sm:hidden">
         {segs.slice(0, 5).map((seg) => (
           <div key={seg.name} className="flex items-center gap-2 text-xs">
             <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
