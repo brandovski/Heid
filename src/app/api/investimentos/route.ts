@@ -1,5 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+
+const INVESTMENT_TYPES = ["cofrinho", "cdb", "lci_lca", "tesouro_direto", "renda_variavel", "fii", "fundo", "previdencia", "cripto", "outro"] as const;
+
+const createInvestimentoSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório").max(200),
+  type: z.enum(INVESTMENT_TYPES, { message: "Tipo de investimento inválido" }),
+  scope: z.enum(["personal", "family"], { message: "Escopo inválido" }),
+  description: z.string().max(500).optional().nullable(),
+  goal_amount: z.coerce.number().positive().optional().nullable(),
+  monthly_contribution_amount: z.coerce.number().positive().optional().nullable(),
+  monthly_contribution_day: z.coerce.number().int().min(1).max(31).optional().nullable(),
+  partner_contribution_amount: z.coerce.number().positive().optional().nullable(),
+  partner_contribution_day: z.coerce.number().int().min(1).max(31).optional().nullable(),
+  is_eligible_for_projects: z.boolean().default(false),
+});
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
@@ -37,26 +53,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Family not configured" }, { status: 400 });
   }
 
-  const {
-    name,
-    type,
-    scope,
-    description,
-    goal_amount,
-    monthly_contribution_amount,
-    monthly_contribution_day,
-    partner_contribution_amount,
-    partner_contribution_day,
-    is_eligible_for_projects,
-  } = await req.json();
+  const body = await req.json();
+  const parsed = createInvestimentoSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Dados inválidos", details: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
+  }
 
-  if (!name?.trim()) return NextResponse.json({ error: "Nome é obrigatório" }, { status: 400 });
-  if (!type) return NextResponse.json({ error: "Tipo é obrigatório" }, { status: 400 });
-  if (!scope) return NextResponse.json({ error: "Escopo é obrigatório" }, { status: 400 });
+  const { name, type, scope, description, goal_amount, monthly_contribution_amount, monthly_contribution_day, partner_contribution_amount, partner_contribution_day, is_eligible_for_projects } = parsed.data;
 
-  // Both or neither for owner monthly contribution
-  const hasAmount = monthly_contribution_amount != null && monthly_contribution_amount !== "";
-  const hasDay = monthly_contribution_day != null && monthly_contribution_day !== "";
+  const hasAmount = monthly_contribution_amount != null;
+  const hasDay = monthly_contribution_day != null;
   if (hasAmount !== hasDay) {
     return NextResponse.json(
       { error: "Valor e dia do aporte mensal devem ser definidos juntos" },
@@ -64,9 +73,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Both or neither for partner contribution
-  const hasPartnerAmount = partner_contribution_amount != null && partner_contribution_amount !== "";
-  const hasPartnerDay = partner_contribution_day != null && partner_contribution_day !== "";
+  const hasPartnerAmount = partner_contribution_amount != null;
+  const hasPartnerDay = partner_contribution_day != null;
   if (hasPartnerAmount !== hasPartnerDay) {
     return NextResponse.json(
       { error: "Valor e dia do aporte do parceiro devem ser definidos juntos" },
@@ -83,11 +91,11 @@ export async function POST(req: NextRequest) {
       type,
       scope,
       description: description?.trim() ?? null,
-      goal_amount: goal_amount != null ? parseFloat(goal_amount) : null,
-      monthly_contribution_amount: hasAmount ? parseFloat(monthly_contribution_amount) : null,
-      monthly_contribution_day: hasDay ? parseInt(monthly_contribution_day) : null,
-      partner_contribution_amount: hasPartnerAmount ? parseFloat(partner_contribution_amount) : null,
-      partner_contribution_day: hasPartnerDay ? parseInt(partner_contribution_day) : null,
+      goal_amount: goal_amount ?? null,
+      monthly_contribution_amount: monthly_contribution_amount ?? null,
+      monthly_contribution_day: monthly_contribution_day ?? null,
+      partner_contribution_amount: partner_contribution_amount ?? null,
+      partner_contribution_day: partner_contribution_day ?? null,
       is_eligible_for_projects: is_eligible_for_projects ?? false,
       is_active: true,
     })

@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+
+const createParcelamentoSchema = z.object({
+  description: z.string().min(1, "Descrição é obrigatória").max(200),
+  total_amount: z.coerce.number().positive("Valor total deve ser positivo"),
+  installments_count: z.coerce.number().int().min(2, "Mínimo 2 parcelas").max(48, "Máximo 48 parcelas"),
+  first_installment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida (YYYY-MM-DD)"),
+  credit_card_id: z.string().uuid("Cartão inválido"),
+  category_id: z.string().uuid().optional().nullable(),
+  notes: z.string().max(500).optional().nullable(),
+  paid_installments: z.coerce.number().int().min(0).default(0),
+});
 
 function addMonths(dateStr: string, months: number): string {
   const [year, month, day] = dateStr.split("-").map(Number);
@@ -28,41 +40,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Family not configured" }, { status: 400 });
   }
 
-  const {
-    description,
-    total_amount,
-    installments_count,
-    first_installment_date,
-    credit_card_id,
-    category_id,
-    notes,
-    paid_installments = 0,
-  } = await req.json();
-
-  if (
-    !description?.trim() ||
-    !total_amount ||
-    !installments_count ||
-    !first_installment_date ||
-    !credit_card_id
-  ) {
+  const body = await req.json();
+  const parsed = createParcelamentoSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "Campos obrigatórios faltando" },
+      { error: "Dados inválidos", details: parsed.error.flatten().fieldErrors },
       { status: 400 }
     );
   }
 
-  const count = Number(installments_count);
-  if (count < 2 || count > 48) {
-    return NextResponse.json(
-      { error: "Número de parcelas deve ser entre 2 e 48" },
-      { status: 400 }
-    );
-  }
+  const { description, total_amount, installments_count, first_installment_date, credit_card_id, category_id, notes, paid_installments } = parsed.data;
+  const count = installments_count;
+  const paidCount = paid_installments;
 
-  const paidCount = Number(paid_installments);
-  if (paidCount < 0 || paidCount > count) {
-    return NextResponse.json({ error: "paid_installments inválido" }, { status: 400 });
+  if (paidCount > count) {
+    return NextResponse.json({ error: "paid_installments não pode exceder o número de parcelas" }, { status: 400 });
   }
 
   const { data: group, error: groupError } = await supabase
@@ -70,7 +62,7 @@ export async function POST(req: NextRequest) {
     .insert({
       family_id: profile.family_id,
       description: description.trim(),
-      total_amount: parseFloat(total_amount),
+      total_amount,
       installments_count: count,
       first_installment_date,
       credit_card_id,
@@ -88,7 +80,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Distribute total across installments (remainder goes to last)
-  const totalCents = Math.round(parseFloat(total_amount) * 100);
+  const totalCents = Math.round(total_amount * 100);
   const installmentCents = Math.floor(totalCents / count);
   const remainderCents = totalCents - installmentCents * count;
 

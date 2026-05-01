@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+
+const createOrcamentoSchema = z.object({
+  reference_month: z.string().regex(/^\d{4}-\d{2}$/, "Mês inválido (YYYY-MM)"),
+  category_id: z.string().uuid("Categoria inválida"),
+  planned_amount: z.coerce.number().positive("Valor planejado deve ser positivo"),
+  notes: z.string().max(500).optional().nullable(),
+  scope: z.enum(["personal", "family"]).default("family"),
+});
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -18,19 +27,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Family not configured" }, { status: 400 });
   }
 
-  const { reference_month, category_id, planned_amount, notes, scope, is_shared } =
-    await req.json();
-
-  if (!reference_month || !category_id || !planned_amount) {
-    return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
+  const body = await req.json();
+  const parsed = createOrcamentoSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Dados inválidos", details: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
   }
 
-  const amount = parseFloat(planned_amount);
-  if (isNaN(amount) || amount <= 0) {
-    return NextResponse.json({ error: "Valor inválido" }, { status: 400 });
-  }
-
-  const finalScope = scope ?? "family";
+  const { reference_month, category_id, planned_amount, notes, scope } = parsed.data;
+  const amount = planned_amount;
+  const finalScope = scope;
 
   const { data, error } = await supabase
     .from("budgets")

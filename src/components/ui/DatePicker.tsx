@@ -32,27 +32,29 @@ function formatDisplay(value: string): string {
   return `${day}/${month}/${year}`;
 }
 
+// react-day-picker v9 class names
 const DAY_PICKER_CLASSES = {
   months: "flex flex-col",
   month: "space-y-3",
-  caption: "flex items-center justify-between px-1",
-  caption_label: "text-sm font-semibold text-gray-900 capitalize",
+  month_caption: "flex items-center justify-between px-1",
+  caption_label: "text-sm font-semibold text-brand-700 capitalize",
   nav: "flex items-center gap-1",
-  nav_button:
-    "p-1 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors",
-  nav_button_previous: "",
-  nav_button_next: "",
-  table: "w-full border-collapse",
-  head_row: "flex",
-  head_cell: "w-9 text-center text-xs font-medium text-gray-400 pb-1",
-  row: "flex mt-1",
-  cell: "w-9 text-center p-0",
-  day: "w-9 h-9 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none",
-  day_selected: "bg-brand-600 text-white hover:bg-brand-700 font-medium",
-  day_today: "font-bold text-brand-600",
-  day_outside: "text-gray-300",
-  day_disabled: "text-gray-200 cursor-not-allowed",
-  day_hidden: "invisible",
+  button_previous:
+    "p-1 rounded-lg text-brand-700/50 hover:text-brand-700 hover:bg-brand-700/5 transition-colors",
+  button_next:
+    "p-1 rounded-lg text-brand-700/50 hover:text-brand-700 hover:bg-brand-700/5 transition-colors",
+  month_grid: "w-full border-collapse",
+  weekdays: "flex",
+  weekday: "w-9 text-center text-xs font-medium text-brand-700/40 pb-1",
+  week: "flex mt-1",
+  day: "w-9 text-center p-0",
+  day_button:
+    "w-9 h-9 rounded-lg text-sm text-brand-700 hover:bg-brand-700/5 transition-colors focus:outline-none",
+  selected: "bg-brand-700 !text-surface hover:bg-brand-600 font-medium",
+  today: "font-bold text-brand-700",
+  outside: "text-brand-700/20",
+  disabled: "text-brand-700/15 cursor-not-allowed",
+  hidden: "invisible",
 };
 
 export default function DatePicker({
@@ -67,7 +69,6 @@ export default function DatePicker({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  // Detecta mobile (< 640px = breakpoint sm do Tailwind)
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
     check();
@@ -94,7 +95,6 @@ export default function DatePicker({
     });
   }, []);
 
-  // Listeners para o popover desktop
   useEffect(() => {
     if (!open || isMobile) return;
     updatePosition();
@@ -125,7 +125,6 @@ export default function DatePicker({
     };
   }, [open, isMobile, updatePosition]);
 
-  // Listener de Escape para o bottom sheet mobile
   useEffect(() => {
     if (!open || !isMobile) return;
     function handleEscape(e: KeyboardEvent) {
@@ -144,20 +143,35 @@ export default function DatePicker({
     }
   }
 
+  const chevronComponent = ({ orientation }: { orientation?: "left" | "right" | "up" | "down" }) =>
+    orientation === "left" ? <ChevronLeft size={16} /> : <ChevronRight size={16} />;
+
+  const calendarNode = (
+    <DayPicker
+      mode="single"
+      selected={selected}
+      onSelect={handleSelect}
+      locale={ptBR}
+      weekStartsOn={0}
+      showOutsideDays
+      classNames={DAY_PICKER_CLASSES}
+      components={{ Chevron: chevronComponent }}
+    />
+  );
+
   return (
     <div className={`relative ${className}`}>
-      {/* Trigger */}
       <button
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`w-full flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm text-left transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 ${
           open
-            ? "border-brand-500 bg-white"
-            : "border-gray-300 bg-white hover:border-gray-400"
-        } ${value ? "text-gray-900" : "text-gray-400"}`}
+            ? "border-brand-700 bg-surface"
+            : "border-brand-700/20 bg-surface hover:border-brand-700/40"
+        } ${value ? "text-brand-700" : "text-brand-700/40"}`}
       >
-        <CalendarDays size={15} className="shrink-0 text-gray-400" />
+        <CalendarDays size={15} className="shrink-0 text-brand-700/40" />
         <span className="flex-1">{value ? formatDisplay(value) : placeholder}</span>
       </button>
 
@@ -165,64 +179,34 @@ export default function DatePicker({
         typeof document !== "undefined" &&
         createPortal(
           isMobile ? (
-            /* ── Mobile: bottom sheet ── */
             <div className="fixed inset-0 z-50 flex flex-col justify-end">
-              {/* Backdrop */}
               <div
                 className="absolute inset-0 bg-black/40"
                 onClick={() => setOpen(false)}
               />
-              {/* Sheet */}
-              <div className="relative z-10 bg-white rounded-t-2xl shadow-xl px-4 pt-4 pb-8">
+              <div className="relative z-10 bg-surface rounded-t-panel shadow-panel px-4 pt-4 pb-8">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base font-semibold text-gray-900">
+                  <h3 className="text-base font-semibold text-brand-700">
                     Selecionar data
                   </h3>
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                    className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700 hover:bg-brand-700/5 transition-colors"
                   >
                     <X size={18} />
                   </button>
                 </div>
-                <div className="flex justify-center">
-                  <DayPicker
-                    mode="single"
-                    selected={selected}
-                    onSelect={handleSelect}
-                    locale={ptBR}
-                    weekStartsOn={0}
-                    showOutsideDays
-                    classNames={DAY_PICKER_CLASSES}
-                    components={{
-                      IconLeft: () => <ChevronLeft size={16} />,
-                      IconRight: () => <ChevronRight size={16} />,
-                    }}
-                  />
-                </div>
+                <div className="flex justify-center">{calendarNode}</div>
               </div>
             </div>
           ) : (
-            /* ── Desktop: popover posicionado ── */
             <div
               ref={popoverRef}
               style={popoverStyle}
-              className="bg-white border border-gray-200 rounded-xl shadow-xl p-3"
+              className="bg-surface border border-brand-700/15 rounded-card shadow-panel p-3"
             >
-              <DayPicker
-                mode="single"
-                selected={selected}
-                onSelect={handleSelect}
-                locale={ptBR}
-                weekStartsOn={0}
-                showOutsideDays
-                classNames={DAY_PICKER_CLASSES}
-                components={{
-                  IconLeft: () => <ChevronLeft size={16} />,
-                  IconRight: () => <ChevronRight size={16} />,
-                }}
-              />
+              {calendarNode}
             </div>
           ),
           document.body

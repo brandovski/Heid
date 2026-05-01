@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+
+const createTransacaoSchema = z.object({
+  description: z.string().min(1, "Descrição é obrigatória").max(200),
+  amount: z.number().positive("Valor deve ser positivo"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida (YYYY-MM-DD)"),
+  type: z.enum(["income", "expense"], { message: "Tipo inválido para lançamento manual" }),
+  category_id: z.string().uuid().optional().nullable(),
+  credit_card_id: z.string().uuid().optional().nullable(),
+  notes: z.string().max(500).optional().nullable(),
+  scope: z.enum(["personal", "family"]).default("personal"),
+  status: z.enum(["pending", "paid"]).default("pending"),
+});
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -18,35 +31,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Family not configured" }, { status: 400 });
   }
 
-  const {
-    description,
-    amount,
-    date,
-    type,
-    category_id,
-    credit_card_id,
-    notes,
-    scope,
-    status,
-  } = await req.json();
-
-  const resolvedStatus = status === "paid" ? "paid" : "pending";
-
-  if (!description?.trim() || !amount || !date || !type) {
+  const body = await req.json();
+  const parsed = createTransacaoSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "Campos obrigatórios faltando" },
+      { error: "Dados inválidos", details: parsed.error.flatten().fieldErrors },
       { status: 400 }
     );
   }
 
-  if (!["income", "expense"].includes(type)) {
-    return NextResponse.json(
-      { error: "Tipo inválido para lançamento manual" },
-      { status: 400 }
-    );
-  }
-
-  const resolvedScope = scope ?? "personal";
+  const { description, amount, date, type, category_id, credit_card_id, notes, scope, status } = parsed.data;
+  const resolvedStatus = status;
+  const resolvedScope = scope;
 
   // Para transações pessoais, herdar preferência de compartilhamento do perfil
   const isShared =
