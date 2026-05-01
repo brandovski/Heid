@@ -16,7 +16,7 @@ import {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: { mes?: string; escopo?: string };
+  searchParams: Promise<{ mes?: string; escopo?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -34,7 +34,7 @@ export default async function DashboardPage({
   if (!profile?.family_id) {
     return (
       <div className="max-w-3xl mx-auto py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+        <h1 className="text-2xl font-bold text-brand-700 mb-4">
           Olá, {profile?.full_name ?? user.email}
         </h1>
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -48,11 +48,12 @@ export default async function DashboardPage({
   }
 
   // ── Parâmetros ────────────────────────────────────────────────────────────────
+  const { mes: mesParam, escopo: escopoParam } = await searchParams;
   const today = new Date();
   const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
-  const mes = searchParams.mes ?? currentMonth;
+  const mes = mesParam ?? currentMonth;
   const escopo: EscopoType =
-    searchParams.escopo === "parceiro" ? "parceiro" : "personal";
+    escopoParam === "parceiro" ? "parceiro" : "personal";
 
   const [y, m] = mes.split("-").map(Number);
   const firstDay = `${mes}-01`;
@@ -189,8 +190,8 @@ export default async function DashboardPage({
       creditCards={(creditCards as CreditCardRow[]) ?? []}
       faturaTransacoes={(faturaTransacoes as unknown as TransactionRow[]) ?? []}
       invoicePayments={(invoicePayments as InvoicePaymentRow[]) ?? []}
-      investments={(investments as unknown as InvestmentContributionRow[]) ?? []}
-      invTransactions={(invTransactions as unknown as InvTransactionRow[]) ?? []}
+      investments={(investments as InvestmentContributionRow[]) ?? []}
+      invTransactions={(invTransactions as InvTransactionRow[]) ?? []}
       currentUserId={user.id}
     />
   );

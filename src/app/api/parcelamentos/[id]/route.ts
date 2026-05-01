@@ -4,8 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 // Cancels all pending installments of the group (soft cancel, no physical deletion)
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -16,7 +17,7 @@ export async function DELETE(
   const { data: group } = await supabase
     .from("installment_groups")
     .select("id")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!group) {
@@ -26,7 +27,7 @@ export async function DELETE(
   const { error } = await supabase
     .from("transactions")
     .update({ status: "cancelled" })
-    .eq("installment_group_id", params.id)
+    .eq("installment_group_id", id)
     .eq("status", "pending");
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

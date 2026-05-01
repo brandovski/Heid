@@ -3,8 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -53,7 +54,7 @@ export async function PATCH(
   const { data, error } = await supabase
     .from("subscriptions")
     .update(updates)
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("family_id", profile.family_id)
     .select()
     .single();
@@ -64,8 +65,9 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -83,7 +85,7 @@ export async function DELETE(
   const { data: sub, error: subError } = await supabase
     .from("subscriptions")
     .select("id, is_active")
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("family_id", profile.family_id)
     .single();
 
@@ -94,7 +96,7 @@ export async function DELETE(
   const { data, error } = await supabase
     .from("subscriptions")
     .update({ is_active: false, cancelled_at: new Date().toISOString() })
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("family_id", profile.family_id)
     .select()
     .single();

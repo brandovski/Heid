@@ -3,8 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { txId: string } }
+  { params }: { params: Promise<{ txId: string }> }
 ) {
+  const { txId } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -15,7 +16,7 @@ export async function DELETE(
   const { data: invTx, error: loadError } = await supabase
     .from("investment_transactions")
     .select("*")
-    .eq("id", params.txId)
+    .eq("id", txId)
     .single();
 
   if (loadError || !invTx) {
@@ -33,7 +34,7 @@ export async function DELETE(
   const { error: deleteInvTxError } = await supabase
     .from("investment_transactions")
     .delete()
-    .eq("id", params.txId);
+    .eq("id", txId);
 
   if (deleteInvTxError) {
     return NextResponse.json({ error: deleteInvTxError.message }, { status: 500 });

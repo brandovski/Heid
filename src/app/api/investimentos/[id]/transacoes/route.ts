@@ -4,8 +4,9 @@ import { getSystemCategoryId } from "@/lib/supabase/system-categories";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -26,7 +27,7 @@ export async function POST(
   const { data: investment, error: invError } = await supabase
     .from("investments")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (invError || !investment) {
@@ -70,7 +71,7 @@ export async function POST(
       user_id: txUserId,
       is_shared: false,
       auto_generated: false,
-      investment_id: params.id,
+      investment_id: id,
       notes: notes?.trim() ?? null,
     })
     .select()
@@ -80,7 +81,7 @@ export async function POST(
 
   // 2. Create investment transaction
   const invTxInsert: Record<string, unknown> = {
-    investment_id: params.id,
+    investment_id: id,
     family_id: profile.family_id,
     type,
     amount: amountNum,

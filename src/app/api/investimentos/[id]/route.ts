@@ -3,8 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -59,7 +60,7 @@ export async function PATCH(
   const { data, error } = await supabase
     .from("investments")
     .update(updates)
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("family_id", profile.family_id)
     .select()
     .single();

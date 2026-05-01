@@ -25,7 +25,7 @@ function getFaturaRange(mes: string) {
 export default async function TransacoesPage({
   searchParams,
 }: {
-  searchParams: { mes?: string };
+  searchParams: Promise<{ mes?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -33,9 +33,10 @@ export default async function TransacoesPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { mes: mesParam } = await searchParams;
   const today = new Date();
   const mes =
-    searchParams.mes ??
+    mesParam ??
     `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
   const { firstDay, lastDay } = getMonthRange(mes);

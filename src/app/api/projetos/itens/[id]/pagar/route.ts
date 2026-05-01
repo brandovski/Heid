@@ -14,8 +14,9 @@ function addMonths(dateStr: string, months: number): string {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -36,7 +37,7 @@ export async function POST(
   const { data: item, error: itemError } = await supabase
     .from("project_items")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (itemError || !item) {
@@ -95,7 +96,7 @@ export async function POST(
             date: paymentDate,
             notes: `Pagamento: ${item.name} — Sinal`,
             auto_generated: false,
-            project_item_id: params.id,
+            project_item_id: id,
           })
           .select()
           .single();
@@ -105,7 +106,7 @@ export async function POST(
         const { error: updateError } = await supabase
           .from("project_items")
           .update({ investment_deposit_id: invTx.id })
-          .eq("id", params.id);
+          .eq("id", id);
 
         if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 
@@ -123,7 +124,7 @@ export async function POST(
             date: paymentDate,
             notes: `Pagamento: ${item.name} — Restante`,
             auto_generated: false,
-            project_item_id: params.id,
+            project_item_id: id,
           });
 
         if (invTxError) return NextResponse.json({ error: invTxError.message }, { status: 500 });
@@ -131,7 +132,7 @@ export async function POST(
         const { error: updateError } = await supabase
           .from("project_items")
           .update({ status: "paid", paid_at: paymentDate })
-          .eq("id", params.id);
+          .eq("id", id);
 
         if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 
@@ -150,7 +151,7 @@ export async function POST(
         date: paymentDate,
         notes: `Pagamento: ${item.name}`,
         auto_generated: false,
-        project_item_id: params.id,
+        project_item_id: id,
       });
 
     if (invTxError) return NextResponse.json({ error: invTxError.message }, { status: 500 });
@@ -158,7 +159,7 @@ export async function POST(
     const { error: updateError } = await supabase
       .from("project_items")
       .update({ status: "paid", paid_at: paymentDate })
-      .eq("id", params.id);
+      .eq("id", id);
 
     if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 
@@ -186,7 +187,7 @@ export async function POST(
     const { error: updateError } = await supabase
       .from("project_items")
       .update({ status: "paid", paid_at: paymentDate, transaction_id: tx.id })
-      .eq("id", params.id);
+      .eq("id", id);
 
     if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 
@@ -249,7 +250,7 @@ export async function POST(
     const { error: updateError } = await supabase
       .from("project_items")
       .update({ status: "paid", paid_at: paymentDate, transaction_id: firstTxId })
-      .eq("id", params.id);
+      .eq("id", id);
 
     if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 
@@ -286,7 +287,7 @@ export async function POST(
       const { error: updateError } = await supabase
         .from("project_items")
         .update({ deposit_transaction_id: depositTx.id })
-        .eq("id", params.id);
+        .eq("id", id);
 
       if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 
@@ -313,7 +314,7 @@ export async function POST(
       const { error: updateError } = await supabase
         .from("project_items")
         .update({ status: "paid", paid_at: paymentDate, remainder_transaction_id: remainderTx.id })
-        .eq("id", params.id);
+        .eq("id", id);
 
       if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 

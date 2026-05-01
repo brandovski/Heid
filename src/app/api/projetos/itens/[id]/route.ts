@@ -3,8 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -30,7 +31,7 @@ export async function PATCH(
     const { data, error } = await supabase
       .from("project_items")
       .update(updateFields)
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("status", "considering")
       .select()
       .single();
@@ -78,7 +79,7 @@ export async function PATCH(
   const { data, error } = await supabase
     .from("project_items")
     .update(updates)
-    .eq("id", params.id)
+    .eq("id", id)
     .select()
     .single();
 
@@ -89,8 +90,9 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -104,7 +106,7 @@ export async function DELETE(
     const { data: item, error: itemError } = await supabase
       .from("project_items")
       .select("status")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (itemError || !item) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -119,7 +121,7 @@ export async function DELETE(
     const { error } = await supabase
       .from("project_items")
       .delete()
-      .eq("id", params.id);
+      .eq("id", id);
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ deleted: true });
@@ -129,7 +131,7 @@ export async function DELETE(
   const { data, error } = await supabase
     .from("project_items")
     .update({ status: "cancelled" })
-    .eq("id", params.id)
+    .eq("id", id)
     .select()
     .single();
 

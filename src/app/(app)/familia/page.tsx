@@ -6,7 +6,7 @@ import type { FamilyTransaction } from "./_components/types";
 export default async function FamiliaPage({
   searchParams,
 }: {
-  searchParams: { mes?: string };
+  searchParams: Promise<{ mes?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -22,9 +22,10 @@ export default async function FamiliaPage({
 
   if (!profile?.family_id) redirect("/dashboard");
 
+  const { mes: mesParam } = await searchParams;
   const today = new Date();
   const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
-  const mes = searchParams.mes ?? currentMonth;
+  const mes = mesParam ?? currentMonth;
 
   const [y, m] = mes.split("-").map(Number);
   const firstDay = `${mes}-01`;

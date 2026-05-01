@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { CreditCard } from "lucide-react";
 import { type FluxoItem, formatCurrency, formatDayHeader } from "./types";
 
@@ -64,8 +64,8 @@ function buildCalendarCells(mes: string): Array<{ dateStr: string | null; day: n
   return cells;
 }
 
-function getDayDots(items: FluxoItem[]): JSX.Element[] {
-  const dots: JSX.Element[] = [];
+function getDayDots(items: FluxoItem[]): React.ReactElement[] {
+  const dots: React.ReactElement[] = [];
   const entradas = items.filter((i) => i.amount > 0);
   const saidas = items.filter((i) => i.amount < 0 && (i.kind === "transaction" || i.kind === "fatura"));
   const projetados = items.filter(

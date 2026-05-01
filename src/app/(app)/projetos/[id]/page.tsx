@@ -7,13 +7,15 @@ import type { Investment } from "@/app/(app)/investimentos/_components/types";
 export default async function ProjetoDetalhePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const { id } = await params;
 
   const [
     { data: project },
@@ -22,17 +24,17 @@ export default async function ProjetoDetalhePage({
     { data: creditCards },
     { data: eligibleInvestments },
   ] = await Promise.all([
-    supabase.from("projects").select("*").eq("id", params.id).single(),
+    supabase.from("projects").select("*").eq("id", id).single(),
     supabase
       .from("project_groups")
       .select("*")
-      .eq("project_id", params.id)
+      .eq("project_id", id)
       .order("order", { ascending: true })
       .order("created_at", { ascending: true }),
     supabase
       .from("project_items")
       .select("*, credit_card:credit_cards(id, name, brand, color)")
-      .eq("project_id", params.id)
+      .eq("project_id", id)
       .order("created_at", { ascending: true }),
     supabase.from("credit_cards").select("id, name, brand, color").eq("is_active", true).order("name"),
     supabase

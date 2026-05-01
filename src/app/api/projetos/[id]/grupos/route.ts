@@ -3,8 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -21,7 +22,7 @@ export async function POST(
   const { data: project, error: projectError } = await supabase
     .from("projects")
     .select("id")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (projectError || !project) return NextResponse.json({ error: "Projeto não encontrado" }, { status: 404 });
@@ -29,7 +30,7 @@ export async function POST(
   const { data, error } = await supabase
     .from("project_groups")
     .insert({
-      project_id: params.id,
+      project_id: id,
       name: name.trim(),
       description: description?.trim() ?? null,
       order: order ?? 0,

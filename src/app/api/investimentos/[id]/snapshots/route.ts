@@ -3,8 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -33,7 +34,7 @@ export async function POST(
   const { data, error } = await supabase
     .from("investment_snapshots")
     .insert({
-      investment_id: params.id,
+      investment_id: id,
       family_id: profile.family_id,
       value: parseFloat(value),
       date,
