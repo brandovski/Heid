@@ -47,8 +47,8 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
     <div
       className={`flex items-center justify-between p-4 rounded-xl border ${
         categoria.is_active
-          ? "bg-white border-gray-200"
-          : "bg-gray-50 border-gray-100 opacity-60"
+          ? "bg-surface border-brand-700/20"
+          : "bg-brand-700/5 border-brand-700/10 opacity-60"
       }`}
     >
       <div className="flex items-center gap-3">
@@ -62,7 +62,7 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
         </div>
         <div>
           <div className="flex items-center gap-1.5 flex-wrap">
-            <p className="text-sm font-medium text-gray-900">{categoria.name}</p>
+            <p className="text-sm font-medium text-brand-700">{categoria.name}</p>
             {typeLabel && typeBadgeClass && (
               <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${typeBadgeClass}`}>
                 {typeLabel}
@@ -75,7 +75,7 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
                 className="w-2.5 h-2.5 rounded-full"
                 style={{ backgroundColor: categoria.color }}
               />
-              <span className="text-xs text-gray-400">{categoria.color}</span>
+              <span className="text-xs text-brand-700/40">{categoria.color}</span>
             </div>
           )}
           {deleteError && (
@@ -88,7 +88,7 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
         {categoria.is_active && (
           <button
             onClick={() => onEdit(categoria)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
             title="Editar"
           >
             <Pencil size={15} />
@@ -96,7 +96,7 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
         )}
         <button
           onClick={handleToggleActive}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
           title={categoria.is_active ? "Arquivar" : "Reativar"}
         >
           {categoria.is_active ? <Archive size={15} /> : <RotateCcw size={15} />}
@@ -104,7 +104,7 @@ export default function CategoriaCard({ categoria, onEdit, onSaved }: Props) {
         {!categoria.is_active && (
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+            className="p-1.5 rounded-lg text-brand-700/40 hover:text-red-500 hover:bg-red-50 transition-colors"
             title="Excluir permanentemente"
           >
             <Trash2 size={15} />

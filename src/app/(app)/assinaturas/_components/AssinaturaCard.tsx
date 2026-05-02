@@ -34,8 +34,8 @@ export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props
     <div
       className={`px-4 py-3 rounded-xl border ${
         !a.is_active
-          ? "bg-gray-50 border-gray-100 opacity-60"
-          : "bg-white border-gray-200"
+          ? "bg-brand-700/5 border-brand-700/10 opacity-60"
+          : "bg-surface border-brand-700/20"
       }`}
     >
       {/* Linha 1: ícone + nome + valor */}
@@ -43,18 +43,18 @@ export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props
         <span className="text-lg shrink-0 w-7 text-center">
           {a.category?.icon ?? "🔄"}
         </span>
-        <p className="flex-1 text-sm font-medium text-gray-900 truncate">{a.name}</p>
+        <p className="flex-1 text-sm font-medium text-brand-700 truncate">{a.name}</p>
         <div className="text-right shrink-0">
           <p className="text-sm font-semibold text-red-600">{formatCurrency(a.amount_brl)}/mês</p>
           {isUsd && (
-            <p className="text-xs text-gray-400">US$ {a.amount_original.toFixed(2)}</p>
+            <p className="text-xs text-brand-700/40">US$ {a.amount_original.toFixed(2)}</p>
           )}
         </div>
       </div>
 
       {/* Linha 2: metadata + badges + ações */}
       <div className="flex items-center gap-2 mt-1.5 ml-10 min-w-0">
-        <p className="flex-1 text-xs text-gray-400 truncate min-w-0">
+        <p className="flex-1 text-xs text-brand-700/40 truncate min-w-0">
           Dia {a.billing_day}
           {a.credit_card ? ` · ${a.credit_card.name}` : ""}
           {a.category ? ` · ${a.category.name}` : ""}
@@ -78,7 +78,7 @@ export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props
               Ativa
             </span>
           ) : (
-            <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">
+            <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-brand-700/10 text-brand-700/50">
               Cancelada
             </span>
           )}
@@ -88,14 +88,14 @@ export default function AssinaturaCard({ assinatura: a, onEdit, onSaved }: Props
               <>
                 <button
                   onClick={() => onEdit(a)}
-                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
                   title="Editar"
                 >
                   <Pencil size={14} />
                 </button>
                 <button
                   onClick={() => setShowConfirm(true)}
-                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  className="p-1.5 rounded-lg text-brand-700/40 hover:text-red-500 hover:bg-red-50 transition-colors"
                   title="Cancelar assinatura"
                 >
                   <XCircle size={14} />

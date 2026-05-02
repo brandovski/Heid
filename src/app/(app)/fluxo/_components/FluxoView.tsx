@@ -291,15 +291,15 @@ export default function FluxoView({
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Fluxo Futuro</h1>
-            <p className="text-sm text-gray-500 mt-1">Linha do tempo financeira mensal.</p>
+            <h1 className="text-xl font-bold text-brand-700">Fluxo Futuro</h1>
+            <p className="text-sm text-brand-700/50 mt-1">Linha do tempo financeira mensal.</p>
           </div>
           {/* Toggle de layout */}
-          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center gap-1 bg-brand-700/10 rounded-lg p-1">
             <button
               onClick={() => setLayout("timeline")}
               className={`p-1.5 rounded-md transition-colors ${
-                layout === "timeline" ? "bg-white shadow-sm text-brand-600" : "text-gray-500 hover:text-gray-700"
+                layout === "timeline" ? "bg-surface shadow-sm text-brand-600" : "text-brand-700/50 hover:text-brand-700"
               }`}
               aria-label="Lista"
             >
@@ -308,7 +308,7 @@ export default function FluxoView({
             <button
               onClick={() => setLayout("calendario")}
               className={`p-1.5 rounded-md transition-colors ${
-                layout === "calendario" ? "bg-white shadow-sm text-brand-600" : "text-gray-500 hover:text-gray-700"
+                layout === "calendario" ? "bg-surface shadow-sm text-brand-600" : "text-brand-700/50 hover:text-brand-700"
               }`}
               aria-label="Calendário"
             >

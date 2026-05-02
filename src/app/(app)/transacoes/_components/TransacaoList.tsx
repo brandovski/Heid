@@ -223,7 +223,7 @@ export default function TransacaoList({
 
       {/* Header desktop */}
       <div className="hidden sm:flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">Transações</h1>
+        <h1 className="text-xl font-bold text-brand-700">Transações</h1>
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
@@ -234,13 +234,13 @@ export default function TransacaoList({
       </div>
 
       {/* Toggle compartilhamento */}
-      <div className="flex items-center gap-3 mb-5 p-3 bg-gray-50 rounded-xl border border-gray-100">
-        <Share2 size={15} className="text-gray-400 shrink-0" />
+      <div className="flex items-center gap-3 mb-5 p-3 bg-brand-700/5 rounded-xl border border-brand-700/10">
+        <Share2 size={15} className="text-brand-700/40 shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-gray-700">
+          <p className="text-xs font-medium text-brand-700">
             Compartilhar com {partnerName}
           </p>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-brand-700/40">
             Novas transações serão visíveis para {partnerName}
           </p>
         </div>
@@ -249,12 +249,12 @@ export default function TransacaoList({
           aria-checked={isShared}
           onClick={handleShareToggle}
           disabled={sharingLoading}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 ${
-            isShared ? "bg-brand-600" : "bg-gray-200"
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-700/30 focus:ring-offset-2 disabled:opacity-50 ${
+            isShared ? "bg-brand-600" : "bg-brand-700/20"
           }`}
         >
           <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+            className={`inline-block h-4 w-4 transform rounded-full bg-surface shadow transition-transform ${
               isShared ? "translate-x-6" : "translate-x-1"
             }`}
           />
@@ -265,7 +265,7 @@ export default function TransacaoList({
       <div className="flex justify-end mb-4">
         <Link
           href="/fixas"
-          className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
+          className="text-xs text-brand-700/40 hover:text-brand-700/70 flex items-center gap-1 transition-colors"
         >
           <Settings size={12} />
           Gerenciar Recorrências
@@ -323,7 +323,7 @@ export default function TransacaoList({
       {/* Filtros */}
       <div className="space-y-3 mb-5">
         {/* Tabs Pessoal / Parceiro */}
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-full sm:w-fit">
+        <div className="flex gap-1 bg-brand-700/10 p-1 rounded-xl w-full sm:w-fit">
           {(
             [
               { value: "personal" as ScopeFilter, label: userName },
@@ -335,8 +335,8 @@ export default function TransacaoList({
               onClick={() => setScopeFilter(value)}
               className={`flex flex-1 sm:flex-none items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 scopeFilter === value
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-surface text-brand-700 shadow-sm"
+                  : "text-brand-700/70 hover:text-brand-700"
               }`}
             >
               {label}
@@ -347,7 +347,7 @@ export default function TransacaoList({
         {/* Tipo + Status + Categoria */}
         <div className="flex flex-wrap gap-2">
           {/* Tipo */}
-          <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+          <div className="flex gap-1 bg-brand-700/10 p-1 rounded-lg">
             {(
               [
                 { value: "all", label: "Todos" },
@@ -360,8 +360,8 @@ export default function TransacaoList({
                 onClick={() => setTypeFilter(value)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   typeFilter === value
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
+                    ? "bg-surface text-brand-700 shadow-sm"
+                    : "text-brand-700/50 hover:text-brand-700"
                 }`}
               >
                 {label}
@@ -370,7 +370,7 @@ export default function TransacaoList({
           </div>
 
           {/* Status */}
-          <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+          <div className="flex gap-1 bg-brand-700/10 p-1 rounded-lg">
             {(
               [
                 { value: "all", label: "Status" },
@@ -384,8 +384,8 @@ export default function TransacaoList({
                 onClick={() => setStatusFilter(value)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   statusFilter === value
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
+                    ? "bg-surface text-brand-700 shadow-sm"
+                    : "text-brand-700/50 hover:text-brand-700"
                 }`}
               >
                 {label}
@@ -397,7 +397,7 @@ export default function TransacaoList({
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-3 py-1.5 bg-gray-100 rounded-lg text-xs font-medium text-gray-600 focus:outline-none border-none"
+            className="px-3 py-1.5 bg-brand-700/10 rounded-lg text-xs font-medium text-brand-700/70 focus:outline-none border-none"
           >
             <option value="">Categoria</option>
             {categorias.map((c) => (
@@ -413,7 +413,7 @@ export default function TransacaoList({
       {/* ── Grupos de fatura (fixos no topo — apenas quando visualizando transações pessoais) ── */}
       {scopeFilter === "personal" && faturaGrupos.length > 0 && (
         <div className="space-y-2 mb-4">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide px-0.5">
+          <p className="text-xs font-medium text-brand-700/40 uppercase tracking-wide px-0.5">
             Faturas de cartão
           </p>
           {faturaGrupos.map((grupo) => (
@@ -430,7 +430,7 @@ export default function TransacaoList({
       {/* ── Grupos de fatura do parceiro (somente leitura) ── */}
       {scopeFilter === "partner" && partnerFaturaGrupos.length > 0 && (
         <div className="space-y-2 mb-4">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide px-0.5">
+          <p className="text-xs font-medium text-brand-700/40 uppercase tracking-wide px-0.5">
             Faturas de cartão
           </p>
           {partnerFaturaGrupos.map((grupo) => (
@@ -448,7 +448,7 @@ export default function TransacaoList({
       {/* ── Lista de transações ── */}
       {filtered.length === 0 &&
         (scopeFilter === "personal" ? faturaGrupos.length === 0 : partnerFaturaGrupos.length === 0) ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-brand-700/40">
           <p className="text-sm">Nenhuma transação encontrada.</p>
           {scopeFilter === "personal" && transacoes.length === 0 && (
             <p className="text-xs mt-1">

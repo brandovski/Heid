@@ -117,7 +117,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2.5 px-4 border border-brand-700/30 rounded-lg text-sm font-medium text-brand-700 hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -135,7 +135,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
     >
       <form id={formId} onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Descrição <span className="text-red-500">*</span>
           </label>
           <input
@@ -143,13 +143,13 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Ex: iPhone 16, TV Samsung..."
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Valor total (R$) <span className="text-red-500">*</span>
             </label>
             <input
@@ -159,11 +159,11 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
               value={totalAmount}
               onChange={(e) => setTotalAmount(e.target.value)}
               placeholder="0,00"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Nº de parcelas <span className="text-red-500">*</span>
             </label>
             <input
@@ -172,28 +172,28 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
               max="48"
               value={installmentsCount}
               onChange={(e) => setInstallmentsCount(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
         </div>
 
         {/* Preview do valor da parcela */}
         {installmentValue > 0 && (
-          <p className="text-xs text-gray-500 -mt-2">
+          <p className="text-xs text-brand-700/50 -mt-2">
             Cada parcela:{" "}
-            <span className="font-semibold text-gray-700">
+            <span className="font-semibold text-brand-700">
               {installmentValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
             </span>
             {isCompleted ? (
               <span className="text-emerald-600"> · todas pagas</span>
             ) : paidInstallments > 0 ? (
-              <span className="text-gray-400"> · {count - paidInstallments} a pagar</span>
+              <span className="text-brand-700/40"> · {count - paidInstallments} a pagar</span>
             ) : null}
           </p>
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Data da compra <span className="text-red-500">*</span>
           </label>
           <DatePicker value={purchaseDate} onChange={setPurchaseDate} placeholder="Selecione a data" />
@@ -222,7 +222,7 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-brand-700/40 mt-1">
                 Primeira parcela ainda não foi cobrada.
               </p>
             )
@@ -230,13 +230,13 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Cartão de crédito <span className="text-red-500">*</span>
           </label>
           <select
             value={creditCardId}
             onChange={(e) => setCreditCardId(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           >
             <option value="">Selecione um cartão</option>
             {cartoes.map((c) => (
@@ -248,11 +248,11 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Categoria</label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           >
             <option value="">Sem categoria</option>
             {categorias.map((c) => (
@@ -265,13 +265,13 @@ export default function ParcelamentoModal({ categorias, cartoes, onClose, onSave
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Observações</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30 resize-none"
           />
         </div>
       </form>

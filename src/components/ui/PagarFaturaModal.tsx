@@ -82,7 +82,7 @@ export default function PagarFaturaModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-brand-700/70 hover:text-brand-700 rounded-lg transition-colors"
             >
               Cancelar
             </button>
@@ -102,9 +102,9 @@ export default function PagarFaturaModal({
 
         {/* Tipo de pagamento */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Valor do pagamento</label>
+          <label className="block text-sm font-medium text-brand-700">Valor do pagamento</label>
 
-          <label className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+          <label className="flex items-center gap-3 p-3 rounded-xl border border-brand-700/20 cursor-pointer hover:bg-brand-700/5 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
             <input
               type="radio"
               name="pay-type"
@@ -114,14 +114,14 @@ export default function PagarFaturaModal({
               className="accent-brand-600"
             />
             <div className="flex items-center justify-between flex-1">
-              <span className="text-sm font-medium text-gray-800">Valor total</span>
-              <span className="text-sm font-semibold text-gray-900">
+              <span className="text-sm font-medium text-brand-700">Valor total</span>
+              <span className="text-sm font-semibold text-brand-700">
                 {formatCurrencyLocal(totalAmount)}
               </span>
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+          <label className="flex items-start gap-3 p-3 rounded-xl border border-brand-700/20 cursor-pointer hover:bg-brand-700/5 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
             <input
               type="radio"
               name="pay-type"
@@ -131,7 +131,7 @@ export default function PagarFaturaModal({
               className="accent-brand-600 mt-0.5"
             />
             <div className="flex-1 space-y-2">
-              <span className="text-sm font-medium text-gray-800">Valor parcial</span>
+              <span className="text-sm font-medium text-brand-700">Valor parcial</span>
               {payType === "partial" && (
                 <input
                   type="number"
@@ -141,7 +141,7 @@ export default function PagarFaturaModal({
                   onChange={(e) => setPartialStr(e.target.value)}
                   placeholder="0,00"
                   autoFocus
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3 py-2 text-sm border border-brand-700/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                 />
               )}
             </div>
@@ -150,7 +150,7 @@ export default function PagarFaturaModal({
 
         {/* Data do pagamento */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-brand-700 mb-1.5">
             Data do pagamento
           </label>
           <DatePicker
@@ -162,15 +162,15 @@ export default function PagarFaturaModal({
 
         {/* Observações */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Observações <span className="text-gray-400 font-normal">(opcional)</span>
+          <label className="block text-sm font-medium text-brand-700 mb-1.5">
+            Observações <span className="text-brand-700/40 font-normal">(opcional)</span>
           </label>
           <input
             type="text"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Ex: débito automático"
-            className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 text-sm border border-brand-700/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
       </form>

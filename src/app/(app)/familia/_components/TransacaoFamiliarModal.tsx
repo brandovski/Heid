@@ -119,7 +119,7 @@ export default function TransacaoFamiliarModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2.5 px-4 border border-brand-700/30 rounded-lg text-sm font-medium text-brand-700 hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -139,7 +139,7 @@ export default function TransacaoFamiliarModal({
         {/* Tipo — apenas na criação */}
         {!isEditing && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-brand-700 mb-2">
               Tipo
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -156,7 +156,7 @@ export default function TransacaoFamiliarModal({
                       ? value === "expense"
                         ? "bg-red-50 border-red-500 text-red-700"
                         : "bg-green-50 border-green-500 text-green-700"
-                      : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                      : "bg-surface border-brand-700/30 text-brand-700 hover:bg-brand-700/5"
                   }`}
                 >
                   {label}
@@ -167,7 +167,7 @@ export default function TransacaoFamiliarModal({
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Descrição <span className="text-red-500">*</span>
           </label>
           <input
@@ -177,13 +177,13 @@ export default function TransacaoFamiliarModal({
             placeholder={
               type === "income" ? "Ex: Venda, Aluguel..." : "Ex: Supermercado, Conta..."
             }
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Valor (R$) <span className="text-red-500">*</span>
             </label>
             <input
@@ -193,11 +193,11 @@ export default function TransacaoFamiliarModal({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0,00"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Data <span className="text-red-500">*</span>
             </label>
             <DatePicker
@@ -209,13 +209,13 @@ export default function TransacaoFamiliarModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Categoria
           </label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           >
             <option value="">Sem categoria</option>
             {categorias.map((c) => (
@@ -228,7 +228,7 @@ export default function TransacaoFamiliarModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Observações
           </label>
           <textarea
@@ -236,7 +236,7 @@ export default function TransacaoFamiliarModal({
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30 resize-none"
           />
         </div>
       </form>

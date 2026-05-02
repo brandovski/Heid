@@ -26,13 +26,13 @@ function CustomTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-gray-100 shadow-xl rounded-xl px-4 py-3 text-xs min-w-[140px]">
-      <p className="font-semibold text-gray-600 mb-2">{label}</p>
+    <div className="bg-surface border border-brand-700/10 shadow-xl rounded-xl px-4 py-3 text-xs min-w-[140px]">
+      <p className="font-semibold text-brand-700/70 mb-2">{label}</p>
       {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-2 mb-1 last:mb-0">
           <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
-          <span className="text-gray-400">{p.dataKey}:</span>
-          <span className="font-semibold text-gray-800 ml-auto pl-2">
+          <span className="text-brand-700/40">{p.dataKey}:</span>
+          <span className="font-semibold text-brand-700 ml-auto pl-2">
             {formatCurrency(p.value)}
           </span>
         </div>

@@ -27,13 +27,13 @@ export default function Modal({ title, onClose, children, footer }: ModalProps) 
 
       {/* Container do modal */}
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 pointer-events-none">
-        <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col max-h-[70vh] overflow-hidden pointer-events-auto">
+        <div className="relative w-full sm:max-w-md bg-surface rounded-t-panel sm:rounded-panel shadow-xl flex flex-col max-h-[70vh] overflow-hidden pointer-events-auto">
           {/* Header — fixo */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
-            <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-brand-700/10 shrink-0">
+            <h2 className="text-base font-semibold text-brand-700">{title}</h2>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
             >
               <X size={18} />
             </button>
@@ -45,7 +45,7 @@ export default function Modal({ title, onClose, children, footer }: ModalProps) 
           </div>
 
           {/* Footer — fixo */}
-          <div className="px-6 py-4 border-t border-gray-100 shrink-0 bg-white">
+          <div className="px-6 py-4 border-t border-brand-700/10 shrink-0 bg-surface">
             {footer}
           </div>
         </div>

@@ -128,7 +128,7 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 rounded-lg transition-colors"
+            className="px-4 py-2 text-sm font-medium text-brand-700/70 hover:text-brand-700 rounded-lg transition-colors"
           >
             Fechar
           </button>
@@ -146,14 +146,14 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
 
         {/* ── Lista de transações ── */}
         {loading ? (
-          <div className="text-center py-8 text-sm text-gray-400">Carregando...</div>
+          <div className="text-center py-8 text-sm text-brand-700/40">Carregando...</div>
         ) : transactions.length === 0 ? (
-          <div className="text-center py-8 text-sm text-gray-400">
+          <div className="text-center py-8 text-sm text-brand-700/40">
             Nenhuma transação neste mês
           </div>
         ) : (
           <div>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-brand-700/5">
               {transactions.map((t) => (
                 <div key={t.id} className="flex items-center justify-between py-2.5 gap-3">
                   <div className="flex items-center gap-2 min-w-0">
@@ -161,14 +161,14 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
                       <span className="text-base shrink-0">{t.category.icon}</span>
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm text-gray-800 truncate">{t.description}</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-sm text-brand-700 truncate">{t.description}</p>
+                      <p className="text-xs text-brand-700/40">
                         {formatDate(t.date)}
                         {t.category?.name && ` · ${t.category.name}`}
                       </p>
                     </div>
                   </div>
-                  <span className="text-sm font-semibold text-gray-900 shrink-0">
+                  <span className="text-sm font-semibold text-brand-700 shrink-0">
                     {formatCurrency(t.amount)}
                   </span>
                 </div>
@@ -176,16 +176,16 @@ export default function FaturaDetalheModal({ isOpen, onClose, cartao }: Props) {
             </div>
 
             {/* Total */}
-            <div className="flex items-center justify-between pt-3 mt-1 border-t border-gray-100">
-              <span className="text-sm font-semibold text-gray-700">Total</span>
-              <span className="text-base font-bold text-gray-900">{formatCurrency(total)}</span>
+            <div className="flex items-center justify-between pt-3 mt-1 border-t border-brand-700/10">
+              <span className="text-sm font-semibold text-brand-700">Total</span>
+              <span className="text-base font-bold text-brand-700">{formatCurrency(total)}</span>
             </div>
           </div>
         )}
 
         {/* ── Status de pagamento ── */}
         {!loading && isPaid && (
-          <div className="border-t border-gray-100 pt-4">
+          <div className="border-t border-brand-700/10 pt-4">
             <div className="flex items-start gap-3 text-sm text-green-700 bg-green-50 rounded-xl px-4 py-3">
               <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
               <div>

@@ -99,9 +99,9 @@ export default function FluxoWidget({ transactions, invoiceCards, currentMonth, 
     .slice(0, 4);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5">
+    <div className="bg-surface rounded-xl border border-brand-700/10 p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-gray-700">Próximas movimentações</h2>
+        <h2 className="text-sm font-semibold text-brand-700">Próximas movimentações</h2>
         <Link
           href={`/fluxo?escopo=${fluxoEscopo}`}
           className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1"
@@ -112,11 +112,11 @@ export default function FluxoWidget({ transactions, invoiceCards, currentMonth, 
 
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-6 text-center">
-          <Calendar size={28} className="text-gray-300 mb-2" />
-          <p className="text-sm text-gray-400">Nenhuma movimentação pendente.</p>
+          <Calendar size={28} className="text-brand-700/30 mb-2" />
+          <p className="text-sm text-brand-700/40">Nenhuma movimentação pendente.</p>
         </div>
       ) : (
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-brand-700/5">
           {items.map((item) => {
             if (item.kind === "fatura") {
               return (
@@ -126,12 +126,12 @@ export default function FluxoWidget({ transactions, invoiceCards, currentMonth, 
                       <CreditCard size={12} />
                     </span>
                     <div className="min-w-0">
-                      <p className="text-sm text-gray-800 truncate">Fatura {item.cardName}</p>
+                      <p className="text-sm text-brand-700 truncate">Fatura {item.cardName}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[10px] bg-brand-50 text-brand-600 rounded px-1.5 py-0.5 font-medium">
                           fatura
                         </span>
-                        <span className="text-xs text-gray-400">{formatDate(item.date)}</span>
+                        <span className="text-xs text-brand-700/40">{formatDate(item.date)}</span>
                       </div>
                     </div>
                   </div>
@@ -161,12 +161,12 @@ export default function FluxoWidget({ transactions, invoiceCards, currentMonth, 
                     </span>
                   )}
                   <div className="min-w-0">
-                    <p className="text-sm text-gray-800 truncate">{item.description}</p>
+                    <p className="text-sm text-brand-700 truncate">{item.description}</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] bg-gray-100 text-gray-500 rounded px-1.5 py-0.5 font-medium">
+                      <span className="text-[10px] bg-brand-700/10 text-brand-700/50 rounded px-1.5 py-0.5 font-medium">
                         {typeBadgeLabel(item.type)}
                       </span>
-                      <span className="text-xs text-gray-400">{formatDate(item.date)}</span>
+                      <span className="text-xs text-brand-700/40">{formatDate(item.date)}</span>
                     </div>
                   </div>
                 </div>

@@ -55,7 +55,7 @@ export default function ConfirmModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="flex-1 py-2.5 px-4 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="flex-1 py-2.5 px-4 border border-brand-700/20 rounded-lg text-sm font-medium text-brand-700 hover:bg-brand-700/5 disabled:opacity-50 transition-colors"
           >
             {cancelLabel}
           </button>
@@ -77,7 +77,7 @@ export default function ConfirmModal({
         <div className={`w-12 h-12 rounded-full flex items-center justify-center ${iconClass}`}>
           <AlertTriangle size={22} />
         </div>
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-sm text-brand-700/50">{description}</p>
       </div>
     </Modal>
   );

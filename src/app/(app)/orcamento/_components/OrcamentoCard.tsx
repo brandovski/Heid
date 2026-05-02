@@ -32,8 +32,8 @@ export default function OrcamentoCard({ budget, onEdit }: Props) {
 
   return (
     <div
-      className={`bg-white rounded-xl border p-4 transition-shadow hover:shadow-sm ${
-        stats.isOverBudget ? "border-red-200" : "border-gray-100"
+      className={`bg-surface rounded-xl border p-4 transition-shadow hover:shadow-sm ${
+        stats.isOverBudget ? "border-red-200" : "border-brand-700/10"
       }`}
     >
       {/* Linha 1: ícone + nome + badges + ações */}
@@ -42,7 +42,7 @@ export default function OrcamentoCard({ budget, onEdit }: Props) {
           {category?.icon && (
             <span className="text-xl shrink-0">{category.icon}</span>
           )}
-          <span className="font-medium text-gray-900 truncate">
+          <span className="font-medium text-brand-700 truncate">
             {category?.name ?? "Categoria"}
           </span>
           {stats.isOverBudget && (
@@ -54,7 +54,7 @@ export default function OrcamentoCard({ budget, onEdit }: Props) {
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => onEdit(budget)}
-            className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+            className="p-1.5 text-brand-700/40 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
           >
             <Pencil size={15} />
           </button>
@@ -64,7 +64,7 @@ export default function OrcamentoCard({ budget, onEdit }: Props) {
             className={`p-1.5 rounded-lg transition-colors ${
               confirmDelete
                 ? "text-red-600 bg-red-50 hover:bg-red-100"
-                : "text-gray-400 hover:text-red-600 hover:bg-red-50"
+                : "text-brand-700/40 hover:text-red-600 hover:bg-red-50"
             }`}
           >
             <Trash2 size={15} />
@@ -76,24 +76,24 @@ export default function OrcamentoCard({ budget, onEdit }: Props) {
       <ProgressBar value={progressValue} color={color} className="mb-2" />
 
       {/* Linha 2: valores */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-brand-700/50">
         <span>
-          <span className="text-gray-400">Pago</span>{" "}
-          <span className="font-medium text-gray-700">
+          <span className="text-brand-700/40">Pago</span>{" "}
+          <span className="font-medium text-brand-700">
             {formatCurrency(stats.spent)}
           </span>
         </span>
         {stats.committed > 0 && (
           <span>
-            <span className="text-gray-400">Comprometido</span>{" "}
+            <span className="text-brand-700/40">Comprometido</span>{" "}
             <span className="font-medium text-amber-600">
               {formatCurrency(stats.committed)}
             </span>
           </span>
         )}
         <span className="ml-auto">
-          <span className="text-gray-400">Planejado</span>{" "}
-          <span className={`font-semibold ${stats.isOverBudget ? "text-red-600" : "text-gray-900"}`}>
+          <span className="text-brand-700/40">Planejado</span>{" "}
+          <span className={`font-semibold ${stats.isOverBudget ? "text-red-600" : "text-brand-700"}`}>
             {formatCurrency(planned_amount)}
           </span>
         </span>

@@ -171,16 +171,16 @@ export default function ProjetoDetalhe({
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl font-bold text-gray-900">{project.name}</h1>
+            <h1 className="text-xl font-bold text-brand-700">{project.name}</h1>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[project.status]}`}>
               {STATUS_LABELS[project.status]}
             </span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-brand-700/10 text-brand-700/50 font-medium">
               {project.scope === "family" ? "Familiar" : "Pessoal"}
             </span>
           </div>
           {project.description && (
-            <p className="text-sm text-gray-500 mt-1">{project.description}</p>
+            <p className="text-sm text-brand-700/50 mt-1">{project.description}</p>
           )}
         </div>
 
@@ -188,7 +188,7 @@ export default function ProjetoDetalhe({
           <button
             type="button"
             onClick={() => setModal({ type: "projeto" })}
-            className="px-3 py-1.5 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-3 py-1.5 text-sm text-brand-700 border border-brand-700/30 rounded-lg hover:bg-brand-700/5 transition-colors"
           >
             Editar
           </button>
@@ -223,23 +223,23 @@ export default function ProjetoDetalhe({
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white border border-gray-200 rounded-xl p-3">
-          <p className="text-xs text-gray-500 mb-1">Orçamento Total</p>
-          <p className="text-base font-bold text-gray-900">{formatCurrency(project.total_budget)}</p>
+        <div className="bg-surface border border-brand-700/20 rounded-xl p-3">
+          <p className="text-xs text-brand-700/50 mb-1">Orçamento Total</p>
+          <p className="text-base font-bold text-brand-700">{formatCurrency(project.total_budget)}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-3">
-          <p className="text-xs text-gray-500 mb-1">Previsto</p>
-          <p className="text-base font-bold text-gray-900">{formatCurrency(budgetPrevisto)}</p>
-          <p className={`text-xs mt-0.5 ${saldoEstimado < 0 ? "text-red-500" : "text-gray-400"}`}>
+        <div className="bg-surface border border-brand-700/20 rounded-xl p-3">
+          <p className="text-xs text-brand-700/50 mb-1">Previsto</p>
+          <p className="text-base font-bold text-brand-700">{formatCurrency(budgetPrevisto)}</p>
+          <p className={`text-xs mt-0.5 ${saldoEstimado < 0 ? "text-red-500" : "text-brand-700/40"}`}>
             Saldo: {formatCurrency(saldoEstimado)}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-3">
-          <p className="text-xs text-gray-500 mb-1">Gasto Real</p>
-          <p className="text-base font-bold text-gray-900">{formatCurrency(gastoReal)}</p>
+        <div className="bg-surface border border-brand-700/20 rounded-xl p-3">
+          <p className="text-xs text-brand-700/50 mb-1">Gasto Real</p>
+          <p className="text-base font-bold text-brand-700">{formatCurrency(gastoReal)}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-3">
-          <p className="text-xs text-gray-500 mb-1">Saldo Real</p>
+        <div className="bg-surface border border-brand-700/20 rounded-xl p-3">
+          <p className="text-xs text-brand-700/50 mb-1">Saldo Real</p>
           <p className={`text-base font-bold ${saldoReal < 0 ? "text-red-600" : "text-green-700"}`}>
             {formatCurrency(saldoReal)}
           </p>
@@ -249,7 +249,7 @@ export default function ProjetoDetalhe({
       {/* Groups */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-700">Grupos de Gasto</h2>
+          <h2 className="text-sm font-semibold text-brand-700">Grupos de Gasto</h2>
           <button
             type="button"
             onClick={() => setModal({ type: "grupo" })}
@@ -261,7 +261,7 @@ export default function ProjetoDetalhe({
         </div>
 
         {groups.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+          <div className="text-center py-10 text-brand-700/40 border-2 border-dashed border-brand-700/20 rounded-xl">
             <p className="text-sm">Nenhum grupo ainda.</p>
             <button
               type="button"

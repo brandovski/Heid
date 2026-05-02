@@ -59,7 +59,7 @@ export default function CartaoList({ initialData }: Props) {
       </div>
 
       {active.length === 0 && inactive.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-brand-700/40">
           <p>Nenhum cartão cadastrado ainda.</p>
         </div>
       )}
@@ -78,7 +78,7 @@ export default function CartaoList({ initialData }: Props) {
 
       {inactive.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-sm font-medium text-gray-400 mb-3">Desativados</h2>
+          <h2 className="text-sm font-medium text-brand-700/40 mb-3">Desativados</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {inactive.map((cartao) => (
               <CartaoCard

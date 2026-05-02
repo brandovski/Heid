@@ -35,12 +35,12 @@ export function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-5"
+      className="bg-surface rounded-panel shadow-card border border-brand-700/20 p-8 space-y-5"
     >
       <div>
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-brand-700 mb-1"
         >
           E-mail
         </label>
@@ -51,8 +51,8 @@ export function LoginForm() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
-                     focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-brand-700/30 rounded-lg text-sm
+                     focus:outline-none focus:ring-2 focus:ring-brand-700/30 focus:border-transparent"
           placeholder="seu@email.com"
         />
       </div>
@@ -60,7 +60,7 @@ export function LoginForm() {
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-brand-700 mb-1"
         >
           Senha
         </label>
@@ -71,8 +71,8 @@ export function LoginForm() {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
-                     focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-brand-700/30 rounded-lg text-sm
+                     focus:outline-none focus:ring-2 focus:ring-brand-700/30 focus:border-transparent"
           placeholder="••••••••"
         />
       </div>
@@ -88,7 +88,7 @@ export function LoginForm() {
         disabled={loading}
         className="w-full py-2.5 px-4 bg-brand-600 text-white text-sm font-medium
                    rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2
-                   focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-60
+                   focus:ring-brand-700/30 focus:ring-offset-2 disabled:opacity-60
                    disabled:cursor-not-allowed transition-colors"
       >
         {loading ? "Entrando..." : "Entrar"}

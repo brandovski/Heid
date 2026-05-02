@@ -24,7 +24,7 @@ const STATUS_BADGE: Record<
 > = {
   pending: { label: "Pendente", className: "bg-yellow-50 text-yellow-700" },
   paid: { label: "Pago", className: "bg-green-50 text-green-700" },
-  cancelled: { label: "Cancelado", className: "bg-gray-100 text-gray-500" },
+  cancelled: { label: "Cancelado", className: "bg-brand-700/10 text-brand-700/50" },
 };
 
 export default function TransacaoCard({
@@ -64,8 +64,8 @@ export default function TransacaoCard({
     <div
       className={`px-4 py-3 rounded-xl border ${
         t.status === "cancelled"
-          ? "bg-gray-50 border-gray-100 opacity-60"
-          : "bg-white border-gray-200"
+          ? "bg-brand-700/5 border-brand-700/10 opacity-60"
+          : "bg-surface border-brand-700/20"
       }`}
     >
       {/* Linha 1: ícone + descrição + valor */}
@@ -73,7 +73,7 @@ export default function TransacaoCard({
         <span className="text-lg shrink-0 w-7 text-center">
           {t.category?.icon ?? (income ? "📈" : "📉")}
         </span>
-        <p className="flex-1 text-sm font-medium text-gray-900 truncate">
+        <p className="flex-1 text-sm font-medium text-brand-700 truncate">
           {t.description}
         </p>
         <span
@@ -88,7 +88,7 @@ export default function TransacaoCard({
 
       {/* Linha 2: metadata + badges + ações */}
       <div className="flex items-center gap-2 mt-1.5 ml-10 min-w-0">
-        <p className="flex-1 text-xs text-gray-400 truncate min-w-0">
+        <p className="flex-1 text-xs text-brand-700/40 truncate min-w-0">
           {formatDate(t.date)}
           {t.category ? ` · ${t.category.name}` : ""}
           {t.credit_card ? ` · ${t.credit_card.name}` : ""}
@@ -97,7 +97,7 @@ export default function TransacaoCard({
         <div className="flex items-center gap-1 shrink-0">
           {/* Badge de tipo (para transações automáticas) */}
           {!isManual && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-brand-700/10 text-brand-700/50 font-medium">
               {typeLabel}
             </span>
           )}
@@ -122,7 +122,7 @@ export default function TransacaoCard({
             {onEdit && isManual && t.status !== "cancelled" && (
               <button
                 onClick={() => onEdit(t)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
                 title="Editar"
               >
                 <Pencil size={14} />
@@ -133,7 +133,7 @@ export default function TransacaoCard({
             {onPagar && t.status === "pending" && (
               <button
                 onClick={() => onPagar(t)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors"
+                className="p-1.5 rounded-lg text-brand-700/40 hover:text-green-600 hover:bg-green-50 transition-colors"
                 title="Marcar como pago"
               >
                 <CheckCircle size={14} />
@@ -144,7 +144,7 @@ export default function TransacaoCard({
             {onEdit && t.status !== "cancelled" && (
               <button
                 onClick={handleCancel}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                className="p-1.5 rounded-lg text-brand-700/40 hover:text-red-500 hover:bg-red-50 transition-colors"
                 title="Cancelar"
               >
                 <XCircle size={14} />
@@ -155,7 +155,7 @@ export default function TransacaoCard({
             {onEdit && isManual && t.status === "cancelled" && (
               <button
                 onClick={() => setShowConfirm(true)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                className="p-1.5 rounded-lg text-brand-700/40 hover:text-red-600 hover:bg-red-50 transition-colors"
                 title="Excluir permanentemente"
               >
                 <Trash2 size={14} />

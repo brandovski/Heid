@@ -82,14 +82,14 @@ export default function InvestimentoList({ investments: initial, transactions, s
 
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+        <div className="flex gap-1 bg-brand-700/10 rounded-lg p-1">
           {(["ativos", "arquivados"] as Tab[]).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setTab(t)}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                tab === t ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                tab === t ? "bg-surface text-brand-700 shadow-sm" : "text-brand-700/50 hover:text-brand-700/70"
               }`}
             >
               {t === "ativos" ? `Ativos (${ativos.length})` : `Arquivados (${arquivados.length})`}
@@ -116,8 +116,8 @@ export default function InvestimentoList({ investments: initial, transactions, s
             {pendingAportes.map((card) => (
               <div key={card.investment.id} className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{card.investment.name}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm font-medium text-brand-700">{card.investment.name}</p>
+                  <p className="text-xs text-brand-700/50">
                     Dia {card.scheduledDay} — {formatCurrency(card.expectedAmount)}
                   </p>
                 </div>
@@ -135,7 +135,7 @@ export default function InvestimentoList({ investments: initial, transactions, s
 
       {/* List */}
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+        <div className="text-center py-12 text-brand-700/40 border-2 border-dashed border-brand-700/20 rounded-xl">
           <p className="text-sm">
             {tab === "ativos" ? "Nenhum investimento ativo." : "Nenhum investimento arquivado."}
           </p>

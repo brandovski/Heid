@@ -19,10 +19,10 @@ export default function AppError({
       <div className="bg-red-50 rounded-full p-4 mb-4">
         <AlertTriangle className="w-8 h-8 text-red-500" />
       </div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-1">
+      <h2 className="text-lg font-semibold text-brand-700 mb-1">
         Algo deu errado
       </h2>
-      <p className="text-sm text-gray-500 mb-6 max-w-xs">
+      <p className="text-sm text-brand-700/50 mb-6 max-w-xs">
         Ocorreu um erro ao carregar esta página. Tente novamente.
       </p>
       <button

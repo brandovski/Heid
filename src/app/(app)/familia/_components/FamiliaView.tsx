@@ -112,7 +112,7 @@ function PagarFamiliaModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2.5 px-4 border border-brand-700/30 rounded-lg text-sm font-medium text-brand-700 hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -129,14 +129,14 @@ function PagarFamiliaModal({
       }
     >
       <form id="pagar-familia-form" onSubmit={handleConfirm} className="space-y-4">
-        <div className="p-3 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 truncate">{transacao.description}</p>
-          <p className="text-base font-semibold text-gray-900 mt-0.5">
+        <div className="p-3 bg-brand-700/5 rounded-lg">
+          <p className="text-sm text-brand-700/70 truncate">{transacao.description}</p>
+          <p className="text-base font-semibold text-brand-700 mt-0.5">
             {formatCurrency(transacao.amount)}
           </p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Data de pagamento
           </label>
           <DatePicker
@@ -144,7 +144,7 @@ function PagarFamiliaModal({
             onChange={setPaidDate}
             placeholder="Selecione a data"
           />
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-brand-700/40 mt-1">
             Padrão: hoje. Altere se o pagamento ocorreu em outra data.
           </p>
         </div>
@@ -201,7 +201,7 @@ export default function FamiliaView({
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       {/* Header */}
-      <h1 className="text-xl font-bold text-gray-900 hidden sm:block">Família</h1>
+      <h1 className="text-xl font-bold text-brand-700 hidden sm:block">Família</h1>
 
       {/* Month navigation */}
       <MonthNavigator
@@ -211,9 +211,9 @@ export default function FamiliaView({
       />
 
       {/* Caixa Familiar */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
+      <div className="bg-surface rounded-2xl border border-brand-700/10 p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+          <h2 className="text-sm font-semibold text-brand-700/50 uppercase tracking-wide">
             Caixa Familiar
           </h2>
           <button
@@ -235,22 +235,22 @@ export default function FamiliaView({
             return (
               <div
                 key={member.id}
-                className="bg-gray-50 rounded-xl p-3.5 flex flex-col gap-1"
+                className="bg-brand-700/5 rounded-xl p-3.5 flex flex-col gap-1"
               >
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-brand-700/50 truncate">
                   {member.full_name ?? "Usuário"}
                 </p>
-                <p className="text-base font-bold text-gray-900">
+                <p className="text-base font-bold text-brand-700">
                   {total > 0 ? formatCurrency(total) : "—"}
                 </p>
                 {memberConts.length > 0 && (
-                  <p className="text-[10px] text-gray-400">
+                  <p className="text-[10px] text-brand-700/40">
                     {memberConts.length}{" "}
                     {memberConts.length === 1 ? "aporte" : "aportes"}
                   </p>
                 )}
                 {total === 0 && (
-                  <p className="text-[10px] text-gray-400">Nenhum aporte</p>
+                  <p className="text-[10px] text-brand-700/40">Nenhum aporte</p>
                 )}
               </div>
             );
@@ -258,7 +258,7 @@ export default function FamiliaView({
         </div>
 
         {/* Totals */}
-        <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-100">
+        <div className="grid grid-cols-3 gap-2 pt-3 border-t border-brand-700/10">
           {[
             {
               label: "Total aportado",
@@ -277,7 +277,7 @@ export default function FamiliaView({
             },
           ].map(({ label, value, color }) => (
             <div key={label} className="text-center">
-              <p className="text-[10px] text-gray-400 mb-0.5">{label}</p>
+              <p className="text-[10px] text-brand-700/40 mb-0.5">{label}</p>
               <p className={`text-sm font-bold ${color}`}>
                 {formatCurrency(value)}
               </p>
@@ -286,7 +286,7 @@ export default function FamiliaView({
         </div>
 
         {totalReceita > 0 && (
-          <p className="text-xs text-gray-400 text-center">
+          <p className="text-xs text-brand-700/40 text-center">
             Inclui{" "}
             <span className="text-green-600 font-medium">
               {formatCurrency(totalReceita)}
@@ -299,10 +299,10 @@ export default function FamiliaView({
       {/* Family transactions */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-700">
+          <h2 className="text-sm font-semibold text-brand-700">
             Transações familiares
             {familyTransactions.length > 0 && (
-              <span className="ml-2 text-xs font-normal text-gray-400">
+              <span className="ml-2 text-xs font-normal text-brand-700/40">
                 ({familyTransactions.length})
               </span>
             )}
@@ -320,15 +320,15 @@ export default function FamiliaView({
         </div>
 
         {familyTransactions.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-8 text-center">
-            <Users className="mx-auto mb-3 text-gray-300" size={32} />
-            <p className="text-sm text-gray-500">
+          <div className="bg-surface rounded-2xl border border-dashed border-brand-700/20 p-8 text-center">
+            <Users className="mx-auto mb-3 text-brand-700/30" size={32} />
+            <p className="text-sm text-brand-700/50">
               Nenhuma transação familiar em{" "}
               <span className="font-medium capitalize">
                 {formatMonth(currentMonth)}
               </span>
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-brand-700/40 mt-1">
               Use o botão "Nova Transação" acima para registrar
             </p>
           </div>
@@ -340,14 +340,14 @@ export default function FamiliaView({
               return (
                 <div
                   key={tx.id}
-                  className="bg-white rounded-xl border border-gray-100 px-4 py-3"
+                  className="bg-surface rounded-xl border border-brand-700/10 px-4 py-3"
                 >
                   {/* Linha 1: ícone + descrição + valor */}
                   <div className="flex items-center gap-3">
                     <span className="text-lg shrink-0">
                       {tx.category?.icon ?? (isExpense ? "💸" : "💰")}
                     </span>
-                    <p className="flex-1 text-sm font-medium text-gray-900 truncate">
+                    <p className="flex-1 text-sm font-medium text-brand-700 truncate">
                       {tx.description}
                     </p>
                     <span
@@ -362,7 +362,7 @@ export default function FamiliaView({
 
                   {/* Linha 2: metadata + status + ações */}
                   <div className="flex items-center gap-2 mt-1.5 ml-9 min-w-0">
-                    <p className="flex-1 text-xs text-gray-400 truncate min-w-0">
+                    <p className="flex-1 text-xs text-brand-700/40 truncate min-w-0">
                       {formatDate(tx.date)} ·{" "}
                       {TRANSACTION_TYPE_LABELS[tx.type] ?? tx.type}
                     </p>
@@ -376,7 +376,7 @@ export default function FamiliaView({
                             setEditingTransacao(tx);
                             setIsTransacaoOpen(true);
                           }}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                          className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
                           title="Editar"
                         >
                           <Pencil size={13} />
@@ -387,7 +387,7 @@ export default function FamiliaView({
                       {tx.status === "pending" && (
                         <button
                           onClick={() => setPagandoTransacao(tx)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors"
+                          className="p-1.5 rounded-lg text-brand-700/40 hover:text-green-600 hover:bg-green-50 transition-colors"
                           title="Marcar como pago"
                         >
                           <CheckCircle size={13} />
@@ -398,7 +398,7 @@ export default function FamiliaView({
                       {tx.status !== "cancelled" && (
                         <button
                           onClick={() => handleCancel(tx)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                          className="p-1.5 rounded-lg text-brand-700/40 hover:text-red-500 hover:bg-red-50 transition-colors"
                           title="Cancelar"
                         >
                           <XCircle size={13} />
@@ -409,7 +409,7 @@ export default function FamiliaView({
                       {isManual && tx.status === "cancelled" && (
                         <button
                           onClick={() => setPendingDeleteTx(tx)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                          className="p-1.5 rounded-lg text-brand-700/40 hover:text-red-600 hover:bg-red-50 transition-colors"
                           title="Excluir permanentemente"
                         >
                           <Trash2 size={13} />

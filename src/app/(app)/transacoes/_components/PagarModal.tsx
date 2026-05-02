@@ -53,7 +53,7 @@ export default function PagarModal({ transacao, onClose, onSaved }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2.5 px-4 border border-brand-700/30 rounded-lg text-sm font-medium text-brand-700 hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -77,15 +77,15 @@ export default function PagarModal({ transacao, onClose, onSaved }: Props) {
         }}
         className="space-y-4"
       >
-        <div className="p-3 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 truncate">{transacao.description}</p>
-          <p className="text-base font-semibold text-gray-900 mt-0.5">
+        <div className="p-3 bg-brand-700/5 rounded-lg">
+          <p className="text-sm text-brand-700/70 truncate">{transacao.description}</p>
+          <p className="text-base font-semibold text-brand-700 mt-0.5">
             {formatCurrency(transacao.amount)}
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Data de pagamento
           </label>
           <DatePicker
@@ -93,7 +93,7 @@ export default function PagarModal({ transacao, onClose, onSaved }: Props) {
             onChange={setPaidDate}
             placeholder="Selecione a data"
           />
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-brand-700/40 mt-1">
             Padrão: hoje. Altere se o pagamento ocorreu em outra data.
           </p>
         </div>

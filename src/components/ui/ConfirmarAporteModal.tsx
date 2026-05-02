@@ -93,7 +93,7 @@ export default function ConfirmarAporteModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex-1 px-4 py-2.5 text-sm font-medium text-brand-700 bg-brand-700/10 rounded-lg hover:bg-brand-700/20 transition-colors"
           >
             Cancelar
           </button>
@@ -114,24 +114,24 @@ export default function ConfirmarAporteModal({
         )}
 
         <div>
-          <p className="text-sm font-medium text-gray-700 mb-1">{investment.name}</p>
-          <p className="text-xs text-gray-400">
+          <p className="text-sm font-medium text-brand-700 mb-1">{investment.name}</p>
+          <p className="text-xs text-brand-700/40">
             Aporte programado para o dia {scheduledDay}
           </p>
         </div>
 
         {/* Valor */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Valor</label>
+          <label className="block text-sm font-medium text-brand-700 mb-2">Valor</label>
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2.5 cursor-pointer">
               <input
                 type="radio"
                 checked={useIntegral}
                 onChange={() => setUseIntegral(true)}
-                className="w-4 h-4 text-brand-600 border-gray-300 focus:ring-brand-500"
+                className="w-4 h-4 text-brand-600 border-brand-700/30 focus:ring-brand-700/30"
               />
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-brand-700">
                 Valor integral ({formatCurrency(expectedAmount)})
               </span>
             </label>
@@ -140,9 +140,9 @@ export default function ConfirmarAporteModal({
                 type="radio"
                 checked={!useIntegral}
                 onChange={() => setUseIntegral(false)}
-                className="w-4 h-4 text-brand-600 border-gray-300 focus:ring-brand-500"
+                className="w-4 h-4 text-brand-600 border-brand-700/30 focus:ring-brand-700/30"
               />
-              <span className="text-sm text-gray-700">Outro valor</span>
+              <span className="text-sm text-brand-700">Outro valor</span>
             </label>
           </div>
           {!useIntegral && (
@@ -153,28 +153,28 @@ export default function ConfirmarAporteModal({
               min="0.01"
               step="0.01"
               placeholder="Valor (R$)"
-              className="mt-2 w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="mt-2 w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           )}
         </div>
 
         {/* Data */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Data</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Data</label>
           <DatePicker value={date} onChange={setDate} placeholder="Selecione a data" />
         </div>
 
         {/* Observações */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Observações <span className="text-gray-400 font-normal">(opcional)</span>
+          <label className="block text-sm font-medium text-brand-700 mb-1">
+            Observações <span className="text-brand-700/40 font-normal">(opcional)</span>
           </label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Ex: aporte feito via Pix"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
       </div>

@@ -91,7 +91,7 @@ export default function CartaoCard({ cartao, onEdit, onSaved, onViewFatura }: Pr
         {/* Badges */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {cartao.credit_limit != null && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-brand-700/40">
               {cartao.credit_limit.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
@@ -115,7 +115,7 @@ export default function CartaoCard({ cartao, onEdit, onSaved, onViewFatura }: Pr
               </button>
               <button
                 onClick={() => onEdit(cartao)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
                 title="Editar"
               >
                 <Pencil size={14} />
@@ -124,7 +124,7 @@ export default function CartaoCard({ cartao, onEdit, onSaved, onViewFatura }: Pr
           )}
           <button
             onClick={handleToggleActive}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
             title={cartao.is_active ? "Desativar" : "Reativar"}
           >
             {cartao.is_active ? <PowerOff size={14} /> : <RotateCcw size={14} />}

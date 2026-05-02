@@ -19,11 +19,11 @@ export default function FaturaGrupoCard({ grupo, mes, onPaid, readOnly = false }
 
   return (
     <>
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-surface rounded-xl border border-brand-700/20 overflow-hidden">
 
         {/* ── Linha principal (sempre visível) ── */}
         <div
-          className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-brand-700/5 transition-colors"
           onClick={() => setExpanded((v) => !v)}
         >
           {/* Dot com cor do cartão */}
@@ -34,13 +34,13 @@ export default function FaturaGrupoCard({ grupo, mes, onPaid, readOnly = false }
 
           {/* Nome + bandeira */}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{grupo.cartaoNome}</p>
-            <p className="text-xs text-gray-400">{grupo.cartaoBrand} · Cartão de crédito</p>
+            <p className="text-sm font-medium text-brand-700 truncate">{grupo.cartaoNome}</p>
+            <p className="text-xs text-brand-700/40">{grupo.cartaoBrand} · Cartão de crédito</p>
           </div>
 
           {/* Total + badge */}
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-sm font-semibold text-gray-900">
+            <span className="text-sm font-semibold text-brand-700">
               {formatCurrency(grupo.total)}
             </span>
             {grupo.isPaid ? (
@@ -53,19 +53,19 @@ export default function FaturaGrupoCard({ grupo, mes, onPaid, readOnly = false }
               </span>
             )}
             {expanded ? (
-              <ChevronUp size={16} className="text-gray-400" />
+              <ChevronUp size={16} className="text-brand-700/40" />
             ) : (
-              <ChevronDown size={16} className="text-gray-400" />
+              <ChevronDown size={16} className="text-brand-700/40" />
             )}
           </div>
         </div>
 
         {/* ── Conteúdo expandido ── */}
         {expanded && (
-          <div className="border-t border-gray-100">
+          <div className="border-t border-brand-700/10">
 
             {/* Lista de transações */}
-            <div className="px-4 py-2 divide-y divide-gray-50">
+            <div className="px-4 py-2 divide-y divide-brand-700/5">
               {grupo.transactions.map((t) => (
                 <div key={t.id} className="flex items-center justify-between py-2 gap-3">
                   <div className="flex items-center gap-2 min-w-0">
@@ -73,14 +73,14 @@ export default function FaturaGrupoCard({ grupo, mes, onPaid, readOnly = false }
                       <span className="text-sm shrink-0">{t.category.icon}</span>
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm text-gray-800 truncate">{t.description}</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-sm text-brand-700 truncate">{t.description}</p>
+                      <p className="text-xs text-brand-700/40">
                         {formatDate(t.date)}
                         {t.category?.name && ` · ${t.category.name}`}
                       </p>
                     </div>
                   </div>
-                  <span className="text-sm text-gray-700 shrink-0">
+                  <span className="text-sm text-brand-700 shrink-0">
                     {formatCurrency(t.amount)}
                   </span>
                 </div>
@@ -88,7 +88,7 @@ export default function FaturaGrupoCard({ grupo, mes, onPaid, readOnly = false }
             </div>
 
             {/* Rodapé expandido: pago ou botão pagar */}
-            <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
+            <div className="px-4 py-3 bg-brand-700/5 border-t border-brand-700/10">
               {grupo.isPaid ? (
                 <div className="flex items-center gap-2 text-sm text-green-700">
                   <CheckCircle2 size={15} className="shrink-0" />
@@ -99,7 +99,7 @@ export default function FaturaGrupoCard({ grupo, mes, onPaid, readOnly = false }
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-brand-700/50">
                     {grupo.transactions.length} transaç{grupo.transactions.length === 1 ? "ão" : "ões"}
                   </span>
                   {!readOnly && (

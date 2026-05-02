@@ -159,7 +159,7 @@ export default function AssinaturaModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2.5 px-4 border border-brand-700/30 rounded-lg text-sm font-medium text-brand-700 hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -177,7 +177,7 @@ export default function AssinaturaModal({
     >
       <form id={formId} onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Nome <span className="text-red-500">*</span>
           </label>
           <input
@@ -185,13 +185,13 @@ export default function AssinaturaModal({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Netflix, Spotify, iCloud..."
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         {/* Moeda */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Moeda</label>
+          <label className="block text-sm font-medium text-brand-700 mb-2">Moeda</label>
           <div className="grid grid-cols-2 gap-2">
             {(["BRL", "USD"] as const).map((c) => (
               <button
@@ -201,7 +201,7 @@ export default function AssinaturaModal({
                 className={`py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
                   currency === c
                     ? "bg-brand-50 border-brand-500 text-brand-700"
-                    : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                    : "bg-surface border-brand-700/30 text-brand-700 hover:bg-brand-700/5"
                 }`}
               >
                 {c === "BRL" ? "🇧🇷 BRL" : "🇺🇸 USD"}
@@ -212,7 +212,7 @@ export default function AssinaturaModal({
 
         {/* Valor */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Valor ({currency}) <span className="text-red-500">*</span>
           </label>
           <input
@@ -222,18 +222,18 @@ export default function AssinaturaModal({
             value={amountOriginal}
             onChange={(e) => setAmountOriginal(e.target.value)}
             placeholder="0,00"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         {/* Campo de valor BRL para USD */}
         {currency === "USD" && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Valor em R$ <span className="text-red-500">*</span>
             </label>
             {rateStatus === "loading" && (
-              <p className="text-xs text-gray-400 mb-1">Buscando cotação atual…</p>
+              <p className="text-xs text-brand-700/40 mb-1">Buscando cotação atual…</p>
             )}
             {rateStatus === "ok" && rate && (
               <p className="text-xs text-green-600 mb-1">
@@ -252,14 +252,14 @@ export default function AssinaturaModal({
               value={amountBrl}
               onChange={(e) => setAmountBrl(e.target.value)}
               placeholder="0,00"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
         )}
 
         {!isEditing && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Data de início (1ª cobrança) <span className="text-red-500">*</span>
             </label>
             <DatePicker value={startDate} onChange={setStartDate} placeholder="Selecione" />
@@ -267,13 +267,13 @@ export default function AssinaturaModal({
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Cartão de crédito <span className="text-red-500">*</span>
           </label>
           <select
             value={creditCardId}
             onChange={(e) => setCreditCardId(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           >
             <option value="">Selecione um cartão</option>
             {cartoes.map((c) => (
@@ -285,11 +285,11 @@ export default function AssinaturaModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Categoria</label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           >
             <option value="">Sem categoria</option>
             {categorias.map((c) => (
@@ -302,13 +302,13 @@ export default function AssinaturaModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Observações</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30 resize-none"
           />
         </div>
 
@@ -325,14 +325,14 @@ export default function AssinaturaModal({
                   setPromoMonths("");
                 }
               }}
-              className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+              className="w-4 h-4 rounded border-brand-700/30 text-brand-600 focus:ring-brand-700/30"
             />
-            <span className="text-sm font-medium text-gray-700">Tem valor promocional?</span>
+            <span className="text-sm font-medium text-brand-700">Tem valor promocional?</span>
           </label>
           {hasPromo && (
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="block text-xs font-medium text-brand-700/70 mb-1">
                   Valor promo (R$) <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -342,11 +342,11 @@ export default function AssinaturaModal({
                   value={promoAmount}
                   onChange={(e) => setPromoAmount(e.target.value)}
                   placeholder="0,00"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3 py-2 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="block text-xs font-medium text-brand-700/70 mb-1">
                   Nº de meses <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -356,7 +356,7 @@ export default function AssinaturaModal({
                   value={promoMonths}
                   onChange={(e) => setPromoMonths(e.target.value)}
                   placeholder="Ex: 3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3 py-2 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                 />
               </div>
             </div>

@@ -66,7 +66,7 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2.5 px-4 border border-brand-700/30 rounded-lg text-sm font-medium text-brand-700 hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -84,7 +84,7 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
     >
       <form id="categoria-form" onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Nome <span className="text-red-500">*</span>
           </label>
           <input
@@ -92,12 +92,12 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Alimentação"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+          <label className="block text-sm font-medium text-brand-700 mb-2">Tipo</label>
           <div className="grid grid-cols-3 gap-2">
             {([
               { value: null, label: "Ambos" },
@@ -111,7 +111,7 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
                 className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
                   type === value
                     ? "bg-brand-50 border-brand-500 text-brand-700"
-                    : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                    : "bg-surface border-brand-700/30 text-brand-700 hover:bg-brand-700/5"
                 }`}
               >
                 {label}
@@ -121,7 +121,7 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Ícone (emoji)
           </label>
           <input
@@ -129,12 +129,12 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
             value={icon}
             onChange={(e) => setIcon(e.target.value)}
             placeholder="🍔"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-brand-700 mb-2">
             Cor
           </label>
           <div className="flex flex-wrap gap-2.5">
@@ -142,8 +142,8 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
               type="button"
               onClick={() => setColor("")}
               className={`w-8 h-8 rounded-full border-2 transition-all ${
-                !color ? "border-brand-500 scale-110" : "border-gray-200"
-              } bg-gray-100`}
+                !color ? "border-brand-500 scale-110" : "border-brand-700/20"
+              } bg-brand-700/10`}
               title="Sem cor"
             />
             {PRESET_COLORS.map((c) => (
@@ -160,7 +160,7 @@ export default function CategoriaModal({ categoria, onClose, onSaved }: Props) {
             ))}
           </div>
           {color && (
-            <p className="text-xs text-gray-400 mt-1">Selecionada: {color}</p>
+            <p className="text-xs text-brand-700/40 mt-1">Selecionada: {color}</p>
           )}
         </div>
       </form>

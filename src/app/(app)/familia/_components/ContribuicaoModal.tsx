@@ -68,7 +68,7 @@ export default function ContribuicaoModal({ isOpen, onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-brand-700 bg-surface border border-brand-700/20 rounded-lg hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -85,12 +85,12 @@ export default function ContribuicaoModal({ isOpen, onClose }: Props) {
       }
     >
       <form id="contribuicao-form" onSubmit={handleSubmit} className="space-y-4">
-        <p className="text-xs text-gray-500 bg-brand-50 text-brand-700 rounded-lg px-3 py-2">
+        <p className="text-xs text-brand-700/50 bg-brand-50 text-brand-700 rounded-lg px-3 py-2">
           O valor será registrado como despesa pessoal e creditado no Caixa Familiar.
         </p>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Valor (R$)
           </label>
           <input
@@ -102,12 +102,12 @@ export default function ContribuicaoModal({ isOpen, onClose }: Props) {
             step="0.01"
             placeholder="0,00"
             autoFocus
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2 border border-brand-700/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Data
           </label>
           <input
@@ -115,21 +115,21 @@ export default function ContribuicaoModal({ isOpen, onClose }: Props) {
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2 border border-brand-700/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Notas{" "}
-            <span className="text-gray-400 font-normal">(opcional)</span>
+            <span className="text-brand-700/40 font-normal">(opcional)</span>
           </label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Observações..."
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+            className="w-full px-3 py-2 border border-brand-700/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30 resize-none"
           />
         </div>
       </form>

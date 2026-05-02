@@ -121,7 +121,7 @@ export default function FixaModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2.5 px-4 border border-brand-700/30 rounded-lg text-sm font-medium text-brand-700 hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -139,7 +139,7 @@ export default function FixaModal({
     >
       <form id={formId} onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Descrição <span className="text-red-500">*</span>
           </label>
           <input
@@ -147,13 +147,13 @@ export default function FixaModal({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={isDespesa ? "Ex: Aluguel" : "Ex: Salário"}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Valor (R$) <span className="text-red-500">*</span>
             </label>
             <input
@@ -163,11 +163,11 @@ export default function FixaModal({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0,00"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Dia do mês <span className="text-red-500">*</span>
             </label>
             <input
@@ -177,19 +177,19 @@ export default function FixaModal({
               value={dayOfMonth}
               onChange={(e) => setDayOfMonth(e.target.value)}
               placeholder="1–31"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Categoria
           </label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           >
             <option value="">Sem categoria</option>
             {categorias
@@ -206,7 +206,7 @@ export default function FixaModal({
         {isDespesa && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-brand-700 mb-2">
                 Forma de pagamento
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -224,7 +224,7 @@ export default function FixaModal({
                     className={`py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
                       paymentMethod === value
                         ? "bg-brand-50 border-brand-500 text-brand-700"
-                        : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                        : "bg-surface border-brand-700/30 text-brand-700 hover:bg-brand-700/5"
                     }`}
                   >
                     {label}
@@ -235,13 +235,13 @@ export default function FixaModal({
 
             {paymentMethod === "credit_card" && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-brand-700 mb-1">
                   Cartão <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={creditCardId}
                   onChange={(e) => setCreditCardId(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                 >
                   <option value="">Selecione um cartão</option>
                   {cartoes.map((c) => (
@@ -256,7 +256,7 @@ export default function FixaModal({
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Início
           </label>
           <DatePicker
@@ -267,7 +267,7 @@ export default function FixaModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Observações
           </label>
           <textarea
@@ -275,7 +275,7 @@ export default function FixaModal({
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30 resize-none"
           />
         </div>
 

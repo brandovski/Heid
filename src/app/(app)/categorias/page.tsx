@@ -15,7 +15,7 @@ export default async function CategoriasPage() {
     <div>
       <div className="hidden sm:flex items-center gap-3 mb-6">
         <Tag className="text-brand-600" size={24} />
-        <h1 className="text-2xl font-bold text-gray-900">Categorias</h1>
+        <h1 className="text-2xl font-bold text-brand-700">Categorias</h1>
       </div>
       <CategoriaList initialData={categorias ?? []} />
     </div>

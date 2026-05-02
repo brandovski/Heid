@@ -62,9 +62,9 @@ export default function ProjetoList({ initialProjects }: Props) {
       {/* Header desktop */}
       <div className="hidden sm:flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Projetos</h1>
+          <h1 className="text-xl font-bold text-brand-700">Projetos</h1>
           {activeProjects.length > 0 && (
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-brand-700/50 mt-0.5">
               {activeProjects.length} ativo{activeProjects.length !== 1 ? "s" : ""} ·{" "}
               {formatCurrency(totalBudget)} orçados
             </p>
@@ -81,7 +81,7 @@ export default function ProjetoList({ initialProjects }: Props) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+      <div className="flex gap-1 bg-brand-700/10 rounded-xl p-1">
         {TABS.map(({ key, label }) => (
           <button
             key={key}
@@ -89,8 +89,8 @@ export default function ProjetoList({ initialProjects }: Props) {
             onClick={() => setTab(key)}
             className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors ${
               tab === key
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-surface text-brand-700 shadow-sm"
+                : "text-brand-700/50 hover:text-brand-700"
             }`}
           >
             {label}
@@ -100,7 +100,7 @@ export default function ProjetoList({ initialProjects }: Props) {
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-brand-700/40">
           <p className="text-sm">Nenhum projeto encontrado</p>
         </div>
       ) : (

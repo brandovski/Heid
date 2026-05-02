@@ -113,7 +113,7 @@ export default function OrcamentoModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-brand-700 bg-surface border border-brand-700/20 rounded-lg hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -132,20 +132,20 @@ export default function OrcamentoModal({
       <form id="orcamento-form" onSubmit={handleSubmit} className="space-y-4">
         {/* Categoria */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Categoria
           </label>
           {editing ? (
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-2 px-3 py-2 bg-brand-700/5 rounded-lg border border-brand-700/20">
               <span>{editing.category?.icon}</span>
-              <span className="text-sm text-gray-700">{editing.category?.name}</span>
+              <span className="text-sm text-brand-700">{editing.category?.name}</span>
             </div>
           ) : (
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+              className="w-full px-3 py-2 border border-brand-700/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30 bg-surface"
             >
               <option value="">Selecionar categoria...</option>
               {availableCategories.map((c) => (
@@ -159,7 +159,7 @@ export default function OrcamentoModal({
 
         {/* Valor planejado */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Valor planejado (R$)
           </label>
           <input
@@ -170,21 +170,21 @@ export default function OrcamentoModal({
             min="0.01"
             step="0.01"
             placeholder="0,00"
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2 border border-brand-700/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         {/* Notas */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Notas <span className="text-gray-400 font-normal">(opcional)</span>
+          <label className="block text-sm font-medium text-brand-700 mb-1">
+            Notas <span className="text-brand-700/40 font-normal">(opcional)</span>
           </label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Observações..."
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+            className="w-full px-3 py-2 border border-brand-700/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30 resize-none"
           />
         </div>
       </form>

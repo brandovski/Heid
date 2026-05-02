@@ -18,7 +18,7 @@ export default function ScopeSelector({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-brand-700 mb-2">
           Escopo
         </label>
         <div className="grid grid-cols-2 gap-2">
@@ -33,7 +33,7 @@ export default function ScopeSelector({
               className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
                 scope === s
                   ? "bg-brand-50 border-brand-500 text-brand-700"
-                  : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                  : "bg-surface border-brand-700/30 text-brand-700 hover:bg-brand-700/5"
               }`}
             >
               {s === "personal" ? "Pessoal" : "Familiar"}
@@ -47,9 +47,9 @@ export default function ScopeSelector({
             type="checkbox"
             checked={isShared}
             onChange={(e) => onIsSharedChange(e.target.checked)}
-            className="rounded border-gray-300 text-brand-600"
+            className="rounded border-brand-700/30 text-brand-600"
           />
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-brand-700/70">
             Compartilhar com parceiro (somente leitura)
           </span>
         </label>

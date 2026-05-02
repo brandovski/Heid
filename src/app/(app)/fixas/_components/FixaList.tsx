@@ -53,13 +53,13 @@ export default function FixaList({
   return (
     <div>
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-full sm:w-fit">
+      <div className="flex gap-1 mb-6 bg-brand-700/10 p-1 rounded-xl w-full sm:w-fit">
         <button
           onClick={() => setTab("receitas")}
           className={`flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             tab === "receitas"
-              ? "bg-white text-green-700 shadow-sm"
-              : "text-gray-600 hover:text-gray-900"
+              ? "bg-surface text-green-700 shadow-sm"
+              : "text-brand-700/70 hover:text-brand-700"
           }`}
         >
           <TrendingUp size={16} />
@@ -69,8 +69,8 @@ export default function FixaList({
           onClick={() => setTab("despesas")}
           className={`flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             tab === "despesas"
-              ? "bg-white text-red-700 shadow-sm"
-              : "text-gray-600 hover:text-gray-900"
+              ? "bg-surface text-red-700 shadow-sm"
+              : "text-brand-700/70 hover:text-brand-700"
           }`}
         >
           <TrendingDown size={16} />
@@ -91,7 +91,7 @@ export default function FixaList({
 
       {/* Lista */}
       {active.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-brand-700/40">
           <p>
             Nenhum
             {tab === "receitas" ? "a receita" : "a despesa"} recorrente cadastrada.
@@ -114,7 +114,7 @@ export default function FixaList({
 
       {inactive.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-sm font-medium text-gray-400 mb-3">
+          <h2 className="text-sm font-medium text-brand-700/40 mb-3">
             Desativadas
           </h2>
           <div className="space-y-2">

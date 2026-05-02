@@ -165,7 +165,7 @@ export default function DatePicker({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`w-full flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm text-left transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+        className={`w-full flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm text-left transition-colors focus:outline-none focus:ring-2 focus:ring-brand-700/30 ${
           open
             ? "border-brand-700 bg-surface"
             : "border-brand-700/20 bg-surface hover:border-brand-700/40"

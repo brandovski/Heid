@@ -15,7 +15,7 @@ interface Props {
 const STATUS_BADGE = {
   active: { label: "Em andamento", className: "bg-brand-50 text-brand-700" },
   done: { label: "Quitado", className: "bg-green-50 text-green-700" },
-  cancelled: { label: "Cancelado", className: "bg-gray-100 text-gray-500" },
+  cancelled: { label: "Cancelado", className: "bg-brand-700/10 text-brand-700/50" },
 };
 
 export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
@@ -38,8 +38,8 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
     <div
       className={`px-4 py-3 rounded-xl border ${
         status === "cancelled"
-          ? "bg-gray-50 border-gray-100 opacity-60"
-          : "bg-white border-gray-200"
+          ? "bg-brand-700/5 border-brand-700/10 opacity-60"
+          : "bg-surface border-brand-700/20"
       }`}
     >
       {/* Linha 1: ícone + descrição + total */}
@@ -47,7 +47,7 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
         <span className="text-lg shrink-0 w-7 text-center">
           {group.category?.icon ?? "🛒"}
         </span>
-        <p className="flex-1 text-sm font-medium text-gray-900 truncate">
+        <p className="flex-1 text-sm font-medium text-brand-700 truncate">
           {group.description}
         </p>
         <span className="text-sm font-semibold text-red-600 shrink-0">
@@ -57,19 +57,19 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
 
       {/* Linha 2: progresso */}
       <div className="mt-2 ml-10">
-        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+        <div className="flex items-center justify-between text-xs text-brand-700/50 mb-1">
           <span>
             {summary.paid}/{summary.total} parcelas pagas
             {summary.paid > 0 && ` · ${formatCurrency(summary.amountPaid)}`}
           </span>
           {summary.nextDate && (
-            <span className="text-gray-400">
+            <span className="text-brand-700/40">
               Próxima: {formatDate(summary.nextDate)}
             </span>
           )}
         </div>
         {summary.total > 0 && (
-          <div className="w-full bg-gray-100 rounded-full h-1.5">
+          <div className="w-full bg-brand-700/10 rounded-full h-1.5">
             <div
               className={`h-1.5 rounded-full transition-all ${
                 status === "done" ? "bg-green-500" : "bg-brand-500"
@@ -82,7 +82,7 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
 
       {/* Linha 3: metadata + badges + ações */}
       <div className="flex items-center gap-2 mt-2 ml-10 min-w-0">
-        <p className="flex-1 text-xs text-gray-400 truncate min-w-0">
+        <p className="flex-1 text-xs text-brand-700/40 truncate min-w-0">
           {group.credit_card?.name ?? "—"}
           {group.category ? ` · ${group.category.name}` : ""}
         </p>
@@ -99,7 +99,7 @@ export default function ParcelamentoCard({ group, summary, onSaved }: Props) {
             <button
               onClick={() => setShowConfirm(true)}
               disabled={loading}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+              className="p-1.5 rounded-lg text-brand-700/40 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
               title="Cancelar parcelas restantes"
             >
               <XCircle size={14} />

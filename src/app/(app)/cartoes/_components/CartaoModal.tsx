@@ -91,7 +91,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2.5 px-4 border border-brand-700/30 rounded-lg text-sm font-medium text-brand-700 hover:bg-brand-700/5 transition-colors"
             >
               Cancelar
             </button>
@@ -109,7 +109,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
     >
       <form id="cartao-form" onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Nome <span className="text-red-500">*</span>
           </label>
           <input
@@ -117,18 +117,18 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Nubank"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-brand-700 mb-1">
             Bandeira <span className="text-red-500">*</span>
           </label>
           <select
             value={brand}
             onChange={(e) => setBrand(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           >
             {CARD_BRANDS.map((b) => (
               <option key={b} value={b}>{b}</option>
@@ -138,7 +138,7 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Fechamento <span className="text-red-500">*</span>
             </label>
             <input
@@ -148,11 +148,11 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={closingDay}
               onChange={(e) => setClosingDay(e.target.value)}
               placeholder="Dia"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Vencimento <span className="text-red-500">*</span>
             </label>
             <input
@@ -162,14 +162,14 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={dueDay}
               onChange={(e) => setDueDay(e.target.value)}
               placeholder="Dia"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Limite (R$)
             </label>
             <input
@@ -179,11 +179,11 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={creditLimit}
               onChange={(e) => setCreditLimit(e.target.value)}
               placeholder="Ex: 5000"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-brand-700 mb-1">
               Últimos 4 dígitos
             </label>
             <input
@@ -192,13 +192,13 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               value={lastFour}
               onChange={(e) => setLastFour(e.target.value.replace(/\D/g, ""))}
               placeholder="1234"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-brand-700 mb-2">
             Cor do cartão
           </label>
           <div className="flex gap-2.5 flex-wrap">
@@ -206,8 +206,8 @@ export default function CartaoModal({ cartao, onClose, onSaved }: Props) {
               type="button"
               onClick={() => setColor("")}
               className={`w-8 h-8 rounded-full border-2 transition-all ${
-                !color ? "border-brand-500 scale-110" : "border-gray-200"
-              } bg-gray-100`}
+                !color ? "border-brand-500 scale-110" : "border-brand-700/20"
+              } bg-brand-700/10`}
               title="Sem cor"
             />
             {CARD_COLORS.map((c) => (

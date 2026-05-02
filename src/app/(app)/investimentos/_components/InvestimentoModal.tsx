@@ -131,7 +131,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
       onClose={onClose}
       footer={
         <div className="flex gap-3">
-          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-medium text-brand-700 bg-brand-700/10 rounded-lg hover:bg-brand-700/20 transition-colors">
             Cancelar
           </button>
           <button type="button" onClick={handleSave} disabled={saving} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-60 transition-colors">
@@ -144,22 +144,22 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
         {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Nome *</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Tesouro Selic, CDB Nubank..."
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tipo *</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Tipo *</label>
           <select
             value={type}
             onChange={(e) => setType(e.target.value as InvestmentType)}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           >
             {TYPE_OPTIONS.map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
@@ -168,7 +168,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Escopo</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Escopo</label>
           <div className="flex gap-2">
             {(["personal", "family"] as Scope[]).map((s) => (
               <button
@@ -178,7 +178,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
                 className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
                   scope === s
                     ? "bg-brand-50 border-brand-500 text-brand-700"
-                    : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                    : "bg-surface border-brand-700/30 text-brand-700 hover:bg-brand-700/5"
                 }`}
               >
                 {s === "personal" ? "Pessoal" : "Familiar"}
@@ -188,18 +188,18 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Descrição</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Meta (R$)</label>
+          <label className="block text-sm font-medium text-brand-700 mb-1">Meta (R$)</label>
           <input
             type="number"
             value={goalAmount}
@@ -207,27 +207,27 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
             min="0"
             step="0.01"
             placeholder="Opcional"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
           />
         </div>
 
         {/* ── Aporte Mensal — card expansível ── */}
-        <div className="border border-gray-200 rounded-xl overflow-hidden">
+        <div className="border border-brand-700/20 rounded-xl overflow-hidden">
           <button
             type="button"
             onClick={() => setContributionOpen((v) => !v)}
-            className="w-full flex items-center justify-between bg-gray-50 px-4 py-3 cursor-pointer hover:bg-gray-100 transition-colors"
+            className="w-full flex items-center justify-between bg-brand-700/5 px-4 py-3 cursor-pointer hover:bg-brand-700/10 transition-colors"
           >
-            <span className="text-sm font-medium text-gray-700">Aporte Mensal</span>
+            <span className="text-sm font-medium text-brand-700">Aporte Mensal</span>
             <ChevronDown
               size={16}
-              className={`text-gray-400 transition-transform duration-200 ${contributionOpen ? "rotate-180" : ""}`}
+              className={`text-brand-700/40 transition-transform duration-200 ${contributionOpen ? "rotate-180" : ""}`}
             />
           </button>
 
           {contributionOpen && (
-            <div className="px-4 py-3 space-y-4 bg-white">
-              <p className="text-xs text-gray-500">
+            <div className="px-4 py-3 space-y-4 bg-surface">
+              <p className="text-xs text-brand-700/50">
                 Configure os aportes de cada membro. Você confirmará manualmente todo mês.
               </p>
 
@@ -242,7 +242,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
                         min="0"
                         step="0.01"
                         placeholder="Valor (R$)"
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                       />
                     </div>
                     <div className="w-28">
@@ -253,17 +253,17 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
                         min="1"
                         max="28"
                         placeholder="Dia (1–28)"
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                       />
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">Defina valor e dia juntos, ou deixe ambos em branco.</p>
+                  <p className="text-xs text-brand-700/40 mt-1">Defina valor e dia juntos, ou deixe ambos em branco.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {/* Seu aporte */}
                   <div>
-                    <p className="text-xs font-medium text-gray-500 mb-2">{`Aporte de ${userName ?? "Você"}`}</p>
+                    <p className="text-xs font-medium text-brand-700/50 mb-2">{`Aporte de ${userName ?? "Você"}`}</p>
                     <div className="flex gap-3">
                       <div className="flex-1">
                         <input
@@ -273,7 +273,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
                           min="0"
                           step="0.01"
                           placeholder="Valor (R$)"
-                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                          className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                         />
                       </div>
                       <div className="w-28">
@@ -284,7 +284,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
                           min="1"
                           max="28"
                           placeholder="Dia (1–28)"
-                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                          className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                         />
                       </div>
                     </div>
@@ -292,7 +292,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
 
                   {/* Aporte do parceiro */}
                   <div>
-                    <p className="text-xs font-medium text-gray-500 mb-2">{`Aporte de ${partnerName ?? "Parceiro"}`}</p>
+                    <p className="text-xs font-medium text-brand-700/50 mb-2">{`Aporte de ${partnerName ?? "Parceiro"}`}</p>
                     <div className="flex gap-3">
                       <div className="flex-1">
                         <input
@@ -302,7 +302,7 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
                           min="0"
                           step="0.01"
                           placeholder="Valor (R$)"
-                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                          className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                         />
                       </div>
                       <div className="w-28">
@@ -313,12 +313,12 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
                           min="1"
                           max="28"
                           placeholder="Dia (1–28)"
-                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                          className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                         />
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400">Defina valor e dia juntos, ou deixe ambos em branco para cada membro.</p>
+                  <p className="text-xs text-brand-700/40">Defina valor e dia juntos, ou deixe ambos em branco para cada membro.</p>
                 </div>
               )}
             </div>
@@ -331,15 +331,15 @@ export default function InvestimentoModal({ investment, onClose, onSaved, userNa
             type="checkbox"
             checked={eligibleForProjects}
             onChange={(e) => setEligibleForProjects(e.target.checked)}
-            className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+            className="w-4 h-4 rounded border-brand-700/30 text-brand-600 focus:ring-brand-700/30"
           />
-          <label htmlFor="eligible" className="text-sm text-gray-700">
+          <label htmlFor="eligible" className="text-sm text-brand-700">
             Elegível para uso em Projetos
           </label>
         </div>
 
         {isEdit && investment.is_active && (
-          <div className="pt-2 border-t border-gray-100">
+          <div className="pt-2 border-t border-brand-700/10">
             <button
               type="button"
               onClick={() => setShowArchiveConfirm(true)}

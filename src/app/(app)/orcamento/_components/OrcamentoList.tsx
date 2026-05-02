@@ -98,7 +98,7 @@ export default function OrcamentoList({
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-bold text-gray-900 hidden sm:block">Orçamento Pessoal</h1>
+        <h1 className="text-xl font-bold text-brand-700 hidden sm:block">Orçamento Pessoal</h1>
       </div>
 
       {/* Navegação de mês */}
@@ -112,7 +112,7 @@ export default function OrcamentoList({
       {!isEmpty && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: "Planejado", value: totalPlanned, color: "text-gray-900" },
+            { label: "Planejado", value: totalPlanned, color: "text-brand-700" },
             { label: "Pago", value: totalSpent, color: "text-green-600" },
             { label: "Comprometido", value: totalCommitted, color: "text-amber-600" },
             {
@@ -123,9 +123,9 @@ export default function OrcamentoList({
           ].map(({ label, value, color }) => (
             <div
               key={label}
-              className="bg-white rounded-xl border border-gray-100 p-3 text-center"
+              className="bg-surface rounded-xl border border-brand-700/10 p-3 text-center"
             >
-              <p className="text-xs text-gray-400 mb-0.5">{label}</p>
+              <p className="text-xs text-brand-700/40 mb-0.5">{label}</p>
               <p className={`text-sm font-bold ${color}`}>{formatCurrency(value)}</p>
             </div>
           ))}
@@ -134,12 +134,12 @@ export default function OrcamentoList({
 
       {/* Estado vazio */}
       {isEmpty ? (
-        <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
-          <p className="text-gray-500 text-sm mb-1">
+        <div className="bg-surface rounded-2xl border border-dashed border-brand-700/20 p-10 text-center">
+          <p className="text-brand-700/50 text-sm mb-1">
             Nenhum orçamento para{" "}
             <span className="font-medium capitalize">{formatMonth(currentMonth)}</span>
           </p>
-          <p className="text-gray-400 text-xs mb-6">
+          <p className="text-brand-700/40 text-xs mb-6">
             Crie do zero ou clone os valores do mês anterior
           </p>
           {cloneError && (
@@ -176,7 +176,7 @@ export default function OrcamentoList({
           <button
             onClick={openCreate}
             disabled={budgetedCategoryIds.size >= categories.length}
-            className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-gray-500 border-2 border-dashed border-gray-200 rounded-xl hover:border-brand-300 hover:text-brand-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-brand-700/50 border-2 border-dashed border-brand-700/20 rounded-xl hover:border-brand-300 hover:text-brand-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus size={16} />
             Adicionar categoria

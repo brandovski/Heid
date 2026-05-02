@@ -38,8 +38,8 @@ export default function FixaCard({ item, tab, categorias, onEdit, onSaved }: Pro
     <div
       className={`px-4 py-3 rounded-xl border ${
         item.is_active
-          ? "bg-white border-gray-200"
-          : "bg-gray-50 border-gray-100 opacity-60"
+          ? "bg-surface border-brand-700/20"
+          : "bg-brand-700/5 border-brand-700/10 opacity-60"
       }`}
     >
       {/* Linha 1: ícone + descrição + valor */}
@@ -47,7 +47,7 @@ export default function FixaCard({ item, tab, categorias, onEdit, onSaved }: Pro
         <span className="text-lg shrink-0 w-7 text-center">
           {categoria?.icon ?? "📁"}
         </span>
-        <p className="flex-1 text-sm font-medium text-gray-900 truncate">
+        <p className="flex-1 text-sm font-medium text-brand-700 truncate">
           {item.description}
         </p>
         <span className={`text-sm font-semibold shrink-0 ${amountColor}`}>
@@ -60,7 +60,7 @@ export default function FixaCard({ item, tab, categorias, onEdit, onSaved }: Pro
 
       {/* Linha 2: metadata + badge + ações */}
       <div className="flex items-center gap-2 mt-1.5 ml-10">
-        <p className="flex-1 text-xs text-gray-400 truncate">
+        <p className="flex-1 text-xs text-brand-700/40 truncate">
           Dia {item.day_of_month}
           {categoria ? ` · ${categoria.name}` : ""}
         </p>
@@ -71,7 +71,7 @@ export default function FixaCard({ item, tab, categorias, onEdit, onSaved }: Pro
           {item.is_active && (
             <button
               onClick={() => onEdit(item)}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
               title="Editar"
             >
               <Pencil size={14} />
@@ -79,7 +79,7 @@ export default function FixaCard({ item, tab, categorias, onEdit, onSaved }: Pro
           )}
           <button
             onClick={handleToggleActive}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
             title={item.is_active ? "Desativar" : "Reativar"}
           >
             {item.is_active ? <PowerOff size={14} /> : <RotateCcw size={14} />}

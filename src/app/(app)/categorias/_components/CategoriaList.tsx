@@ -57,7 +57,7 @@ export default function CategoriaList({ initialData }: Props) {
       </div>
 
       {active.length === 0 && inactive.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-brand-700/40">
           <p>Nenhuma categoria cadastrada ainda.</p>
         </div>
       )}
@@ -86,7 +86,7 @@ export default function CategoriaList({ initialData }: Props) {
 
       {activeBoth.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Receita ou Despesa</h2>
+          <h2 className="text-xs font-semibold text-brand-700/50 uppercase tracking-wider mb-2">Receita ou Despesa</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {activeBoth.map((cat) => (
               <CategoriaCard key={cat.id} categoria={cat} onEdit={handleEdit} onSaved={handleSaved} />
@@ -97,7 +97,7 @@ export default function CategoriaList({ initialData }: Props) {
 
       {inactive.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-sm font-medium text-gray-400 mb-3">Arquivadas</h2>
+          <h2 className="text-sm font-medium text-brand-700/40 mb-3">Arquivadas</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {inactive.map((cat) => (
               <CategoriaCard

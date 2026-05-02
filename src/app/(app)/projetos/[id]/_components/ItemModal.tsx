@@ -178,7 +178,7 @@ export default function ItemModal({
       onClose={onClose}
       footer={
         <div className="flex gap-3">
-          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-medium text-brand-700 bg-brand-700/10 rounded-lg hover:bg-brand-700/20 transition-colors">
             Cancelar
           </button>
           <button type="button" onClick={handleSave} disabled={saving} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-60 transition-colors">
@@ -193,11 +193,11 @@ export default function ItemModal({
         {/* Confirm mode */}
         {isConfirm ? (
           <>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-brand-700/70">
               Confirme o valor real do item <strong>{item?.name}</strong> para finalizar.
             </p>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-brand-700 mb-1">
                 {item?.payment_type === "deposit_remainder" ? "Valor Total Real (R$) *" : "Valor Real (R$) *"}
               </label>
               <input
@@ -207,14 +207,14 @@ export default function ItemModal({
                 min="0"
                 step="0.01"
                 placeholder="0,00"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
               />
             </div>
 
             {item?.payment_type === "deposit_remainder" ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Valor da Entrada (R$) *</label>
+                  <label className="block text-sm font-medium text-brand-700 mb-1">Valor da Entrada (R$) *</label>
                   <input
                     type="number"
                     value={confirmDepositAmount}
@@ -222,11 +222,11 @@ export default function ItemModal({
                     min="0"
                     step="0.01"
                     placeholder="0,00"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Data de pagamento da entrada</label>
+                  <label className="block text-sm font-medium text-brand-700 mb-1">Data de pagamento da entrada</label>
                   <DatePicker
                     value={expectedPaymentDate}
                     onChange={setExpectedPaymentDate}
@@ -234,7 +234,7 @@ export default function ItemModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Data de pagamento do restante</label>
+                  <label className="block text-sm font-medium text-brand-700 mb-1">Data de pagamento do restante</label>
                   <DatePicker
                     value={confirmRemainderDate}
                     onChange={setConfirmRemainderDate}
@@ -242,14 +242,14 @@ export default function ItemModal({
                   />
                 </div>
                 {confirmDepositAmountNum > 0 && actualAmountNum > 0 && (
-                  <p className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
+                  <p className="text-xs text-brand-700/50 bg-brand-700/5 rounded-lg px-3 py-2">
                     Restante: <strong>{formatCurrency(confirmRemainderPreview)}</strong>
                   </p>
                 )}
               </>
             ) : (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-brand-700 mb-1">
                   Data prevista de pagamento
                 </label>
                 <DatePicker
@@ -257,7 +257,7 @@ export default function ItemModal({
                   onChange={setExpectedPaymentDate}
                   placeholder="Selecione a data"
                 />
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-brand-700/40 mt-1">
                   Usada na projeção de saldo do investimento.
                 </p>
               </div>
@@ -268,11 +268,11 @@ export default function ItemModal({
             {/* Group selector */}
             {groups.length > 1 && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Grupo</label>
+                <label className="block text-sm font-medium text-brand-700 mb-1">Grupo</label>
                 <select
                   value={groupId}
                   onChange={(e) => setGroupId(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                 >
                   {groups.map((g) => (
                     <option key={g.id} value={g.id}>{g.name}</option>
@@ -282,29 +282,29 @@ export default function ItemModal({
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
+              <label className="block text-sm font-medium text-brand-700 mb-1">Nome *</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ex: Buffet, Passagem aérea..."
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+              <label className="block text-sm font-medium text-brand-700 mb-1">Descrição</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 placeholder="Opcional"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-700/30"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Valor Orçado (R$)</label>
+              <label className="block text-sm font-medium text-brand-700 mb-1">Valor Orçado (R$)</label>
               <input
                 type="number"
                 value={budgetAmount}
@@ -312,13 +312,13 @@ export default function ItemModal({
                 min="0"
                 step="0.01"
                 placeholder="0,00"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
               />
             </div>
 
             {/* Payment type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Pagamento</label>
+              <label className="block text-sm font-medium text-brand-700 mb-1">Tipo de Pagamento</label>
               <div className="flex gap-2 flex-wrap">
                 {PAYMENT_TYPE_OPTIONS.map(({ value, label }) => (
                   <button
@@ -328,7 +328,7 @@ export default function ItemModal({
                     className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                       paymentType === value
                         ? "bg-brand-600 text-white border-brand-600"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                        : "bg-surface text-brand-700 border-brand-700/30 hover:border-brand-700/50"
                     }`}
                   >
                     {label}
@@ -341,7 +341,7 @@ export default function ItemModal({
             {paymentType && (
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Origem do Pagamento</label>
+                  <label className="block text-sm font-medium text-brand-700 mb-1">Origem do Pagamento</label>
                   <div className="flex gap-2 flex-wrap">
                     {(["personal", "family"] as const).map((o) => (
                       <button
@@ -351,7 +351,7 @@ export default function ItemModal({
                         className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
                           paymentOrigin === o
                             ? "bg-brand-600 text-white border-brand-600"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                            : "bg-surface text-brand-700 border-brand-700/30 hover:border-brand-700/50"
                         }`}
                       >
                         {o === "personal" ? "Pessoal" : "Caixa Familiar"}
@@ -364,7 +364,7 @@ export default function ItemModal({
                         className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
                           paymentOrigin === "investment"
                             ? "bg-brand-600 text-white border-brand-600"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                            : "bg-surface text-brand-700 border-brand-700/30 hover:border-brand-700/50"
                         }`}
                       >
                         Investimento
@@ -375,11 +375,11 @@ export default function ItemModal({
 
                 {paymentOrigin === "investment" && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Investimento</label>
+                    <label className="block text-sm font-medium text-brand-700 mb-1">Investimento</label>
                     <select
                       value={investmentId}
                       onChange={(e) => setInvestmentId(e.target.value)}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                     >
                       <option value="">Selecione...</option>
                       {eligibleInvestments.map((inv) => (
@@ -395,7 +395,7 @@ export default function ItemModal({
 
             {paymentType === "cash" && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Método</label>
+                <label className="block text-sm font-medium text-brand-700 mb-1">Método</label>
                 <div className="flex gap-2 flex-wrap">
                   {CASH_METHODS.map(({ value, label }) => (
                     <button
@@ -405,7 +405,7 @@ export default function ItemModal({
                       className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                         paymentMethod === value
                           ? "bg-brand-600 text-white border-brand-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                          : "bg-surface text-brand-700 border-brand-700/30 hover:border-brand-700/50"
                       }`}
                     >
                       {label}
@@ -418,11 +418,11 @@ export default function ItemModal({
             {paymentType === "card_installment" && (
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Cartão</label>
+                  <label className="block text-sm font-medium text-brand-700 mb-1">Cartão</label>
                   <select
                     value={creditCardId}
                     onChange={(e) => setCreditCardId(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                   >
                     <option value="">Selecione...</option>
                     {creditCards.map((c) => (
@@ -431,14 +431,14 @@ export default function ItemModal({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nº de Parcelas</label>
+                  <label className="block text-sm font-medium text-brand-700 mb-1">Nº de Parcelas</label>
                   <input
                     type="number"
                     value={installmentsCount}
                     onChange={(e) => setInstallmentsCount(e.target.value)}
                     min="2"
                     max="48"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                   />
                 </div>
               </div>
@@ -447,7 +447,7 @@ export default function ItemModal({
             {paymentType === "deposit_remainder" && (
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Valor do Sinal (R$)</label>
+                  <label className="block text-sm font-medium text-brand-700 mb-1">Valor do Sinal (R$)</label>
                   <input
                     type="number"
                     value={depositAmount}
@@ -455,15 +455,15 @@ export default function ItemModal({
                     min="0"
                     step="0.01"
                     placeholder="0,00"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-700/30"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Data do Restante</label>
+                  <label className="block text-sm font-medium text-brand-700 mb-1">Data do Restante</label>
                   <DatePicker value={remainderDate} onChange={setRemainderDate} placeholder="Selecione a data" />
                 </div>
                 {depositAmountNum > 0 && actualAmountNum > 0 && (
-                  <p className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
+                  <p className="text-xs text-brand-700/50 bg-brand-700/5 rounded-lg px-3 py-2">
                     Restante a pagar: <strong>{formatCurrency(remainderPreview)}</strong>
                   </p>
                 )}
@@ -471,13 +471,13 @@ export default function ItemModal({
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+              <label className="block text-sm font-medium text-brand-700 mb-1">Notas</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
                 placeholder="Opcional"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full px-3 py-2.5 border border-brand-700/30 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-700/30"
               />
             </div>
           </>

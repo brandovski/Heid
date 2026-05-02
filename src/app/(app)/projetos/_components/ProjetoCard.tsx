@@ -23,7 +23,7 @@ export default function ProjetoCard({ project, onEdit, onStatusChange }: Props) 
   const isOver = project.gasto_real > project.total_budget;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-shadow">
+    <div className="bg-surface border border-brand-700/20 rounded-xl p-4 hover:shadow-sm transition-shadow">
       <div className="flex items-start gap-3">
         <div className="mt-0.5 p-2 bg-brand-50 rounded-lg shrink-0">
           <Target size={16} className="text-brand-600" />
@@ -34,21 +34,21 @@ export default function ProjetoCard({ project, onEdit, onStatusChange }: Props) 
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href={`/projetos/${project.id}`}
-              className="text-sm font-semibold text-gray-900 hover:text-brand-600 transition-colors truncate"
+              className="text-sm font-semibold text-brand-700 hover:text-brand-600 transition-colors truncate"
             >
               {project.name}
             </Link>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[project.status]}`}>
               {STATUS_LABELS[project.status]}
             </span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-brand-700/10 text-brand-700/50 font-medium">
               {project.scope === "family" ? "Familiar" : "Pessoal"}
             </span>
           </div>
 
           {/* Row 2 */}
           <div className="mt-2 space-y-1">
-            <div className="flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center justify-between text-xs text-brand-700/50">
               <span>
                 {formatCurrency(project.gasto_real)} gastos de {formatCurrency(project.total_budget)}
               </span>
@@ -68,7 +68,7 @@ export default function ProjetoCard({ project, onEdit, onStatusChange }: Props) 
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
           >
             <MoreHorizontal size={16} />
           </button>
@@ -76,10 +76,10 @@ export default function ProjetoCard({ project, onEdit, onStatusChange }: Props) 
           {menuOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 top-8 z-20 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-1">
+              <div className="absolute right-0 top-8 z-20 w-40 bg-surface rounded-xl shadow-lg border border-brand-700/10 py-1">
                 <button
                   onClick={() => { setMenuOpen(false); onEdit(project); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  className="w-full text-left px-4 py-2.5 text-sm text-brand-700 hover:bg-brand-700/5"
                 >
                   Editar
                 </button>
@@ -87,13 +87,13 @@ export default function ProjetoCard({ project, onEdit, onStatusChange }: Props) 
                   <>
                     <button
                       onClick={() => { setMenuOpen(false); onStatusChange(project.id, "completed"); }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-brand-700/5"
                     >
                       Concluir
                     </button>
                     <button
                       onClick={() => { setMenuOpen(false); onStatusChange(project.id, "cancelled"); }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-brand-700/5"
                     >
                       Cancelar
                     </button>
@@ -102,7 +102,7 @@ export default function ProjetoCard({ project, onEdit, onStatusChange }: Props) 
                 {project.status !== "active" && (
                   <button
                     onClick={() => { setMenuOpen(false); onStatusChange(project.id, "active"); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-brand-600 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2.5 text-sm text-brand-600 hover:bg-brand-700/5"
                   >
                     Reativar
                   </button>

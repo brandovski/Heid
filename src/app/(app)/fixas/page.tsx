@@ -29,7 +29,7 @@ export default async function FixasPage() {
     <div>
       <div className="flex items-center gap-3 mb-6">
         <Repeat className="text-brand-600" size={24} />
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-brand-700">
           Recorrências
         </h1>
       </div>

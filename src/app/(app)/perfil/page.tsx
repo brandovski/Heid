@@ -38,27 +38,27 @@ export default async function PerfilPage() {
           {initials}
         </div>
         {name && (
-          <p className="text-lg font-semibold text-gray-900">{name}</p>
+          <p className="text-lg font-semibold text-brand-700">{name}</p>
         )}
-        <p className="text-sm text-gray-500">{user.email}</p>
+        <p className="text-sm text-brand-700/50">{user.email}</p>
       </div>
 
       {/* Configurações */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-        <p className="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+      <div className="bg-surface rounded-2xl border border-brand-700/10 overflow-hidden">
+        <p className="px-4 pt-4 pb-2 text-xs font-semibold text-brand-700/40 uppercase tracking-wide">
           Configurações
         </p>
 
         <Link
           href="/categorias"
-          className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors border-t border-gray-100"
+          className="flex items-center gap-3 px-4 py-3.5 hover:bg-brand-700/5 transition-colors border-t border-brand-700/10"
         >
-          <Tag size={16} className="text-gray-400 shrink-0" />
-          <span className="flex-1 text-sm text-gray-700">Categorias de gastos</span>
-          <ChevronRight size={16} className="text-gray-300" />
+          <Tag size={16} className="text-brand-700/40 shrink-0" />
+          <span className="flex-1 text-sm text-brand-700">Categorias de gastos</span>
+          <ChevronRight size={16} className="text-brand-700/30" />
         </Link>
 
-        <div className="border-t border-gray-100">
+        <div className="border-t border-brand-700/10">
           <LogoutButton />
         </div>
       </div>

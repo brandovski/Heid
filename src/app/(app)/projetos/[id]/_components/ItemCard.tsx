@@ -63,10 +63,10 @@ export default function ItemCard({
   }
 
   return (
-    <div className={`flex items-start gap-3 py-3 px-4 rounded-xl ${isPaid ? "bg-green-50" : isCancelled ? "bg-gray-50" : "bg-white border border-gray-100"}`}>
+    <div className={`flex items-start gap-3 py-3 px-4 rounded-xl ${isPaid ? "bg-green-50" : isCancelled ? "bg-brand-700/5" : "bg-surface border border-brand-700/10"}`}>
       {/* Status icon */}
       <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-        isPaid ? "bg-green-500" : isCancelled ? "bg-gray-200" : "bg-gray-100"
+        isPaid ? "bg-green-500" : isCancelled ? "bg-brand-700/20" : "bg-brand-700/10"
       }`}>
         {isPaid && <Check size={12} className="text-white" />}
       </div>
@@ -74,14 +74,14 @@ export default function ItemCard({
       <div className="flex-1 min-w-0">
         {/* Row 1: name + status badge */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`text-sm font-medium ${isCancelled ? "line-through text-gray-400" : "text-gray-900"}`}>
+          <span className={`text-sm font-medium ${isCancelled ? "line-through text-brand-700/40" : "text-brand-700"}`}>
             {item.name}
           </span>
           <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${ITEM_STATUS_COLORS[item.status]}`}>
             {ITEM_STATUS_LABELS[item.status]}
           </span>
           {item.payment_type && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-brand-700/10 text-brand-700/50 font-medium">
               {PAYMENT_TYPE_LABELS[item.payment_type]}
             </span>
           )}
@@ -90,7 +90,7 @@ export default function ItemCard({
         {/* Row 2: amounts */}
         <div className="flex items-center gap-3 mt-0.5 flex-wrap">
           {item.budget_amount != null && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-brand-700/40">
               Orçado: {formatCurrency(item.budget_amount)}
             </span>
           )}
@@ -109,11 +109,11 @@ export default function ItemCard({
         {/* Row 3: deposit/remainder breakdown for confirmed deposit_remainder items */}
         {isDepositRemainder && item.status === "confirmed" && item.deposit_amount != null && item.actual_amount != null && (
           <div className="flex items-center gap-3 mt-0.5">
-            <span className={`text-xs ${depositPaid ? "text-green-600" : "text-gray-500"}`}>
+            <span className={`text-xs ${depositPaid ? "text-green-600" : "text-brand-700/50"}`}>
               Entrada: {formatCurrency(item.deposit_amount)}{depositPaid ? " ✓" : ""}
             </span>
-            <span className="text-xs text-gray-400">|</span>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-brand-700/40">|</span>
+            <span className="text-xs text-brand-700/50">
               Restante: {formatCurrency(item.actual_amount - item.deposit_amount)}
             </span>
           </div>
@@ -137,7 +137,7 @@ export default function ItemCard({
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-brand-700/40 hover:text-brand-700/70 hover:bg-brand-700/10 transition-colors"
           >
             <MoreHorizontal size={16} />
           </button>
@@ -145,10 +145,10 @@ export default function ItemCard({
           {menuOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 top-8 z-20 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1">
+              <div className="absolute right-0 top-8 z-20 w-44 bg-surface rounded-xl shadow-lg border border-brand-700/10 py-1">
                 <button
                   onClick={() => { setMenuOpen(false); onEdit(item); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  className="w-full text-left px-4 py-2.5 text-sm text-brand-700 hover:bg-brand-700/5"
                 >
                   Editar
                 </button>
@@ -156,7 +156,7 @@ export default function ItemCard({
                 {item.status === "considering" && (
                   <button
                     onClick={() => { setMenuOpen(false); onConfirm(item); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-brand-700 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2.5 text-sm text-brand-700 hover:bg-brand-700/5"
                   >
                     Confirmar
                   </button>
@@ -165,7 +165,7 @@ export default function ItemCard({
                 {item.status === "confirmed" && !isDepositRemainder && (
                   <button
                     onClick={() => openPayModal("Pagar")}
-                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-brand-700/5"
                   >
                     Pagar
                   </button>
@@ -174,7 +174,7 @@ export default function ItemCard({
                 {item.status === "confirmed" && isDepositRemainder && !depositPaid && (
                   <button
                     onClick={() => openPayModal("Pagar Entrada")}
-                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-brand-700/5"
                   >
                     Pagar Entrada
                   </button>
@@ -183,7 +183,7 @@ export default function ItemCard({
                 {item.status === "confirmed" && isDepositRemainder && depositPaid && (
                   <button
                     onClick={() => openPayModal("Pagar Restante")}
-                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2.5 text-sm text-green-700 hover:bg-brand-700/5"
                   >
                     Pagar Restante
                   </button>
@@ -191,7 +191,7 @@ export default function ItemCard({
 
                 <button
                   onClick={() => { setMenuOpen(false); onCancel(item.id); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50"
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-brand-700/5"
                 >
                   Cancelar
                 </button>
@@ -205,15 +205,15 @@ export default function ItemCard({
       {payDate && typeof document !== "undefined" && createPortal(
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setPayDate("")} />
-          <div className="relative z-10 w-full max-w-sm bg-white rounded-t-2xl sm:rounded-xl shadow-xl p-5 mx-0 sm:mx-4">
-            <h3 className="text-base font-semibold text-gray-900 mb-1">{payLabel}</h3>
-            <p className="text-xs text-gray-400 mb-4">Selecione a data em que o pagamento foi realizado</p>
+          <div className="relative z-10 w-full max-w-sm bg-surface rounded-t-2xl sm:rounded-xl shadow-xl p-5 mx-0 sm:mx-4">
+            <h3 className="text-base font-semibold text-brand-700 mb-1">{payLabel}</h3>
+            <p className="text-xs text-brand-700/40 mb-4">Selecione a data em que o pagamento foi realizado</p>
             <DatePicker value={payDate} onChange={setPayDate} />
             <div className="flex gap-2 mt-4">
               <button
                 type="button"
                 onClick={() => setPayDate("")}
-                className="flex-1 px-4 py-2.5 text-sm text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm text-brand-700 border border-brand-700/30 rounded-xl hover:bg-brand-700/5 transition-colors"
               >
                 Cancelar
               </button>
