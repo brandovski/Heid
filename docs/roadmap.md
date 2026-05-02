@@ -406,14 +406,79 @@
 - [x] `src/app/apple-icon.png` — ícone iOS 180×180
 - [x] `src/app/opengraph-image.png` — imagem de compartilhamento 1200×630
 
-### Dashboard redesign (próximo)
-- [ ] Saudação com nome do usuário (Kaisei Tokumin display)
-- [ ] Seletor de mês com chevrons
-- [ ] Grid de 5 cards de resumo (Receitas, Despesas, A receber, A pagar, Saldo)
-- [ ] Layout 2 colunas: gráfico + próximas movimentações
-- [ ] Card full-width de próximas movimentações com botão "Ver tudo"
+### Dashboard redesign (Sessão 042)
+- [x] Saudação com nome do usuário (Kaisei Tokumin display, `font-serif text-[42px]`)
+- [x] `MonthNavigator` — componente reutilizável, aplicado em 7 páginas
+- [x] `InfoCard` — card de métrica com variantes income/expense/neutral/highlighted
+- [x] Grid de 5 cards de resumo (Receitas, Despesas, A receber, A pagar, Saldo)
+- [x] Layout 2 colunas: gráfico donut + seção de orçamento
+- [x] `GraficoCategoria` — Recharts donut, cor da categoria, tooltip compacta
+- [x] Paleta pastel de categorias alinhada ao branding
 
-**Critério de conclusão:** aplicação com identidade visual coerente, sidebar funcional no desktop, favicon e ícones corretos, Dashboard fiel ao Figma.
+### Migração de tokens legados (pendente)
+- [ ] `transacoes/` — `TransacaoList`, `TransacaoCard`, `TransacaoModal`, `FaturaGrupoCard`
+- [ ] `orcamento/` — `OrcamentoList`, `OrcamentoCard`, `OrcamentoModal`
+- [ ] `cartoes/` — `CartaoList`, `CartaoModal`, `FaturaDetalheModal`
+- [ ] `familia/`, `fluxo/` — views e modais
+- [ ] `investimentos/` — lista, card, detalhe, modais
+- [ ] Fixas, assinaturas, parcelamentos, projetos, categorias
+
+**Critério de conclusão:** zero tokens legados (`bg-white`, `text-gray-*`, `border-gray-*`) em toda a aplicação. ✅ Design system: concluído | Migração de tokens: em andamento
+
+---
+
+## Fase 12 — Revisão de Infra, Next.js 15 e App Mobile
+
+**Objetivo:** revisão geral de código e infraestrutura, upgrade do framework, e criação do app mobile nativo com Expo.
+
+### Bloco A — Migração de Repositório
+- [ ] Criar `brandovski/Heid` no GitHub pessoal
+- [ ] Atualizar remote: `git remote set-url origin https://github.com/brandovski/Heid.git`
+- [x] Adicionar `/docs` ao `.gitignore` (documentação de dev é local, não pública)
+- [ ] Push com histórico completo
+- [ ] Reconectar Vercel ao novo repositório
+- [ ] Atualizar referências nos docs (`setup.md`, `session-start-prompt.md`, `diario-dev.md`)
+
+### Bloco B — Upgrade Next.js 14 → 15
+- [x] Upgrade Next.js para ^15.5.15 (`npm install next@latest`)
+- [x] Ajustar `searchParams` em todos os `page.tsx` (agora `Promise<SearchParams>`)
+- [x] Ajustar `params` em todos os route handlers `[id]/route.ts` (agora `Promise`)
+- [x] Renomear `next.config.mjs` → `next.config.ts`
+- [x] `npm run build` sem erros — critério de conclusão ✅ **Concluído na Sessão 043**
+
+### Bloco C — Revisão de Código e Qualidade
+- [x] C1 — Zod; schemas de validação nos endpoints POST críticos (`/api/transacoes`, `/api/parcelamentos`, `/api/investimentos`, `/api/orcamento`)
+- [x] C2 — Remover `as unknown` casts desnecessários em `dashboard/page.tsx` (mantidos onde Supabase join exige)
+- [ ] C3 — Migração de tokens legados (ver Fase UI/Branding acima)
+- [x] C4 — `react-day-picker` v8 → v9 (class names e Chevron atualizados em `DatePicker.tsx`)
+
+### Bloco D — App Mobile Expo (fases M1–M4)
+- Estrutura: `/mobile` na raiz do repositório (co-localizado, sem monorepo)
+- Stack: Expo Router · NativeWind v4 · TanStack Query · Supabase direto · Victory Native XL · SecureStore
+- Distribuição: Expo Go (uso pessoal, sem lojas por ora)
+
+#### M1 — Fundação
+- [ ] Setup Expo + Expo Router + NativeWind + Supabase + SecureStore
+- [ ] Auth flow (login / logout com sessão persistida)
+- [ ] Bottom tabs: Dashboard, Transações, Fluxo, Orçamento, Mais
+- [ ] Dashboard: 5 cards de resumo com dados reais
+
+#### M2 — Core financeiro
+- [ ] Transações: listagem + FAB nova transação (bottom sheet)
+- [ ] Orçamento: barras de progresso por categoria
+- [ ] Fluxo: próximos lançamentos
+
+#### M3 — Módulos secundários
+- [ ] Cartões e Faturas + bottom sheet "Pagar Fatura"
+- [ ] Investimentos: saldo + histórico de aportes
+- [ ] Projetos e Família
+
+#### M4 — Gráficos e refinamento
+- [ ] Victory Native XL: gráfico de área + donut
+- [ ] Skeleton loaders em todas as telas
+- [ ] Animações nativas de transição
+
+**Critério de conclusão geral:** build web sem erros no Next.js 15; Expo Go no iPhone exibe Dashboard com dados reais.
 
 ---
 
@@ -423,10 +488,10 @@
 - Filtros avançados na listagem de transações
 - Notificações (e-mail / push) para vencimentos próximos
 - Modo escuro
-- App mobile (PWA ou React Native)
+- Publicação nas lojas (App Store / Play Store) via EAS Submit
 - Importação de extrato bancário (OFX / CSV)
 - Múltiplas moedas além de USD
 
 ---
 
-*Atualizado em: 2026-03-22 (sessão 041)*
+*Atualizado em: 2026-04-30 (sessão 043)*
